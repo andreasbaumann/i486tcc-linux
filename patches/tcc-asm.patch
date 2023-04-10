@@ -1,0 +1,25 @@
+diff -rauN tinycc/i386-asm.c tinycc-asm-hint-patches/i386-asm.c
+--- tinycc/i386-asm.c	2023-04-07 20:25:37.000000000 +0200
++++ tinycc-asm-hint-patches/i386-asm.c	2022-12-10 20:05:48.352133191 +0100
+@@ -1197,6 +1197,8 @@
+         case 'i':
+         case 'm':
+         case 'g':
++        case 't':
++        case 'u':
+             pr = 4;
+             break;
+         default:
+@@ -1441,6 +1443,12 @@
+                 }
+             }
+             break;
++        case 't':
++            // TODO "Top of 80387 floating-point stack (%st(0))"
++            break;
++        case 'u':
++            // TODO "Second from top of 80387 floating-point stack (%st(1))"
++            break;
+         default:
+             tcc_error("asm constraint %d ('%s') could not be satisfied",
+                   j, op->constraint);

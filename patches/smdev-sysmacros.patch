@@ -1,0 +1,12 @@
+diff --git a/smdev.c b/smdev.c
+index b774908..092ed31 100644
+--- a/smdev.c
++++ b/smdev.c
+@@ -2,6 +2,7 @@
+ #include <sys/ioctl.h>
+ #include <sys/stat.h>
+ #include <sys/types.h>
++#include <sys/sysmacros.h>
+ 
+ #include <linux/sockios.h>
+ #include <linux/if_packet.h>

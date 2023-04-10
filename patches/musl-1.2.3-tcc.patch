@@ -1,0 +1,200 @@
+diff -rauN musl-1.2.3/arch/i386/syscall_arch.h musl-1.2.3-tcc-patch/arch/i386/syscall_arch.h
+--- musl-1.2.3/arch/i386/syscall_arch.h	2022-04-07 19:12:40.000000000 +0200
++++ musl-1.2.3-tcc-patch/arch/i386/syscall_arch.h	2022-12-04 20:22:59.904734444 +0100
+@@ -15,21 +15,21 @@
+ static inline long __syscall0(long n)
+ {
+ 	unsigned long __ret;
+-	__asm__ __volatile__ (SYSCALL_INSNS : "=a"(__ret) : "a"(n) : "memory");
++	__asm__ __volatile__ ("int $128" : "=a"(__ret) : "a"(n) : "memory");
+ 	return __ret;
+ }
+ 
+ static inline long __syscall1(long n, long a1)
+ {
+ 	unsigned long __ret;
+-	__asm__ __volatile__ (SYSCALL_INSNS_12 : "=a"(__ret) : "a"(n), "d"(a1) : "memory");
++	__asm__ __volatile__ ("xchg %%ebx,%%edx ; int $128 ; xchg %%ebx,%%edx" : "=a"(__ret) : "a"(n), "d"(a1) : "memory");
+ 	return __ret;
+ }
+ 
+ static inline long __syscall2(long n, long a1, long a2)
+ {
+ 	unsigned long __ret;
+-	__asm__ __volatile__ (SYSCALL_INSNS_12 : "=a"(__ret) : "a"(n), "d"(a1), "c"(a2) : "memory");
++	__asm__ __volatile__ ("xchg %%ebx,%%edx ; int $128 ; xchg %%ebx,%%edx" : "=a"(__ret) : "a"(n), "d"(a1), "c"(a2) : "memory");
+ 	return __ret;
+ }
+ 
+@@ -37,7 +37,7 @@
+ {
+ 	unsigned long __ret;
+ #if !defined(__PIC__) || !defined(BROKEN_EBX_ASM)
+-	__asm__ __volatile__ (SYSCALL_INSNS : "=a"(__ret) : "a"(n), "b"(a1), "c"(a2), "d"(a3) : "memory");
++	__asm__ __volatile__ ("int $128" : "=a"(__ret) : "a"(n), "b"(a1), "c"(a2), "d"(a3) : "memory");
+ #else
+ 	__asm__ __volatile__ (SYSCALL_INSNS_34 : "=a"(__ret) : "a"(n), "D"(a1), "c"(a2), "d"(a3) : "memory");
+ #endif
+@@ -48,7 +48,7 @@
+ {
+ 	unsigned long __ret;
+ #if !defined(__PIC__) || !defined(BROKEN_EBX_ASM)
+-	__asm__ __volatile__ (SYSCALL_INSNS : "=a"(__ret) : "a"(n), "b"(a1), "c"(a2), "d"(a3), "S"(a4) : "memory");
++	__asm__ __volatile__ ("int $128" : "=a"(__ret) : "a"(n), "b"(a1), "c"(a2), "d"(a3), "S"(a4) : "memory");
+ #else
+ 	__asm__ __volatile__ (SYSCALL_INSNS_34 : "=a"(__ret) : "a"(n), "D"(a1), "c"(a2), "d"(a3), "S"(a4) : "memory");
+ #endif
+@@ -59,7 +59,7 @@
+ {
+ 	unsigned long __ret;
+ #if !defined(__PIC__) || !defined(BROKEN_EBX_ASM)
+-	__asm__ __volatile__ (SYSCALL_INSNS
++	__asm__ __volatile__ ("int $128"
+ 		: "=a"(__ret) : "a"(n), "b"(a1), "c"(a2), "d"(a3), "S"(a4), "D"(a5) : "memory");
+ #else
+ 	__asm__ __volatile__ ("pushl %2 ; push %%ebx ; mov 4(%%esp),%%ebx ; " SYSCALL_INSNS " ; pop %%ebx ; add $4,%%esp"
+@@ -72,7 +72,7 @@
+ {
+ 	unsigned long __ret;
+ #if !defined(__PIC__) || !defined(BROKEN_EBX_ASM)
+-	__asm__ __volatile__ ("pushl %7 ; push %%ebp ; mov 4(%%esp),%%ebp ; " SYSCALL_INSNS " ; pop %%ebp ; add $4,%%esp"
++	__asm__ __volatile__ ("pushl %7 ; push %%ebp ; mov 4(%%esp),%%ebp ; int $128 ; pop %%ebp ; add $4,%%esp"
+ 		: "=a"(__ret) : "a"(n), "b"(a1), "c"(a2), "d"(a3), "S"(a4), "D"(a5), "g"(a6) : "memory");
+ #else
+ 	unsigned long a1a6[2] = { a1, a6 };
++++ musl-1.2.3-tcc-patch/include/complex.h	2022-12-04 20:13:22.383887400 +0100
+@@ -5,6 +5,7 @@
+ extern "C" {
+ #endif
+ 
++#define _Complex
+ #define complex _Complex
+ #ifdef __GNUC__
+ #define _Complex_I (__extension__ (0.0f+1.0fi))
+diff -rauN musl-1.2.3/src/env/__libc_start_main.c musl-1.2.3-tcc-patch/src/env/__libc_start_main.c
+--- musl-1.2.3/src/env/__libc_start_main.c	2022-04-07 19:12:40.000000000 +0200
++++ musl-1.2.3-tcc-patch/src/env/__libc_start_main.c	2022-12-04 21:21:22.539871726 +0100
+@@ -10,7 +10,7 @@
+ static void dummy(void) {}
+ weak_alias(dummy, _init);
+ 
+-extern weak hidden void (*const __init_array_start)(void), (*const __init_array_end)(void);
++extern __attribute__((weak)) __attribute__((hidden)) void (*const __init_array_start)(void), (*const __init_array_end)(void);
+ 
+ static void dummy1(void *p) {}
+ weak_alias(dummy1, __init_ssp);
+diff -rauN musl-1.2.3/src/math/i386/fabs.c musl-1.2.3-tcc-patch/src/math/i386/fabs.c
+--- musl-1.2.3/src/math/i386/fabs.c	2022-04-07 19:12:40.000000000 +0200
++++ musl-1.2.3-tcc-patch/src/math/i386/fabs.c	2022-12-04 20:54:37.967518315 +0100
+@@ -1,7 +1,9 @@
+ #include <math.h>
++#include <assert.h>
+ 
+ double fabs(double x)
+ {
++	assert("t constraint not implemented in tcc!!");
+ 	__asm__ ("fabs" : "+t"(x));
+ 	return x;
+ }
+diff -rauN musl-1.2.3/src/math/i386/fmod.c musl-1.2.3-tcc-patch/src/math/i386/fmod.c
+--- musl-1.2.3/src/math/i386/fmod.c	2022-04-07 19:12:40.000000000 +0200
++++ musl-1.2.3-tcc-patch/src/math/i386/fmod.c	2022-12-04 20:54:57.187546505 +0100
+@@ -1,9 +1,11 @@
+ #include <math.h>
++#include <assert.h>
+ 
+ double fmod(double x, double y)
+ {
+ 	unsigned short fpsr;
+ 	// fprem does not introduce excess precision into x
++	assert("u constraint not implemented in tcc!!");
+ 	do __asm__ ("fprem; fnstsw %%ax" : "+t"(x), "=a"(fpsr) : "u"(y));
+ 	while (fpsr & 0x400);
+ 	return x;
+diff -rauN musl-1.2.3/src/math/i386/llrint.c musl-1.2.3-tcc-patch/src/math/i386/llrint.c
+--- musl-1.2.3/src/math/i386/llrint.c	2022-04-07 19:12:40.000000000 +0200
++++ musl-1.2.3-tcc-patch/src/math/i386/llrint.c	2022-12-04 20:38:32.356102062 +0100
+@@ -3,6 +3,6 @@
+ long long llrint(double x)
+ {
+ 	long long r;
+-	__asm__ ("fistpll %0" : "=m"(r) : "t"(x) : "st");
++	__asm__ ("flds %1 ; fistpll %0" : "=m"(r) : "m"(x));
+ 	return r;
+ }
+diff -rauN musl-1.2.3/src/math/i386/llrintf.c musl-1.2.3-tcc-patch/src/math/i386/llrintf.c
+--- musl-1.2.3/src/math/i386/llrintf.c	2022-04-07 19:12:40.000000000 +0200
++++ musl-1.2.3-tcc-patch/src/math/i386/llrintf.c	2022-12-04 20:38:50.936129313 +0100
+@@ -3,6 +3,6 @@
+ long long llrintf(float x)
+ {
+ 	long long r;
+-	__asm__ ("fistpll %0" : "=m"(r) : "t"(x) : "st");
++	__asm__ ("flds %1 ; fistpll %0" : "=m"(r) : "m"(x));
+ 	return r;
+ }
+diff -rauN musl-1.2.3/src/math/i386/llrintl.c musl-1.2.3-tcc-patch/src/math/i386/llrintl.c
+--- musl-1.2.3/src/math/i386/llrintl.c	2022-04-07 19:12:40.000000000 +0200
++++ musl-1.2.3-tcc-patch/src/math/i386/llrintl.c	2022-12-04 20:39:20.266172331 +0100
+@@ -3,6 +3,6 @@
+ long long llrintl(long double x)
+ {
+ 	long long r;
+-	__asm__ ("fistpll %0" : "=m"(r) : "t"(x) : "st");
++	__asm__ ("fldt %1 ; fistpll %0" : "=m"(r) : "m"(x));
+ 	return r;
+ }
+diff -rauN musl-1.2.3/src/math/i386/lrint.c musl-1.2.3-tcc-patch/src/math/i386/lrint.c
+--- musl-1.2.3/src/math/i386/lrint.c	2022-04-07 19:12:40.000000000 +0200
++++ musl-1.2.3-tcc-patch/src/math/i386/lrint.c	2022-12-04 20:36:10.505894011 +0100
+@@ -3,6 +3,6 @@
+ long lrint(double x)
+ {
+ 	long r;
+-	__asm__ ("fistpl %0" : "=m"(r) : "t"(x) : "st");
++	__asm__ __volatile__ ("fldl %1 ; fistpl %0\n" : "=m" (r) : "m" (x) );
+ 	return r;
+ }
+diff -rauN musl-1.2.3/src/math/i386/lrintf.c musl-1.2.3-tcc-patch/src/math/i386/lrintf.c
+--- musl-1.2.3/src/math/i386/lrintf.c	2022-04-07 19:12:40.000000000 +0200
++++ musl-1.2.3-tcc-patch/src/math/i386/lrintf.c	2022-12-04 20:39:50.996217402 +0100
+@@ -3,6 +3,6 @@
+ long lrintf(float x)
+ {
+ 	long r;
+-	__asm__ ("fistpl %0" : "=m"(r) : "t"(x) : "st");
++	__asm__ ("flds %1 ; fistpl %0" : "=m"(r) : "m"(x));
+ 	return r;
+ }
+diff -rauN musl-1.2.3/src/math/i386/lrintl.c musl-1.2.3-tcc-patch/src/math/i386/lrintl.c
+--- musl-1.2.3/src/math/i386/lrintl.c	2022-04-07 19:12:40.000000000 +0200
++++ musl-1.2.3-tcc-patch/src/math/i386/lrintl.c	2022-12-04 20:40:11.686247748 +0100
+@@ -3,6 +3,6 @@
+ long lrintl(long double x)
+ {
+ 	long r;
+-	__asm__ ("fistpl %0" : "=m"(r) : "t"(x) : "st");
++	__asm__ ("fldt %1 ; fistpl %0" : "=m"(r) : "m"(x));
+ 	return r;
+ }
+diff -rauN musl-1.2.3/src/signal/i386/sigsetjmp.s musl-1.2.3-tcc-patch/src/signal/i386/sigsetjmp.s
+--- musl-1.2.3/src/signal/i386/sigsetjmp.s	2022-04-07 19:12:40.000000000 +0200
++++ musl-1.2.3-tcc-patch/src/signal/i386/sigsetjmp.s	2022-12-04 21:01:49.568151339 +0100
+@@ -2,10 +2,11 @@
+ .global __sigsetjmp
+ .type sigsetjmp,@function
+ .type __sigsetjmp,@function
++1:	jmp ___setjmp
+ sigsetjmp:
+ __sigsetjmp:
+ 	mov 8(%esp),%ecx
+-	jecxz 1f
++	jecxz 1b
+ 
+ 	mov 4(%esp),%eax
+ 	popl 24(%eax)
+@@ -23,4 +24,3 @@
+ .hidden __sigsetjmp_tail
+ 	jmp __sigsetjmp_tail
+ 
+-1:	jmp ___setjmp
