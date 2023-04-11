@@ -41,3 +41,8 @@ patches
   * 'sys/sysmacros.h' is missing for 'minor' and 'major'
 - smdev
   * 'sys/sysmacros.h' is missing for 'minor' and 'major'
+- netbsd-curses
+  * ignoring 'strong alias' attribute
+- vis
+  * disabled probing of 'curses/termcap' with 'pkconfig', added them
+    directly to 'configure'

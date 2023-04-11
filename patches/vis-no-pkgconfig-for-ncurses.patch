@@ -1,0 +1,33 @@
+diff --git a/configure b/configure
+index 1e72e2b..0403a22 100755
+--- a/configure
++++ b/configure
+@@ -190,8 +190,8 @@ tmpo="./conf$$-$PPID-$i.o"
+ test "$i" -gt 50 && fail "$0: cannot create temporary file $tmpc"
+ done
+ set +C
+-trap 'rm -f "$tmpc" "$tmpo"' EXIT QUIT TERM HUP
+-trap 'rm -f "$tmpc" "$tmpo" && echo && fail "$0: interrupted"' INT
++#trap 'rm -f "$tmpc" "$tmpo"' EXIT QUIT TERM HUP
++#trap 'rm -f "$tmpc" "$tmpo" && echo && fail "$0: interrupted"' INT
+ 
+ #
+ # Find a C compiler to use
+@@ -285,7 +285,7 @@ fi
+ 
+ have_pkgconfig=no
+ printf "checking for pkg-config... "
+-cmdexists pkg-config && have_pkgconfig=yes
++#cmdexists pkg-config && have_pkgconfig=yes
+ printf "%s\n" "$have_pkgconfig"
+ 
+ if test "$help" = "yes" ; then
+@@ -325,7 +325,7 @@ EOF
+ 		fi
+ 
+ 		CFLAGS_CURSES=""
+-		LDFLAGS_CURSES="-l$libcurses"
++		LDFLAGS_CURSES="-l$libcurses -ltermcap"
+ 
+ 		if $CC $CFLAGS $CFLAGS_CURSES "$tmpc" \
+ 			$LDFLAGS $LDFLAGS_CURSES -o "$tmpo" >/dev/null 2>&1 ; then

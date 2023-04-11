@@ -28,6 +28,9 @@ SMDEV_VERSION="8d075"
 SINIT_VERSION="28c44"
 SDHCP_VERSION="8455f"
 UFLBBL_VERSION="d8680"
+VIS_VERSION="c9737"
+LIBTERMKEY_VERSION="0.22"
+NETBSD_NCURSES_VERSION="0.3.2"
 
 echo "Building in base directory '$BASE'"
 
@@ -90,6 +93,19 @@ if [ ! -f "${BASE}/downloads/sdhcp-${SDHCP_VERSION}.tar.gz" ]; then
 	git -C "sdhcp-${SDHCP_VERSION}" checkout "${SDHCP_VERSION}"
 	tar zcf "${BASE}/downloads/sdhcp-${SDHCP_VERSION}.tar.gz" "sdhcp-${SDHCP_VERSION}"
 	rm -rf "sdhcp-${SDHCP_VERSION}"
+	cd ..
+fi
+
+if [ ! -f "${BASE}/downloads/netbsd-curses-${NETBSD_NCURSES_VERSION}.tar.gz" ]; then
+	wget -O "${BASE}/downloads/netbsd-curses-${NETBSD_NCURSES_VERSION}.tar.gz" "https://github.com/sabotage-linux/netbsd-curses/archive/refs/tags/v${NETBSD_NCURSES_VERSION}.tar.gz"
+fi
+
+if [ ! -f "${BASE}/downloads/vis-${VIS_VERSION}.tar.gz" ]; then
+	cd "${BASE}/downloads/"
+	git clone https://github.com/martanne/vis.git "vis-${VIS_VERSION}"
+	git -C "vis-${VIS_VERSION}" checkout "${VIS_VERSION}"
+	tar zcf "${BASE}/downloads/vis-${VIS_VERSION}.tar.gz" "vis-${VIS_VERSION}"
+	rm -rf "vis-${VIS_VERSION}"
 	cd ..
 fi
 
@@ -278,6 +294,52 @@ else
 	echo "stage1 sdhcp exists"
 fi
 
+
+
+if [ ! -f "${BASE}/root/stage1/lib/libncurses.a" ]; then
+	rm -rf "netbsd-curses-${NETBSD_NCURSES_VERSION}"
+	tar xf "${BASE}/downloads/netbsd-curses-${NETBSD_NCURSES_VERSION}.tar.gz"
+	cd "netbsd-curses-${NETBSD_NCURSES_VERSION}"
+	patch -Np1 < "../../../patches/netbsd-curses-attributes.patch"
+	CC="${BASE}/root/stage1/bin/i386-tcc" LDFLAGS='-static' make all-static
+	CC="${BASE}/root/stage1/bin/i386-tcc" LDFLAGS='-static' make install-static \
+		PREFIX="${BASE}/root/stage1"
+	cd ..
+else
+	echo "stage1 netbsd-curses exists"
+fi
+
+if [ ! -f "${BASE}/root/stage1/lib/libtermkey.a" ]; then
+	rm -rf "libtermkey-${LIBTERMKEY_VERSION}"
+	tar xf "${BASE}/downloads/libtermkey-${LIBTERMKEY_VERSION}.tar.gz"
+	cd "libtermkey-${LIBTERMKEY_VERSION}"
+	"${BASE}/root/stage1/bin/i386-tcc" -c termkey.c
+	"${BASE}/root/stage1/bin/i386-tcc" -c driver-ti.c
+	"${BASE}/root/stage1/bin/i386-tcc" -c driver-csi.c
+	"${BASE}/root/stage1/bin/i386-tcc" -ar libtermkey.a termkey.o driver-ti.o driver-csi.o
+	cp libtermkey.a "${BASE}/root/stage1/lib"
+	cp termkey.h "${BASE}/root/stage1/include"
+	cd ..
+else
+	echo "stage1 libtermkey exists"
+fi
+
+if [ ! -x "${BASE}/root/stage1/bin/vi" ]; then
+	rm -rf "vis-${VIS_VERSION}"
+	tar xf "${BASE}/downloads/vis-${VIS_VERSION}.tar.gz"
+	cd "vis-${VIS_VERSION}"
+	patch -Np1 < "../../../patches/vis-no-pkgconfig-for-ncurses.patch"
+	LDFLAGS=-L"${BASE}/root/stage1/lib" \
+	CFLAGS=-I"${BASE}/root/stage1/include" \
+	CC="${BASE}/root/stage1/bin/i386-tcc"  \
+	./configure --prefix="${BASE}/root/stage1" \
+		--disable-lua
+	make LDFLAGS=-static
+	cp vis "${BASE}/root/stage1/bin/vi"
+	cd ..
+else
+	echo "stage1 vis exists"
+fi
 
 cd ../..
 

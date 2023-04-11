@@ -1,0 +1,16 @@
+diff -rauN netbsd-curses-0.3.2/libcurses/color.c netbsd-curses-0.3.2-patch/libcurses/color.c
+--- netbsd-curses-0.3.2/libcurses/color.c	2021-05-20 16:53:17.000000000 +0200
++++ netbsd-curses-0.3.2-patch/libcurses/color.c	2023-04-11 20:54:42.466274243 +0200
+@@ -511,10 +511,12 @@
+ }
+ 
+ /* no_color_video is a terminfo macro, but we need to retain binary compat */
++/*
+ #ifdef __strong_alias
+ #undef no_color_video
+ __strong_alias(no_color_video, no_color_attributes)
+ #endif
++*/
+ /*
+  * no_color_attributes --
+  *	Return attributes that cannot be combined with color.
