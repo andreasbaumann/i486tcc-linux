@@ -17,16 +17,16 @@ patches
 
 - tcc
   * musl uses 't' and 'u' for i487 stack inline assembly, we try not
-    to use floating point anymore, currently the tcc patch is a
-    non-functional stub
+    to use floating point anywhere, currently the tcc patch is a
+    non-functional stub to make musl compile
   * configure fails completly when used with the stage0 compiler, we
-    patch by hand configure and the Makefile to build a standalone
+    patch by hand 'configure' and 'Makefile' to build a standalone
     version using stage0 libaries and header files
   * 'config.mak' sets correct pathes and CPU flags for the i386 architecure
 - musl
   * tcc doesn't expand macro definitions in inline assembly:
     SYSCALL_INSNS in syscall stubs. Expanded them by hand.
-  * tcc has no support for Complex, we just define it empty and
+  * tcc has no support for 'Complex', we just define it empty and
     we never use complex numbers
   * replaced 'weak hidden' with
     '__attribute__((weak)) __attribute__((hidden))'

@@ -31,6 +31,10 @@ UFLBBL_VERSION="d8680"
 VIS_VERSION="c9737"
 LIBTERMKEY_VERSION="0.22"
 NETBSD_NCURSES_VERSION="0.3.2"
+TMUX_VERSION="3.3a"
+ZLIB_VERSION="1.2.13"
+MANDOC_VERSION="1.14.6"
+ABASE_VERSION="6638f"
 
 echo "Building in base directory '$BASE'"
 
@@ -106,6 +110,28 @@ if [ ! -f "${BASE}/downloads/vis-${VIS_VERSION}.tar.gz" ]; then
 	git -C "vis-${VIS_VERSION}" checkout "${VIS_VERSION}"
 	tar zcf "${BASE}/downloads/vis-${VIS_VERSION}.tar.gz" "vis-${VIS_VERSION}"
 	rm -rf "vis-${VIS_VERSION}"
+	cd ..
+fi
+
+if [ ! -f "${BASE}/downloads/tmux-${TMUX_VERSION}.tar.gz" ]; then
+	wget -O "${BASE}/downloads/tmux-${TMUX_VERSION}.tar.gz" "https://github.com/tmux/tmux/releases/download/${TMUX_VERSION}/tmux-${TMUX_VERSION}.tar.gz"
+fi
+
+if [ ! -f "${BASE}/downloads/zlib-${ZLIB_VERSION}.tar.gz" ]; then
+	wget -O "${BASE}/downloads/zlib-${ZLIB_VERSION}.tar.gz" "https://zlib.net/zlib-${ZLIB_VERSION}.tar.gz"
+
+fi
+
+if [ ! -f "${BASE}/downloads/mandoc-${MANDOC_VERSION}.tar.gz" ]; then
+	wget -O "${BASE}/downloads/mandoc-${MANDOC_VERSION}.tar.gz" "https://mdocml.bsd.lv/snapshots/mandoc-${MANDOC_VERSION}.tar.gz"
+fi
+
+if [ ! -f "${BASE}/downloads/abase-${ABASE_VERSION}.tar.gz" ]; then
+	cd "${BASE}/downloads/"
+	git clone git://git.andreasbaumann.cc/abase.git "abase-${ABASE_VERSION}"
+	git -C "abase-${ABASE_VERSION}" checkout "${ABASE_VERSION}"
+	tar zcf "${BASE}/downloads/abase-${ABASE_VERSION}.tar.gz" "abase-${ABASE_VERSION}"
+	rm -rf "abase-${ABASE_VERSION}"
 	cd ..
 fi
 
@@ -339,6 +365,80 @@ if [ ! -x "${BASE}/root/stage1/bin/vi" ]; then
 	cd ..
 else
 	echo "stage1 vis exists"
+fi
+
+if [ ! -x "${BASE}/root/stage1/bin/tmux" ]; then
+	rm -rf "tmux-${TMUX_VERSION}"
+	tar xf "${BASE}/downloads/tmux-${TMUX_VERSION}.tar.gz"
+	cd "tmux-${TMUX_VERSION}"
+	CC="${BASE}/root/stage1/bin/i386-tcc" \
+	./configure --prefix="${BASE}/root/stage1" \
+		--enable-static
+	make LIBS="-lncursesw -levent_core -lterminfo"
+	make install PREFIX="${BASE}/root/stage1"
+	cd ..
+else
+	echo "stage1 tmux exists"
+fi
+
+if [ ! -f "${BASE}/root/stage1/lib/libz.a" ]; then
+	rm -rf "zlib-${ZLIB_VERSION}"
+	tar xf "${BASE}/downloads/zlib-${ZLIB_VERSION}.tar.gz"
+	cd "zlib-${ZLIB_VERSION}"
+	CC="${BASE}/root/stage1/bin/i386-tcc" \
+	./configure --prefix="${BASE}/root/stage1" \
+		--static
+	make
+	make install PREFIX="${BASE}/root/stage1"
+	cd ..
+else
+	echo "stage1 zlib exists"
+fi
+
+if [ ! -x "${BASE}/root/stage1/bin/man" ]; then
+	rm -rf "mandoc-${MANDOC_VERSION}"
+	tar xf "${BASE}/downloads/mandoc-${MANDOC_VERSION}.tar.gz"
+	cd "mandoc-${MANDOC_VERSION}"
+	cat >configure.local <<EOF
+		PREFIX=${BASE}/root/stage1
+		BINDIR=/bin
+		SBINDIR=/bin
+		CC="${BASE}/root/stage1/bin/i386-tcc"
+		CFLAGS="-static -I${BASE}/root/stage1/include"
+		LDFLAGS="-static -L${BASE}/root/stage1/lib"
+		BINM_PAGER=more
+EOF
+	./configure 
+	make
+	make install DESTDIR="${BASE}/root/stage1"
+	cd ..
+else
+	echo "stage1 mandoc exists"
+fi
+
+if [ ! -x "${BASE}/root/stage1/bin/abase-box" ]; then
+	rm -rf "abase-${ABASE_VERSION}"
+	tar xf "${BASE}/downloads/abase-${ABASE_VERSION}.tar.gz"
+	cd "abase-${ABASE_VERSION}"
+	make abase-box CC="${BASE}/root/stage1/bin/i386-tcc" LDFLAGS=-static
+	make abase-box-install PREFIX="${BASE}/root/stage1"
+	cd ..
+else
+	echo "stage1 abase exists"
+fi
+
+
+if [ ! -f "${BASE}/root/stage1/boot/bzImage" ]; then
+	rm -rf "linux-${LINUX_KERNEL_VERSION}"
+	tar xf "${BASE}/downloads/linux-${LINUX_KERNEL_VERSION}.tar.gz"
+	cd "linux-$(LINUX_KERNEL_VERSION)"
+	echo "TODO: implement kernel building, using miniconfig.."
+	false
+	mkdir "${BASE}/root/stage1/boot"
+	mkdir "${BASE}/root/stage1/lib/modules"
+	cd ..
+else
+	echo "stage1 kernel exists"
 fi
 
 cd ../..
