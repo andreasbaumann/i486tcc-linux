@@ -34,7 +34,7 @@ NETBSD_NCURSES_VERSION="0.3.2"
 TMUX_VERSION="3.3a"
 ZLIB_VERSION="1.2.13"
 MANDOC_VERSION="1.14.6"
-ABASE_VERSION="6638f"
+ABASE_VERSION="36cd0"
 
 echo "Building in base directory '$BASE'"
 
@@ -300,6 +300,7 @@ if [ ! -x "${BASE}/root/stage1/bin/sinit" ]; then
 	rm -rf "sinit-${SINIT_VERSION}"
 	tar xf "${BASE}/downloads/sinit-${SINIT_VERSION}.tar.gz"
 	cd "sinit-${SINIT_VERSION}"
+	cp "${BASE}/configs/sinit-config.h" config.h
 	make CC="${BASE}/root/stage1/bin/i386-tcc" LDFLAGS=-static
 	make install PREFIX="${BASE}/root/stage1"
 	cd ..
@@ -427,12 +428,19 @@ else
 	echo "stage1 abase exists"
 fi
 
-
 if [ ! -f "${BASE}/root/stage1/boot/bzImage" ]; then
 	rm -rf "linux-${LINUX_KERNEL_VERSION}"
 	tar xf "${BASE}/downloads/linux-${LINUX_KERNEL_VERSION}.tar.gz"
 	cd "linux-$(LINUX_KERNEL_VERSION)"
 	echo "TODO: implement kernel building, using miniconfig.."
+	# TODO:
+	# tar xf linux-6.2.11.tar.xz
+	# cd linux-6.2.11/
+	# cp ../linux-6.2.10/.config .
+	# make menuconfig
+	# make -j 16 bzImage
+	# make -j 16 modules
+	# find . -name '*.ko' | xargs tar cvf ~/modules.tar
 	false
 	mkdir "${BASE}/root/stage1/boot"
 	mkdir "${BASE}/root/stage1/lib/modules"
@@ -441,7 +449,34 @@ else
 	echo "stage1 kernel exists"
 fi
 
+if [ ! -f "${BASE}/root/stage1/boot/boot.img" ]; then
+	rm -rf "uflbbl-${UFLBBL_VERSION}"
+	tar xf "${BASE}/downloads/uflbbl-${UFLBBL_VERSION}.tar.gz"
+	cd "uflbbl-${UFLBBL_VERSION}/src"
+	nasm -o boot.img boot.asm
+	cp boot.img "${BASE}/root/stage1/boot/boot.img"
+	cd ../..
+else
+	echo "stage1 uflbbl exists"
+fi
+
 cd ../..
+
+if [ ! -f "${BASE}/ramdisk.img" ]; then
+	echo "Creating ramdisk.."
+	${BASE}/scripts/create_ramdisk.sh
+else
+	echo "ramdisk image exists"
+fi
+
+if [ ! -f "${BASE}/floppy.img" ]; then
+	touch EOF
+	tar cvf data.tar -b1 bzImage ramdisk.img EOF
+	cat "${BASE}/root/stage1/boot/boot.img" data.tar > "${BASE}/floppy.img"
+	split -d -b 1474560 floppy.img floppy
+else
+	echo "floppy images exist"
+fi
 
 trap - 0
 

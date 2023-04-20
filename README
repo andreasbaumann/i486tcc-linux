@@ -9,8 +9,25 @@ which uses a USTAR-like format for storing kernel and ramdisk.
 requirements
 ------------
 
-A native C compiler. gcc/clang is a must for the Linux kernel.
-NASM
+- A native C compiler. gcc/clang is a must for the Linux kernel
+- NASM for assembling the floppy boot loader 'uflbbl'
+- a make, probably GNU make is required
+
+directory layout
+----------------
+
+scripts/   build scripts
+dowloads/  downloaded software (tarballs or git/svn/cvs checkouts)
+src/       contains all unpacked sources for building
+../stage0  host toolchain building
+../stage1  ramdisk first native build
+configs/   configurations used during building, e.g. suckless config.h files
+root/      the binary artifacts of each stage
+../stage0
+../stage1
+local/     local adaptions and configurations which go into the ramdisk
+ramdisk/   the ramdisk being later compressed to ramdisk.img
+tests/     test programs to test sanity of stages
 
 patches
 -------
@@ -46,3 +63,145 @@ patches
 - vis
   * disabled probing of 'curses/termcap' with 'pkconfig', added them
     directly to 'configure'
+
+kernel options
+--------------
+
+We just enable things we absolutely need to be running Linux, each config
+option below states the main reason we think, it has to be enabled.
+The starting point of the Linux kernel configuration is 'make tinyconfig'.
+
+bugs
+----
+
+- tcc cannot compile the linux kernel. Most likely this will remain
+  a bug forever..
+- Having i486tcc-linux self-hosting might not be feasable as we
+  have too many funny build tools around and we don't want to get
+  into the busybox/tinderbox trap, where everything has to be
+  emulated. We rather reimplement software to use less build
+  tools (at most tcc and samurai and maybe some confiure-like
+  new tool).
+- 'joe' is quite slow in startup. For now we resort to 'vis' with
+  somewhat better performance. It's not clear whether the software is
+  so slow or because we use 'tcc'.
+- build only the i386 (or choosen cross-compiler), especially the native
+  one for stage1. The stage0 can be a full or a partial cross-compiler
+  ideally. For now both stages are building a full cross-compiler and
+  then superflous architectures are removed. Fixing this likely needs
+  some rewrite of the tcc Makefiles.
+- The native compiler in stage1 doesn't set pathes correctly:
+    # tcc -o test test.c
+    tcc: error: file 'crt1.o' not found
+    tcc: error: file 'crti.o' not found
+    test.c:1: error: include file 'stdio.h' not found
+  Does recompiling it help?
+  It's just search pathes presumably still being hard-coded to root/stage1,
+  this works for now (as workaround):
+    i386-tcc -vv -static -L/lib -I/include -nostdlib -c  -o test.o test.c
+    i386-tcc -vv -static -L/lib -I/include -nostdlib -o test /lib/crt1.o test.o /lib/libc.a
+  so recompiling it inside the chroot might work (though it needs patching
+  again and a stage2 probably, as it has to run inside the chroot and eventually
+  even inside a qemu emulation).
+- currently we bundle too many things in the initial ramdisk:
+  - man pages
+  - a full tcc compiler with musl/system header files and libraries
+  - all kernel modules (instead of just the essential or/and the ones
+    fitting to the hardware)
+- kernel modules should remain uncompressed when added to the ramdisk and
+  compressed as *.ko.xz when living in a normal filesystem on a floppy
+  or hard disk.
+- binaries are not crunched. sbase/ubase/abase create Xbase-box crunched
+  binaries by hand, doesn't work across packages. NetBSD crunch approach
+  could help.
+- vis has no lua interpreter support build-in currently (needed?)
+- gave up on ex, is not really working:
+  memory management issues, always results in "Out of memory - too many lines in file"
+  This editor is a little bit too low level to use anyway.
+
+other approaches
+----------------
+
+linux-486
+---------
+
+https://github.com/tcsullivan/linux-486
+
+nice ideas, preinit decompresses lzma compressed files, uses the
+chromium Linux syscall wrapper to be a standalone binary (as
+the C library is compressed too).
+
+preinit/init.c
+preinit/linux_syscall_support.h
+
+no ramdisk, decompresses directly into / (which is the boot root without
+an initial change_root?), so is this in RAM?
+
+Uses buildroot for the toolchain.
+Boot loader is LILO.
+C-library is uclibc.
+There are 486-related kernel patches, but e run without issues on 6.2 on
+a real machine, so why?
+
+I really like the shell scripts to build the system, they are extremely
+simple.
+
+gray486linux
+------------
+
+Maybe the final system is nice, but the NIX build system is not..
+
+0001-WIP-patch-kernel-to-skip-endbr32-instruction-on-real.patch
+interesting approach to ignore endbr32 without the help of fixing
+gcc/binutils (we should check again, why we got it inside busybox,
+musl and tinycc don't to this kind of stuff).
+
+Use of dropbear could be a good idea.
+
+aboriginal
+----------
+
+miniconfig.sh
+hush as init shell
+highly portable
+lots of patches, we must see if those are still relevant
+the comments in patches and comments are really funny and helpfull.
+also nice autoamitzation, smoke tests using qemu and report generation
+
+oasis
+-----
+
+statically linked, the Lua build thing is weird.
+he also rewrote ninja as samurai in C (which is nice).
+
+the package list was more or less an inspiration for our list of packages:
+
+musl instead of glibc
+sbase instead of coreutils
+ubase instead of util-linux
+oksh instead of bash
+sdhcp instead of dhclient or dhcpcd
+vis instead of vim or emacs
+netbsd-curses instead of ncurses
+mandoc instead of man-db
+
+those packages we are still considering:
+
+pigz instead of gzip
+bearssl instead of openssl
+byacc instead of bison
+perp and sinit instead of sysvinit or systemd
+netsurf instead of chromium or firefox
+samurai instead of ninja
+velox instead of Xorg
+
+morpheus
+--------
+
+statically linked
+
+stali
+-----
+
+uses suckless tools
+everything statically linked

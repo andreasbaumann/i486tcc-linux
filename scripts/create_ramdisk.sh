@@ -19,6 +19,7 @@ SCRIPT=$(readlink -f "$0")
 BASE=$(dirname ${SCRIPT})/..
 
 RAMDISK="${BASE}"/ramdisk
+LOCAL="${BASE}"/local
 
 rm -rf "${BASE}/ramdisk"
 cp -R "${BASE}/root/stage1" "${BASE}/ramdisk"
@@ -55,8 +56,24 @@ test -d "${RAMDISK}"/dev/pts || mkdir "${RAMDISK}"/dev/pts
 test -d "${RAMDISK}"/proc || mkdir "${RAMDISK}"/proc
 test -d "${RAMDISK}"/sys || mkdir "${RAMDISK}"/sys
 test -d "${RAMDISK}"/tmp || mkdir "${RAMDISK}"/tmp
+test -d "${RAMDISK}"/var || mkdir "${RAMDISK}"/var
+test -d "${RAMDISK}"/var/run || mkdir "${RAMDISK}"/var/run
+
+# copy locally adapted scripts
+test -d "${RAMDISK}/root" || mkdir "${RAMDISK}/root"
+cp "${LOCAL}"/root/.profile "${RAMDISK}/root"
+test -d "${RAMDISK}/etc" || mkdir "${RAMDISK}/etc"
+cp -dR "${LOCAL}"/etc/* "${RAMDISK}/etc"
+HASH=$(openssl passwd -1  -salt '5RPVAd' 'xx')
+echo "root:${HASH}:17718::::::" >"${RAMDISK}/etc/shadow"
+
+# package ramdisk directory with cpio and compress it with xz
+cd "${RAMDISK}"
+find . | cpio -H newc -o -R root:root | xz --check=crc32 > ../ramdisk.img
+cd ..
 
 du -hs "${BASE}/ramdisk"
+ls -h ramdisk.img
 
 trap - 0
 

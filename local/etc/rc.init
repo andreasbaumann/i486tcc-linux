@@ -1,0 +1,22 @@
+#!/bin/oksh
+
+echo "Starting.."
+
+echo "Mounting pseudo-filesystems.."
+mkdir -p /proc /sys
+mount -n -t proc -o nosuid,noexec,nodev proc /proc
+mount -n -t sysfs -o nosuid,noexec,nodev,ro sys /sys
+mount -n -t devtmpfs -o mode=0755,nosuid udev /dev
+mkdir -p /dev/pts
+mount -n -t devpts -o mode=0620,gid=5,nosuid,noexec devpts /dev/pts
+
+echo "Mounting filesustems.."
+mount -a
+
+echo "Starting login sessions.."
+respawn getty /dev/tty1 &
+respawn getty /dev/tty2 &
+respawn getty /dev/tty3 &
+respawn getty /dev/tty4 &
+
+echo "Done."

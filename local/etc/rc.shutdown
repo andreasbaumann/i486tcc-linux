@@ -1,0 +1,11 @@
+#!/bin/oksh
+
+echo "Shutding down all processes.."
+killall5 -s KILL
+
+echo "Synching and unmounting filesystems.."
+sync
+umount -a
+
+echo "Shut down."
+wait
