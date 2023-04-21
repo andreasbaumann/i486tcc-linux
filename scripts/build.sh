@@ -18,7 +18,7 @@ set -e
 SCRIPT=$(readlink -f "$0")
 BASE=$(dirname ${SCRIPT})/..
 
-LINUX_KERNEL_VERSION="6.2.10"
+LINUX_KERNEL_VERSION="6.2.11"
 TINYCC_VERSION="85b27"
 MUSL_VERSION="1.2.3"
 _OKSH_VERSION="7.2"
@@ -37,6 +37,8 @@ MANDOC_VERSION="1.14.6"
 ABASE_VERSION="36cd0"
 
 echo "Building in base directory '$BASE'"
+
+# download sources
 
 if [ ! -f "${BASE}/downloads/tinycc-${TINYCC_VERSION}.tar.gz" ]; then
 	cd "${BASE}/downloads/"
@@ -152,6 +154,9 @@ if [ ! -f "${BASE}/downloads/linux-${LINUX_KERNEL_VERSION}.tar.gz" ]; then
 	wget -O "${BASE}/downloads/linux-${LINUX_KERNEL_VERSION}.tar.gz" "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-${LINUX_KERNEL_VERSION}.tar.gz"
 fi
 
+# stage 0
+#########
+
 cd "${BASE}/src/stage0"
 
 # stage 0 host, build a 64-bit cross-compiler for i386, the host might
@@ -202,7 +207,8 @@ if [ ! -x "${BASE}/root/stage1/bin/i386-tcc" ]; then
 	cd "tinycc-${TINYCC_VERSION}"
 	patch -Np1 < "../../../patches/tcc-asm.patch"
 	patch -Np1 < "../../../patches/tcc-stage1.patch"
-	sed -i "s|@@BASE@@|${BASE}|g" Makefile configure
+	sed -i "s|@@BASE@@|${BASE}|g" Makefile configure config-extra.mak
+	sed -i "s|@@TINYCC_VERSION@@|${TINYCC_VERSION}|g" Makefile configure config-extra.mak
 	./configure --enable-static --prefix="${BASE}/root/stage1" \
 		--cc="${BASE}/root/stage0/bin/i386-tcc" --config-musl \
 		--enable-cross
@@ -213,6 +219,9 @@ if [ ! -x "${BASE}/root/stage1/bin/i386-tcc" ]; then
 else
 	echo "stage1 tcc-i386 binary exists"
 fi
+
+# stage 1
+#########
 
 # rebuild musl with tcc from stage1
 
@@ -431,7 +440,7 @@ fi
 if [ ! -f "${BASE}/root/stage1/boot/bzImage" ]; then
 	rm -rf "linux-${LINUX_KERNEL_VERSION}"
 	tar xf "${BASE}/downloads/linux-${LINUX_KERNEL_VERSION}.tar.gz"
-	cd "linux-$(LINUX_KERNEL_VERSION)"
+	cd "linux-${LINUX_KERNEL_VERSION}"
 	echo "TODO: implement kernel building, using miniconfig.."
 	# TODO:
 	# tar xf linux-6.2.11.tar.xz
@@ -449,6 +458,8 @@ else
 	echo "stage1 kernel exists"
 fi
 
+# floppy boot loader
+
 if [ ! -f "${BASE}/root/stage1/boot/boot.img" ]; then
 	rm -rf "uflbbl-${UFLBBL_VERSION}"
 	tar xf "${BASE}/downloads/uflbbl-${UFLBBL_VERSION}.tar.gz"
@@ -462,12 +473,16 @@ fi
 
 cd ../..
 
+# ramdisk
+
 if [ ! -f "${BASE}/ramdisk.img" ]; then
 	echo "Creating ramdisk.."
 	${BASE}/scripts/create_ramdisk.sh
 else
 	echo "ramdisk image exists"
 fi
+
+# create boot floppies
 
 if [ ! -f "${BASE}/floppy.img" ]; then
 	touch EOF

@@ -73,7 +73,7 @@ index bc0d3e5..3d9c90b 100755
  if test -z "$cross_prefix" ; then
    CONFTEST=./conftest$EXESUF
 -  if ! $cc -o $CONFTEST $source_path/conftest.c ; then
-+  if ! $cc -nostdlib -I@@BASE@@/root/stage0/include -o ./conftest @@BASE@@/root/stage0/lib/crt1.o  /data/work/i486/src/stage1/tinycc/conftest.c @@BASE@@/root/stage0/lib/libc.a @@BASE@@/root/stage0/lib/tcc/i386-libtcc1.a; then
++  if ! $cc -nostdlib -I@@BASE@@/root/stage0/include -o ./conftest @@BASE@@/root/stage0/lib/crt1.o @@BASE@@/src/stage1/tinycc-@@TINYCC_VERSION@@/conftest.c @@BASE@@/root/stage0/lib/libc.a @@BASE@@/root/stage0/lib/tcc/i386-libtcc1.a; then
      echo "configure: error: '$cc' failed to compile conftest.c."
    else
      cc_name="$($CONFTEST compiler)"
@@ -84,8 +84,8 @@ index 0000000..b74be45
 +++ b/config-extra.mak
 @@ -0,0 +1,6 @@
 +NATIVE_DEFINES += -march=i486 -mcpu=i486
-+ROOT-i386 = /data/work/i486/root/stage1
-+CRT-i386  = /data/work/i486/root/stage1/lib
-+LIB-i386  = /data/work/i486/root/stage1/lib
-+INC-i386  = /data/work/i486/root/stage1/include
++ROOT-i386 = @@BASE@@/root/stage1
++CRT-i386  = @@BASE@@/root/stage1/lib
++LIB-i386  = @@BASE@@/root/stage1/lib
++INC-i386  = @@BASE@@/root/stage1/include
 +DEF-i386  += -D__linux__
