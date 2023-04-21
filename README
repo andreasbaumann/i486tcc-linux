@@ -5,6 +5,7 @@ Build a small Linux system with as little resource usage as possible.
 Modern kernel, suckless if possible, i486 as target. Trying to
 squeeze binaries with NetBSD cruch. Using a floppy boot loader
 which uses a USTAR-like format for storing kernel and ramdisk.
+Using musl for it's ability to produce small static binaries.
 
 requirements
 ------------
@@ -64,6 +65,14 @@ patches
   * disabled probing of 'curses/termcap' with 'pkconfig', added them
     directly to 'configure'
 
+dependencies
+------------
+
+- vis
+  - libevent
+  - optionally lua
+  - netbsd-curses
+  
 kernel options
 --------------
 
@@ -118,7 +127,12 @@ bugs
 - gave up on ex, is not really working:
   memory management issues, always results in "Out of memory - too many lines in file"
   This editor is a little bit too low level to use anyway.
-
+- a lot of stuff is copy-pasted between sbase/ubase/abase/smdev, etc. for
+  instance parts of libutil
+- we heavily use tools from the host (perl, python, make, m4, etc.) from
+  the host (but we don't want those tools inside our system also). So
+  self-hosting will be tricky.
+  
 other approaches
 ----------------
 
@@ -205,3 +219,19 @@ stali
 
 uses suckless tools
 everything statically linked
+
+sabotage
+--------
+
+They use an old gcc without a lot of depenendencies (C++, libraries, etc.)
+to build the toolchain for stage 0. This is similar to us using tcc.
+This is the first distro based on musl which made musl much more suitable
+to build a Linux userspace upon.
+
+links
+-----
+
+- Sabotage Linux:
+  - http://sabo.xyz/
+  - https://sabotage-linux.neocities.org/
+  - https://sabotage-linux.neocities.org/blog/11/

@@ -1,0 +1,343 @@
+Devs on Acid
+
+     * [1]Home
+     * [2]About
+     * [3]RSS
+
+10 years Sabotage Linux - The history of the first musl-based distro
+
+   9 Apr 2021 12:02 UTC
+
+   On Monday, 5th April 2021, [4]Sabotage Linux had its 10 years
+   anniversary since its [5]first commit by Christian Neukirchen aka
+   chris2, nowadays known as [6]Leah Neukirchen.
+
+   It consisted of the following packages:
+     * linux 2.6.38.2
+     * binutils 2.21
+     * busybox 1.18.4
+     * gnu make 3.82
+     * gcc 3.4.6 (used only for stage0 bootstrap)
+     * gcc 4.5.2 (stage1 compiler) plus its dependencies gmp, mpfr, mpc
+     * perl 5.12.3
+     * gawk 3.1.8
+     * gnu sed 4.2.1
+     * gnu m4 1.4.16 (plus a patch to disable [7]GNUlib fallout)
+     * musl from a forked git repository, roughly equivalent to musl 0.7.6
+
+   The build procedure consisted of building a stage0 rootfs, containing a
+   musl targeting C compiler toolchain and a stripped down busybox binary
+   that was barely sufficient to make it possible to chroot into the
+   rootfs and build the rest of the packages without leaks from the host
+   environment. GCC 3.4.6 was chosen as the stage0 compiler because it
+   doesn't require 3rd party libraries like mpc, mpfr, gmp (these were
+   added as a hard dependency to gcc >= 4.3), and because it is much
+   slimmer than GCC 4+ and therefore faster to build.
+
+   Once inside the rootfs, GCC 4.5.2 was built (because the linux kernel
+   required extensions only available in recent gccs), GNU m4 (required as
+   a prerequisite for almost every package using GNU autotools), and GNU
+   awk/sed because the sed and awk offered by busybox were too buggy or
+   didn't support extensions used by other package build scripts. Perl was
+   built because the kernel build system required to execute some perl
+   scripts. Also busybox got built a second time with a bigger set of
+   applets.
+
+   Everything was built with a set of shell scripts, and there wasn't even
+   an init system yet, so sabotage could only be used inside the chrooted
+   rootfs.
+
+   The next day with [8]commit 6fc138a the init system based on busybox
+   runit and the necessary /etc infrastructure was added to make sabotage
+   almost bootable on bare metal. The boot loader extlinux was added a day
+   later, in [9]commit b57b0f1, marking the first version that could be
+   booted. During the next days a couple of tweaks and packages were added
+   (zlib, openssl, git) and on April, 9th the first bootable binary
+   distribution was [10]released.
+
+   Shortly after that release some people that tried out sabotage
+   suggested improvements and Chris switched to a build system based on
+   plan9's mk. The editor vim was added, replacing busybox's vi, as well
+   as a couple of other packages including ncurses, bsdtar, xz, automake,
+   and openssh. On 13th of April, another binary [11]release was shipped
+   that was already much more usable, one could even SSH in!
+
+   The following days saw addition of python 2.7.1, expat, and a basic set
+   of packages to support Xorg display server. the musl package recipe was
+   switched to the official git repo.
+
+   Sabotage was the first distro built upon musl libc and was crucial for
+   getting musl to a point where it could be used with opensource packages
+   from a variety of sources. During the early development chris2 was
+   communicating issues he encountered on a hourly basis to dalias, the
+   musl libc author and the issues got fixed almost immediately. Getting
+   mainstream packages to build usually required hacks and patches,
+   because back then GNU/Linux was a GLIBC-centric monoculture, and many
+   packages used either GLIBC-specific extensions, or worse: private __
+   prefixed symbols and types that were never meant to be used outside of
+   internal libc code.
+
+   [12]Release 2011-04-18 was the first sabotage release that could be
+   used with basic X11 windowing, and when I first tried it out. I've been
+   idling in the #musl IRC channel (at that time consisting of 8 regulars)
+   since a couple weeks, following its development, mainly interested in
+   it due to its ability to create static linked binaries with minimal
+   footprint.
+
+The musl C library
+
+   [13]musl is a libc, that means the C standard library. It provides the
+   functions and headers dictated by the C standard, as well as those
+   mandated by POSIX. It's the most important component in UNIX userspace,
+   as almost all software interfaces with it. By doing syscalls to the
+   Linux kernel, it's the interface between userspace and kernel space.
+   The standard in 2011 was the GLIBC libc.
+
+   Rich Felker, musl's author, was frustrated with GLIBC because it was
+   designed around a central idiom: dynamic linking. Static linking was
+   only possible to a limited extent (no use of network code involving DNS
+   lookup, as that would pull in the dlopen()ed GLIBC framework that
+   allows to use different name lookup backends), and with a giant
+   footprint: even a simple "hello world" resulted in a 500 KB binary.
+   Another thing that frustrated him was the unreadability of the GLIBC
+   source code, where often the real definition of a function is hidden
+   behind numerous [14]layers of abstractions.
+
+   Rich was writing his own libc on an as-needed basis to get the
+   applications he's been interested in into a tiny static executable that
+   could be transfered from one PC to the other and executed without
+   having to ship a bunch of dynamic 3rd party libraries. He's been
+   working on this for a couple years, when he decided in February 2011 to
+   publish the first release 0.5.0 for the i386 architecture.
+
+   Musl was already of such high quality back then that he immediately
+   attracted contributors, the first one being [15]Nicholas J. Cain who
+   contributed support for x86_64 already within the first week of musl's
+   public release. Other early adopters tried it out on their favorite
+   programs and reported issues, which were fixed almost in real-time.
+   From 0.5.0 up to 0.7.9, a new version was released typically in less
+   than one week.
+
+   Musl 0.7.11, released on June 28, 2011, was the first version to
+   feature a dynamic linker.
+
+   Before that, only static linking was available.
+
+My involvement
+
+   I started using sabotage after the 2011-04-18 release, mainly to have
+   an isolated rootfs environment where I had a compiler toolchain
+   targeting musl to build my own programs with it.
+
+   The alternative was to use the musl-gcc wrapper script, part of the
+   musl release. It was a shell script starting gcc with the right options
+   to pick up musl's include and library directories instead of the host
+   GLIBC ones.
+
+   Chris2 continued work mainly to add support for 32bit x86, as sabotage
+   up to that point targeted only the x86_64 architecture, culminating in
+   the [16]2011-04-30 release. Then he stopped doing any work on sabotage
+   for about 2 months.
+
+   At that point it had become clear that we would need dynamic linking at
+   some point, because of the following reasons:
+     * The Xorg stack consisted of dozens of libraries designed for
+       dynamic linking. Even though Chris2 managed to get the X server
+       statically linked, it resulted in a huge monolithic binary, but it
+       couldnt load additional xf86 drivers.
+     * Python and perl depend on dynamic linking to load
+       extensions/packages written in C via dlopen(). perl offers a way to
+       statically link those extensions into the perl binary, but that
+       requires to relink the interpreter whenever a new extension has to
+       be added. AFAIK, python doesn't offer anything equivalent.
+     * Some applications, like e.g. weechat, are designed around a
+       dynamically-linked plugin system that are loaded on an as-needed
+       basis via dlopen().
+
+   I suspect Chris2 had never intended for sabotage to support dynamic
+   linking, and was frustrated with this situation, causing him to abandon
+   the project. Meanwhile the sabotage users Josiah Worcester aka
+   [17]pikhq (nowadays known as Ada Worcester) and myself were pushing
+   Rich to write a dynamic linker so the above could be addressed,
+   resulting in the 0.7.11 [18]release of musl. It was pikhq who then
+   added basic dynamic linking support to his sabotage fork, which I
+   ultimately picked up to start hacking on sabotage on my own, after a PR
+   I filed in early may was ignored for almost 2 months, and nothing else
+   happened on Chris2's repo. Meanwhile pikhq started to work on his own
+   distro project called [19]bootstrap linux.
+
+   It was on July 19th that I decided to do my own thing, as there were a
+   couple issues I had with the upstream way of building packages and
+   reckoning that upstream seemed pretty much dead anyway. First I fixed a
+   couple things that were buggy, and added a couple of packages. 2 days
+   later pikhq merged my changes into his master, and another 2 days later
+   Chris2 suddenly started hacking on sabotage again, yet he merged only
+   the changes made by pikhq but none of mine. He bumped a couple of
+   package revisions, but his activity on sabotage stalled for a second
+   time on July 29th, this time for good.
+
+   The major problem I had with the old build system was that it didn't
+   pick up from where it left off when things went wrong. One had to
+   compile the whole set of packages over and over.
+
+   I had previous experience with a build-from-source package manager on
+   MacOS, MacPorts, and was frustrated that it did things in a strictly
+   serial way. For example, if one was to build a package with 10
+   dependencies, the first dependency would be downloaded, then built,
+   then the next dependency downloaded, and so on. Clearly, if one has a
+   slow internet connection, it's much preferable to download package2
+   while package1 is building, or even better, completely detach the
+   download and build steps, and try to download several packages at once
+   to saturate the available bandwidth, and start building as soon as the
+   first download is complete.
+
+   This was the design I had in mind for my new package manager called
+   [20]butch.
+
+   Mid September, when it became clear that Chris2's sabotage was
+   abandoned for good, I started hacking on butch and it was finished the
+   next day, on 19th.
+
+   The package manager had a new package format, that was composed of
+   ini-style sections, with a build section containing the build
+   instructions, and another section listing download mirrors for source
+   code release tarballs and their checksum for integrity checks.
+
+   For greater flexibility, the build section was merged with a
+   shell-script template and executed once the tarball was available. That
+   meant one could adjust things like CFLAGS and other things from a
+   single template rather than hardcoding them into every recipe. It also
+   allowed me to experiment with the location things get installed to.
+
+   Another major change that my package manager introduced was per-package
+   installation directories. Ever since I started using Linux I was
+   confused by which file belongs to which package, so my design was to
+   create one directory per package in /opt, .e.g /opt/ncurses, and then
+   symlink the files in there into the main FS root via a relative
+   symlink. This allows one to do a simple ls -la on a file and
+   immediately know which package it belongs too:
+$ ls -la /bin/tic
+lrwxrwxrwx    1 root     root            28 Jan 18 21:42 /bin/tic -> ../opt/netb
+sd-curses/bin/tic
+
+   But also, to remove a package by simply removing its directory in /opt.
+
+   Meanwhile, the butch package manager has been rewritten in POSIX sh in
+   lieu of C, which makes it much more hackable.
+
+   Apart from that, sabotage to this day still follows the initial
+   philosophy and file system layout and init system created by Chris2
+   during the first week of sabotage's existence.
+
+Evolution of sabotage and musl
+
+   Sabotage Linux was the only major distro based on musl libc for several
+   years, only in 2014 [21]alpine linux joined the ranks. Until that
+   happened, it's been mainly my feedback to Rich about issues I
+   encountered that turned musl into a libc ready for prime-time. I filed
+   uncountable bug reports to 3rd party packages that relied on buggy
+   behaviour of GLIBC or used GLIBC-only extensions or internal types/data
+   structures/functions, and got quite some of them to use a different,
+   more portable approach. When Alpine Linux joined the ranks, most of the
+   pioneer work was already done, including making musl compatible to
+   GCC's libstdc++. Before that, sabotage was strictly C-only and one of
+   the major issues I faced was that some required C libraries required
+   the build system CMake written in C++. I ended up writing custom
+   Makefiles for some projects only to make them buildable in my C++-less
+   distro.
+
+   Fortunately, back in the day almost the entire Linux FOSS
+   infrastructure was based on C, so it was relatively easy to bootstrap
+   most things from source. This is quite different to today with Rust
+   zealots starting to rewrite critical library components in Rust, which
+   is basically almost impossible to bootstrap from source, and only
+   supports a small subset of the architectures supported by sabotage.
+
+   I refuse to [22]add Rust to sabotage, and am asking myself whether Rust
+   and the accompanying security theater was created to fragment the FOSS
+   ecosystem, and weaken the status of the C programming language, which
+   is the underlying cause for the huge success and performance, stability
+   and resource-efficiency of the UNIX operating system. The leaked
+   [23]halloween documents prove without a shadow of a doubt that M$ saw
+   Linux/FOSS (already in 1998) as a huge threat to their market monopoly
+   and sought ways to undermine it. Certainly they didn't stop after the
+   leak and were seeking ever new methods to achieve their goal of
+   weakening the FOSS movement. A collaboration with [24]Mozilla and
+   Google (Go with its online micro-dependency concept) seems possible.
+   Just make it too hard to build stuff from source and FOSS will exist
+   only in name.
+
+   Meanwhile even GCC switched to C++ as its implementation language as of
+   GCC 4.8. Had that been the case in 2011, it's easy to imagine that a
+   distro based on musl would've given up already during infancy.
+
+   During the years, I made sabotage compile on a big variety of
+   architectures, at first using QEMU to build in a native environment,
+   later by adding support for cross-compilation. I even contributed
+   support for powerpc and x32 architectures to musl.
+
+   Once Alpine Linux joined the ranks of distros using musl, I
+   back-pedaled my involvement quite a bit, figuring that alpine with its
+   big number of contributors could take over the job of filing upstream
+   bug reports and playing guinea pig for new musl releases.
+
+   Alpine Linux got hugely successful once it was chosen as the standard
+   distro for Docker images due to its small footprint and binary package
+   manager, attracting even more users to musl. Other distros like Void
+   Linux joined.
+
+   Even though many projects and desktop linux distros still target GLIBC
+   only, musl has become a serious competitor and willingness of upstreams
+   to support it has considerably increased. It is meanwhile used by many
+   projects, even the WebAssembly workgroup has chosen it as its C library
+   implementation as it was already adopted by emscripten.
+
+   Sabotage itself always stayed a niche project, since I didn't spend any
+   effort on advertising it or creating a polished website to attract new
+   users, therefore it was most of the time a one-man-show, even though
+   many contributors appeared and disappeared over time. Apart from
+   myself, only [25]AequoreaVictoria who also happens to provide the build
+   server hosting has been with the project since 2012 with regular
+   contributions.
+
+   Yet, it still is one of the most stable, mature and versatile musl
+   distros available, and probably the easiest way to get a usable and
+   slim distro cross-compiled for any new architecture or embedded
+   hardware project.
+
+   During its development a number of side-projects were released that
+   allowed to side-step the need of bloated dependencies, most notably
+   [26]gettext-tiny and [27]netbsd-curses, which are now used by a number
+   of other distros, but also things like [28]atk-bridge-fake which allows
+   to build GTK+3 without dbus dependency.
+
+References
+
+   1. https://sabotage-linux.neocities.org/blog/
+   2. https://sabotage-linux.neocities.org/blog/about
+   3. https://sabotage-linux.neocities.org/blog/feed.rss
+   4. https://sabotage-linux.neocities.org/
+   5. https://codeberg.org/sabotage-linux/sabotage/commit/18a642e05254d45921cc3c3d8282d648a9927fe9
+   6. http://github.com/leahneukirchen/
+   7. https://gitlab.com/sortix/sortix/-/wikis/Gnulib
+   8. https://codeberg.org/sabotage-linux/sabotage/commit/6fc138ae1e8ff7554f4aef7446bf2b709d02e88b
+   9. https://codeberg.org/sabotage-linux/sabotage/commit/b57b0f1b68e2a0412c8ee
+  10. https://codeberg.org/sabotage-linux/sabotage/src/tag/2011-04-09
+  11. https://codeberg.org/sabotage-linux/sabotage/src/tag/2011-04-13
+  12. https://codeberg.org/sabotage-linux/sabotage/src/tag/2011-04-18
+  13. http://musl.libc.org/
+  14. https://drewdevault.com/2020/09/25/A-story-of-two-libcs.html
+  15. https://github.com/niklata/
+  16. https://codeberg.org/sabotage-linux/sabotage/src/tag/2011-04-30
+  17. https://github.com/pikhq
+  18. http://musl.libc.org/releases.html
+  19. https://github.com/pikhq/bootstrap-linux
+  20. https://codeberg.org/sabotage-linux/butch/
+  21. http://web.archive.org/web/20150210091628/https://www.alpinelinux.org/posts/Alpine-Linux-has-switched-to-musl-libc.html
+  22. https://sabotage-linux.neocities.org/blog/3/
+  23. http://www.catb.org/~esr/halloween/
+  24. https://digdeeper.neocities.org/ghost/mozilla.html
+  25. https://github.com/AequoreaVictoria
+  26. https://codeberg.org/sabotage-linux/gettext-tiny
+  27. https://codeberg.org/sabotage-linux/netbsd-curses
+  28. https://codeberg.org/sabotage-linux/atk-bridge-fake
