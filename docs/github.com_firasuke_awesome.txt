@@ -1,0 +1,891 @@
+   #[1]GitHub
+
+   [2]Skip to content
+
+   (BUTTON) Toggle navigation
+   [3]Sign up
+   (BUTTON)
+
+     * (BUTTON) Product
+          + Actions
+            Automate any workflow
+          + Packages
+            Host and manage packages
+          + Security
+            Find and fix vulnerabilities
+          + Codespaces
+            Instant dev environments
+          + Copilot
+            Write better code with AI
+          + Code review
+            Manage code changes
+          + Issues
+            Plan and track work
+          + Discussions
+            Collaborate outside of code
+       Explore
+          + [4]All features
+          + [5]Documentation
+          + [6]GitHub Skills
+          + [7]Blog
+     * (BUTTON) Solutions
+       For
+          + [8]Enterprise
+          + [9]Teams
+          + [10]Startups
+          + [11]Education
+       By Solution
+          + [12]CI/CD & Automation
+          + [13]DevOps
+          + [14]DevSecOps
+       Case Studies
+          + [15]Customer Stories
+          + [16]Resources
+     * (BUTTON) Open Source
+          + GitHub Sponsors
+            Fund open source developers
+          + The ReadME Project
+            GitHub community articles
+       Repositories
+          + [17]Topics
+          + [18]Trending
+          + [19]Collections
+     * [20]Pricing
+
+   ____________________
+     * In this repository All GitHub RET
+       Jump to RET
+
+     * No suggested jump to results
+
+     * In this repository All GitHub RET
+       Jump to RET
+     * In this user All GitHub RET
+       Jump to RET
+     * In this repository All GitHub RET
+       Jump to RET
+
+   [21]Sign in
+   [22]Sign up
+
+   (BUTTON)
+   {{ message }}
+
+   [23]firasuke / [24]awesome Public
+     * [25]Notifications
+     * [26]Fork 6
+     * [27]Star 132 (BUTTON)
+
+   A curated list of awesome projects
+
+License
+
+   [28]ISC license
+   [29]132 stars [30]6 forks
+   [31]Star (BUTTON)
+   [32]Notifications
+
+     * [33]Code
+     * [34]Issues 0
+     * [35]Pull requests 0
+     * [36]Actions
+     * [37]Projects 0
+     * [38]Security
+     * [39]Insights
+
+   More
+     * [40]Code
+     * [41]Issues
+     * [42]Pull requests
+     * [43]Actions
+     * [44]Projects
+     * [45]Security
+     * [46]Insights
+
+firasuke/awesome
+
+   This commit does not belong to any branch on this repository, and may
+   belong to a fork outside of the repository.
+   main
+
+   Switch branches/tags (BUTTON)
+   ____________________
+   (BUTTON) Branches (BUTTON) Tags
+   Could not load branches
+   Nothing to show
+   [47]{{ refName }} default
+
+   [48]View all branches
+   Could not load tags
+   Nothing to show
+   [49]{{ refName }} default
+
+   [50]View all tags
+
+Name already in use
+
+   (BUTTON)
+   A tag already exists with the provided branch name. Many Git commands
+   accept both tag and branch names, so creating this branch may cause
+   unexpected behavior. Are you sure you want to create this branch?
+
+   (BUTTON) Cancel (BUTTON) Create
+   [51]1 branch [52]0 tags
+   Code
+     * (BUTTON) Local
+     * (BUTTON) Codespaces
+
+     * Clone
+       (button) HTTPS (button) GitHub CLI
+       https://github.com/f
+       Use Git or checkout with SVN using the web URL.
+       gh repo clone firasu
+       Work fast with our official CLI. [53]Learn more.
+     * [54]Open with GitHub Desktop
+     * [55]Download ZIP
+
+Sign In Required
+
+   Please [56]sign in to use Codespaces.
+
+Launching GitHub Desktop
+
+   If nothing happens, [57]download GitHub Desktop and try again.
+   (BUTTON)
+
+Launching GitHub Desktop
+
+   If nothing happens, [58]download GitHub Desktop and try again.
+   (BUTTON)
+
+Launching Xcode
+
+   If nothing happens, [59]download Xcode and try again.
+   (BUTTON)
+
+Launching Visual Studio Code
+
+   Your codespace will open once ready.
+
+   There was a problem preparing your codespace, please try again.
+
+Latest commit
+
+
+Git stats
+
+     * [60]95 commits
+
+Files
+
+   [61]Permalink
+   Failed to load latest commit information.
+   Type
+   Name
+   Latest commit message
+   Commit time
+   [62]LICENSE
+
+
+   [63]README.md
+
+
+   (BUTTON) View code
+   [64]awesome [65]Mirrors
+
+[66]README.md
+
+awesome
+
+   A curated list of awesome projects that I both learnt and drew
+   inspiration from whilst working on [67]glaucus:
+     * [68]Aalbus: A Linux distribution using musl libc, the LLVM tool
+       chain and a mostly (Net)BSD-derived userland
+     * [69]Aboriginal Linux: A shell script that builds the
+       smallest/simplest linux system capable of rebuilding itself from
+       source code
+     * [70]Abyss OS: A modern take on the "just enough OS" paradigm, with
+       a focus on modern components (LLVM, musl) and flexibility
+     * [71]Adelie Linux: A Free, Libre operating environment based on the
+       Linux kernel
+     * [72]agunix: Silver Unix is a POSIX userspace focused on cutting the
+       fat out of the typical modern Unix userland
+     * [73]Alfheim Linux: A systemd free, Arch Linux based operating
+       system customized to help you get the most out of your machine
+     * [74]Alpaquita Linux: A full-featured, fast and secure Linux
+       operating system optimized for Java, with performance features
+       including the BellSoft optimized musl version
+     * [75]Alpine Linux: A security-oriented, lightweight Linux
+       distribution based on musl libc and busybox
+     * [76]Alpine-S6: Alpine Linux Base + S6 Init System
+     * [77]Alter Linux: ArchLinux based distro
+     * [78]android-toolchain-build: The new Android GNU toolchain
+     * [79]apathy: A 64 bit libre linux distribution built from scratch
+       using apathy-mlfs for its base; utilizing musl libc, libressl,
+       partially busybox and sysvinit with a home-brewed init structure
+       written in posix shell
+     * [80]apathy-mlfs: A libre linux from scratch book utilizing musl
+       libc, libressl, sysvinit and partially busybox
+     * [81]Arch Linux: A simple, lightweight distribution
+     * [82]ARM Cross Linux From Scratch (arm-clfs): This repo, notes and
+       instructions are designed to build linux from scratch in a cross
+       compiled manner, in support of creating a stage1 tarball for
+       Habitat Studio, for use with arm processors
+     * [83]Artix Linux: A rolling-release distribution, based on Arch
+       Linux that uses OpenRC, runit or s6 as init because PID1 must be
+       simple, secure and stable
+     * [84]Ataraxia Linux: An independent, multi-platform, general purpose
+       operating system, based on the Linux kernel, musl libc and busybox
+     * [85]Automated Linux From Scratch (ALFS): A project that creates the
+       generic framework for an extendable system builder and package
+       installer
+     * [86]Bare Linux: Barely a Linux
+     * [87]Baserock Linux: A great way to build custom appliance systems
+       with Linux
+     * [88]Bedrock Linux: A meta Linux distribution which allows users to
+       utilize features from other, typically mutually exclusive
+       distributions
+     * [89]Beyond Linux From Scratch (BLFS): A project that continues
+       where the LFS book finishes
+     * [90]Beyond Musl Linux From Scratch (BMLFS): Build Recipes for MLFS
+       [Musl Linux From Scratch]
+     * [91]bleeding-edge-toolchain: All-in-one script to build
+       bleeding-edge-toolchain for ARM microcontrollers
+     * [92]Bleeding Linux From Scratch
+     * [93]B/LFS-s6
+     * [94]Bluedragon: A security-enhanced, fully featured XFCE4 desktop,
+       amd64 Gentoo system, built with musl as its C standard library
+     * [95]bonsai: A tiny Linux distribution focused on simplicity and
+       security
+     * [96]build-linux: A short tutorial about building Linux based
+       operating systems
+     * [97]Buildroot: A simple, efficient and easy-to-use tool to generate
+       embedded Linux systems through cross-compilation
+     * [98]Build Your Own Linux: Walks users through building a basic
+       Linux distribution
+     * [99]Businesscard Linux: A Buildroot distribution small enough to
+       run on a business card
+     * [100]Carbs Linux: An in-development Linux® distribution with a
+       suckless mindset
+     * [101]Cavium: Cavium Open-Source Distributions
+     * [102]Chimera Linux: A Linux distribution based on FreeBSD userland
+       and LLVM
+     * [103]Clear Linux OS: An open source, rolling release Linux
+       distribution optimized for performance and security, from the Cloud
+       to the Edge, designed for customization, and manageability
+     * [104]clfs-arm: A project that provides you with step-by-step
+       instructions for building your own customized Linux system entirely
+       from source on the ARM architecture
+     * [105]CloverOS: Performance optimized default Gentoo install
+     * [106]CMLFS: Clang-Built Musl Linux From Scratch
+     * [107]Community Driven BLFS (CBLFS): An open project that takes over
+       after you have completed a Cross-LFS based build
+     * [108]CROSS-BUILDING LINUX: The Little Blue Linux build process
+     * [109]Cross-Compiled Linux From Scratch (CLFS): A project that
+       provides you with step-by-step instructions for building your own
+       customized Linux system entirely from source
+     * [110]Crosstool-NG: A versatile (cross) toolchain generator
+     * [111]crosware: Tools, things, stuff, miscellaneous, detritus, junk,
+       etc., primarily for Chrome OS / Chromium OS
+     * [112]Crux Linux: A lightweight Linux distribution for the x86-64
+       architecture targeted at experienced Linux users
+     * [113]Cucumber Linux: An independent distribution that is usable as
+       an every day, general purpose operating system and aims to do this
+       in as minimalistic a way as possible and in a way that follows the
+       Unix Philosophy
+     * [114]dahliaOS: A modern, secure, lightweight and responsive
+       operating system, combining the best of GNU/Linux and Fuchsia OS
+     * [115]Debian From Scratch: An instruction manual for teaching Linux
+       From Scratch users how to make a fully-fledged Debian system based
+       on LFS
+     * [116]distri: A Linux distribution to research fast package
+       management
+     * [117]Diverse Linux: A spin of Exherbo Linux that provides a set of
+       opinionated defaults, lightweight and/or performant alternatives,
+       binary packages and pre-installed utilities
+     * [118]Docker Linux From Scratch (DLFS): Docker configuration for
+       building Linux From Scratch system
+     * [119]Dragora GNU/Linux-Libre: An independent GNU/Linux-Libre
+       distribution based on concepts of simplicity
+     * [120]EasyOS: An experimental Linux distribution
+     * [121]Eclectic Linux: A new mixed distribution based on Exherbo
+       Linux
+     * [122]EERIE Linux: An experimental distribution which is built with
+       an alternative C Library called musl, and also comes with the
+       package manager pacman and generally tries to be very close to Arch
+       Linux
+     * [123]ELLCC: A project using clang and the LLVM compiler
+       infrastructure
+     * [124]Eltanin: A project aiming to produce a free, simple and
+       complete general purpose operating system
+     * [125]Embedded Linux Wiki: The purpose of this wiki is to preserve
+       and present information about the development and use of Linux in
+       embedded systems as well as open source projects and tools for
+       general embedded development
+     * [126]Funtoo Linux: A community-developed Linux meta-distribution
+       based upon Gentoo Linux
+     * [127]Gary OS: An entire GNU/Linux system in a single bootable file
+     * [128]Gentoo Linux: A highly flexible, source-based Linux
+       distribution
+     * [129]GentooLTO: A Gentoo Portage configuration for building with
+       -O3, Graphite, and LTO optimizations
+     * [130]gentoo-s6-services
+     * [131]Glasnost Linux: A Linux® distribution using the Clang/LLVM
+       toolchain and musl libc
+     * [132]glaucus: An independent, open-source, rolling-release,
+       lightweight Linux® distribution based on musl libc and toybox,
+       designed from scratch for optimum performance without sacrificing
+       convenience
+     * [133]Glendix: An attempt at porting ideas from the Plan 9 operating
+       system to Linux
+     * [134]gnuxc: GNU OS Cross-Compiler
+     * [135]GoboLinux: An alternative Linux distribution which redefines
+       the entire filesystem hierarchy
+     * [136]Hanh Linux: An independent, source-based Linux distribution
+       that is fast, lightweight, simple and flexible
+     * [137]Heads: A minimal Linux that runs as a coreboot or LinuxBoot
+       ROM payload to provide a secure, flexible boot environment for
+       laptops and servers
+     * [138]iglunix: A Linux (and other kernels) distro with no GNU
+       components
+     * [139]KISS: An independent Linux distribution with a focus on
+       simplicity and the concept of "less is more"
+     * [140]Kreato Linux: An independent Linux(R) distribution focused on
+       modularity, simplicity and code readability, inspired from projects
+       such as KISS Linux and Gentoo
+     * [141]KSLinux: A Linux Distribution Based on GNU/Linux
+     * [142]LangitKetujuh: A GNU/Linux distribution with glibc and musl
+       libc based on VoidLinux, using runit init, KDE desktop environment,
+       stable rolling release and efficient resource usage
+     * [143]LFS-s6: s6 scripts for LFS and BLFS
+     * [144]lh-bootstrap: A set of scripts that build a disk image for a
+       virtual machine such as QEMU
+     * [145]Libertine Linux: A secure, built-from git-controlled source
+       Linux system that is fully auditable and runs solely from RAM
+     * [146]lightcube-bootstrap-musl: Scripts to bootstrap a build
+       environment for LightCube OS using musl libc
+     * [147]LiGurOS: A source based distribution based on a broad family
+       of Gentoo-based distributions
+     * [148]Lilala Linux: Minimal linux for single board computer
+     * [149]Linaro: Together with Arm, Linaro co-maintains the Arm
+       software ecosystem, providing the tools, security and Linux kernel
+       quality needed for a solid base to differentiate on
+     * [150]Linux From Scratch (LFS): A project that provides you with
+       step-by-step instructions for building your own custom Linux
+       system, entirely from source code
+     * [151]Linux From Scratch Made (more) Easy (LFS-ME): A simple,
+       fakeroot based, package manager for LFS heavily inspired by
+       Archlinux' package management
+     * [152]make-rootfs: Set of make recipes to bootstrap static musl /
+       llvm based filesystem image
+     * [153]managarm: A pragmatic microkernel-based OS with fully
+       asynchronous I/O
+     * [154]Mere Linux: A lightweight, server-centric Linux distribution
+       using musl libc, pacman and s6
+     * [155]MesaLock Linux: A memory-safe Linux distribution where the
+       whole user space applications are rewritten in memory-safe
+       programming languages like Rust and Go
+     * [156]Metta OS: A multimedia, mobile, social OS
+     * [157]Minimal Linux Live (MLL): A tiny educational Linux
+       distribution, which is designed to be built from scratch by using a
+       collection of automated shell scripts
+     * [158]mkroot: Simple Linux build, bootable under qemu for multiple
+       architectures
+     * [159]MocaccinoOS: A minimal Musl-based Linux From Scratch
+       meta-distribution for the 21st century
+     * [160]Moebius: Minimal Linux distribution for your Raspberry PI
+     * [161]Monolinux: An embedded Linux distro with a single statically
+       linked executable
+     * [162]Morpheus Linux: A suckless linux distro
+     * [163]MUE Linux: An attempt at a minimalistic linux system with
+       strong ideals
+     * [164]musl-cross: A small suite of scripts and patches for building
+       musl libc cross compilers
+     * [165]musl-cross-make: Simple makefile-based build for musl cross
+       compiler
+     * [166]Musl-LFS-s6-Bootscripts: Bootscripts to boot a MLFS/LFS system
+       with s6 and s6-rc
+     * [167]Musl Linux From Scrath (MLFS): Linux From Scratch using Musl
+       as Libc
+     * [168]muslpi: CLFS (Cross Linux From Scratch) build system for
+       raspberry pi using the musl libc
+     * [169]mussel: The shortest and fastest script available today to
+       build working cross compilers that target musl libc
+     * [170]mutiny: BSD-inspired Linux system and research project aiming
+       to be a testbed for interesting system design, forward thinking
+       design choices, minimalism, and fun computing
+     * [171]myLinux: A small UNIX like OS for embedded systems
+     * [172]natick: A research Linux Distribution based on the latest
+       Linux Kernel, the BusyBox userland, and the musl C library
+     * [173]nenuzhnix: The most useless linux distro
+     * [174]NetBSD: A free, fast, secure, and highly portable Unix-like
+       Open Source operating system
+     * [175]NOIR: An independent Linux® distribution with a focus on
+       performance and practical functionality
+     * [176]noname linux: musl based, x86_64 only, lightweight, personal
+       distro
+     * [177]Non-GNU toolchain: Build a toolchain that can build Linux
+       kernel, a minimal userspace (e.g. nenuzhnix) and ultimately itself
+       without using any GNU software
+     * [178]Obarun Linux: Arch Linux based system without systemd
+     * [179]obarun-s6rcserv: s6-rc services
+     * [180]obarun-s6serv: s6 services
+     * [181]OpenBSD: A FREE, multi-platform 4.4BSD-based UNIX-like
+       operating system
+     * [182]OpenEmbedded: The build framework for embedded Linux that
+       offers a best-in-class cross-compile environment and allows
+       developers to create a complete Linux Distribution for embedded
+       systems
+     * [183]OpenMandriva: A full-featured Linux desktop and server,
+       sponsored by the OpenMandriva Association
+     * [184]OpenWrt: A Linux operating system targeting embedded devices
+     * [185]Optimux: Optimized Musl Linux From Scratch
+     * [186]OSDev: This website provides information about the creation of
+       operating systems and serves as a community for those people
+       interested in OS creation
+     * [187]Panda Linux: An open-source and free operating system based on
+       Debian/Ubuntu and built entirely by compiling source-code, using
+       custom optimizations
+     * [188]Physix: An experimental, automated Build-From-Source Linux
+       distribution; originally inspired by Linux From Scratch
+     * [189]PiLFS: Linux From Scratch on the Raspberry Pi
+     * [190]Prelinux: A set of scripts to build a minimal initrd and
+       filesystem
+     * [191]pts-tcc: Tiny, self-contained C compiler using TCC + uClibc
+     * [192]qLinux: A distribution study, that uses [193]mussel to build a
+       cross-compiled musl based Linux distribution
+     * [194]Raptix: An open-source operating system that uses [195]mussel
+       to build a system running a Linux kernel with a custom filesystem
+       hierarchy
+     * [196]rc: s6/s6-rc service management database
+     * [197]rc-user: User s6-rc hierarchy meant for use with [198]rc
+     * [199]rlsd2: A minimalistic GNU/Linux-libre distro
+     * [200]rv8.io: RISC-V simulator for x86-64
+     * [201]s6-boot: Boot files for s6
+     * [202]s6-overlay: s6 overlay for containers (includes execline,
+       s6-linux-utils & a custom init)
+     * [203]Sabotage Linux: An experimental linux distribution based on
+       musl libc and busybox
+     * [204]Serpent OS: A Truly Modern Linux* Distribution, Heavily Under
+       Construction
+     * [205]solyste: [s]illy, [o]dd and [l]ightweight [y]pnose's [st]atic
+       [e]nvironment
+     * [206]Spark: An Arch Linux meta-distro with some core components
+       swapped out
+     * [207]Spider Linux: A work-in-progress, modern, independent, free
+       and open-source Linux distribution
+     * [208]SSD/Linux: The SSD Linux operating system, which straps NetBSD
+       userland functions onto the Linux kernel
+     * [209]StarLinux: A Linux Distribution (rewritten from MLL) which can
+       be build directly on the Host Machine
+     * [210]static linux (stali): A static linux distribution based on the
+       original pre-2010 plans of the suckless.org project, however since
+       2018 it became independent from suckless.org and is maintained by
+       Anselm solely
+     * [211]StelaLinux: A lightweight, simple, and fast
+       glibc/busybox/linux Distribution
+     * [212]superBoxon: A GNU/Linux distribution based on the Slackware 64
+       current with a simple and human friendly BSD like init system
+     * [213]swerve: A suckless-inspired Unix-like monolithic kernel for
+       i386
+     * [214]T2: A flexible Open Source System Development Environment or
+       Distribution Build Kit (others might even name it Meta
+       Distribution)
+     * [215]TeoraLinux: An experimental Linux Distribution with Musl,
+       BusyBox, and Java
+     * [216]tldrlfs: Too Long; Didn't Read Linux From Scratch
+     * [217]tomsrtbt: The most GNU/Linux on 1 floppy disk
+     * [218]trinity: Toy linux distro based on morpheus
+     * [219]UmVirt LFS (ULFS):Source code based transparent & autonomous
+       GNU/Linux infrastructure
+     * [220]Vanilla: A new radically different, simple, modern Linux
+       distribution based on a complete LLVM toolchain, musl and busybox
+     * [221]Venom Linux: A source based linux distribution originally
+       built on top of LFS (Linux From Scratch) guide then independently
+       grows make it usable for daily use
+     * [222]Vine Linux: A compact and lightweight Japanese Linux
+       distribution developed by Project Vine and many collaborators
+     * [223]Void Linux: A general purpose operating system, based on the
+       monolithic Linux® kernel
+     * [224]Warm Linux: A lightweight Linux distribution designed for
+       container-like environments
+     * [225]Wombat Linux: A lightweight Linux distribution that relies on
+       musl-libc over glibc and replaces the usual GNU Coreutils with
+       Suckless Base
+     * [226]Wyverkiss: An alternative rootfs for KISS Linux that doesn't
+       use GNU
+     * [227]Wyvertux: A(n almost) GNU-free Linux distribution
+     * [228]Yocto Project: An open source collaboration project that helps
+       developers create custom Linux-based systems regardless of the
+       hardware architecture
+     * [229]Yosild: A single shell script that builds a full, minimal
+       Linux distribution, based on BusyBox
+     * [230]Zandra Linux: A simple musl-based Linux distribution
+     * [231]ZYDUX: Toolbox to build the cross compiler and minimal GNU
+       Linux from scratch named ZYDUX
+
+Mirrors
+
+     * [232]Bitbucket
+     * [233]Codeberg
+     * [234]Framagit
+     * [235]GitHub
+     * [236]GitLab
+     * [237]NotABug
+     * [238]SourceHut
+
+About
+
+   A curated list of awesome projects
+
+Topics
+
+   [239]awesome [240]projects [241]curated
+
+Resources
+
+   [242]Readme
+
+License
+
+   [243]ISC license
+
+Stars
+
+   [244]132 stars
+
+Watchers
+
+   [245]10 watching
+
+Forks
+
+   [246]6 forks
+   [247]Report repository
+
+[248]Releases
+
+   No releases published
+
+[249]Packages 0
+
+   No packages published
+
+[250]Contributors 2
+
+     *
+     *
+
+Footer
+
+   © 2023 GitHub, Inc.
+
+Footer navigation
+
+     * [251]Terms
+     * [252]Privacy
+     * [253]Security
+     * [254]Status
+     * [255]Docs
+     * [256]Contact GitHub
+     * [257]Pricing
+     * [258]API
+     * [259]Training
+     * [260]Blog
+     * [261]About
+
+   (BUTTON) You can't perform that action at this time.
+
+   You signed in with another tab or window. [262]Reload to refresh your
+   session. You signed out in another tab or window. [263]Reload to
+   refresh your session.
+
+   (BUTTON)
+
+References
+
+   Visible links:
+   1. https://github.com/opensearch.xml
+   2. https://github.com/firasuke/awesome#start-of-content
+   3. https://github.com/signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E&source=header-repo
+   4. https://github.com/features
+   5. https://docs.github.com/
+   6. https://skills.github.com/
+   7. https://github.blog/
+   8. https://github.com/enterprise
+   9. https://github.com/team
+  10. https://github.com/enterprise/startups
+  11. https://education.github.com/
+  12. https://github.com/solutions/ci-cd/
+  13. https://resources.github.com/devops/
+  14. https://resources.github.com/devops/fundamentals/devsecops/
+  15. https://github.com/customer-stories
+  16. https://resources.github.com/
+  17. https://github.com/topics
+  18. https://github.com/trending
+  19. https://github.com/collections
+  20. https://github.com/pricing
+  21. https://github.com/login?return_to=https%3A%2F%2Fgithub.com%2Ffirasuke%2Fawesome
+  22. https://github.com/signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E&source=header-repo&source_repo=firasuke%2Fawesome
+  23. https://github.com/firasuke
+  24. https://github.com/firasuke/awesome
+  25. https://github.com/login?return_to=%2Ffirasuke%2Fawesome
+  26. https://github.com/login?return_to=%2Ffirasuke%2Fawesome
+  27. https://github.com/login?return_to=%2Ffirasuke%2Fawesome
+  28. https://github.com/firasuke/awesome/blob/main/LICENSE
+  29. https://github.com/firasuke/awesome/stargazers
+  30. https://github.com/firasuke/awesome/forks
+  31. https://github.com/login?return_to=%2Ffirasuke%2Fawesome
+  32. https://github.com/login?return_to=%2Ffirasuke%2Fawesome
+  33. https://github.com/firasuke/awesome
+  34. https://github.com/firasuke/awesome/issues
+  35. https://github.com/firasuke/awesome/pulls
+  36. https://github.com/firasuke/awesome/actions
+  37. https://github.com/firasuke/awesome/projects
+  38. https://github.com/firasuke/awesome/security
+  39. https://github.com/firasuke/awesome/pulse
+  40. https://github.com/firasuke/awesome
+  41. https://github.com/firasuke/awesome/issues
+  42. https://github.com/firasuke/awesome/pulls
+  43. https://github.com/firasuke/awesome/actions
+  44. https://github.com/firasuke/awesome/projects
+  45. https://github.com/firasuke/awesome/security
+  46. https://github.com/firasuke/awesome/pulse
+  47. https://github.com/firasuke/awesome/tree/{{%20urlEncodedRefName%20}}
+  48. https://github.com/firasuke/awesome/branches
+  49. https://github.com/firasuke/awesome/tree/{{%20urlEncodedRefName%20}}
+  50. https://github.com/firasuke/awesome/tags
+  51. https://github.com/firasuke/awesome/branches
+  52. https://github.com/firasuke/awesome/tags
+  53. https://cli.github.com/
+  54. https://desktop.github.com/
+  55. https://github.com/firasuke/awesome/archive/refs/heads/main.zip
+  56. https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=216342127
+  57. https://desktop.github.com/
+  58. https://desktop.github.com/
+  59. https://developer.apple.com/xcode/
+  60. https://github.com/firasuke/awesome/commits/main
+  61. https://github.com/firasuke/awesome/tree/f946424e2e29305db7356157bba158b7ad5e3232
+  62. https://github.com/firasuke/awesome/blob/main/LICENSE
+  63. https://github.com/firasuke/awesome/blob/main/README.md
+  64. https://github.com/firasuke/awesome#awesome
+  65. https://github.com/firasuke/awesome#mirrors
+  66. https://github.com/firasuke/awesome#readme
+  67. https://www.glaucuslinux.org/
+  68. https://github.com/Aalbus-linux/Aalbus
+  69. http://landley.net/aboriginal/
+  70. https://abyss.run/
+  71. https://www.adelielinux.org/
+  72. https://drewdevault.com/2017/05/05/Building-a-real-Linux-distro.html
+  73. https://alfheimlinux.wixsite.com/alfheimlinux
+  74. https://bell-sw.com/alpaquita-linux
+  75. https://alpinelinux.org/
+  76. https://github.com/woahbase/alpine-s6
+  77. https://github.com/SereneTeam/alterlinux
+  78. https://github.com/redstar3894/android-toolchain-build
+  79. https://github.com/mssx86/apathy
+  80. https://github.com/mssx86/apathy-mlfs
+  81. https://www.archlinux.org/
+  82. https://github.com/predominant/arm-clfs
+  83. https://artixlinux.org/
+  84. https://ataraxialinux.github.io/
+  85. http://linuxfromscratch.org/alfs/
+  86. https://github.com/uggedal/bare
+  87. https://wiki.baserock.org/
+  88. https://bedrocklinux.org/
+  89. http://linuxfromscratch.org/blfs/
+  90. https://github.com/dslm4515/BMLFS
+  91. https://github.com/FreddieChopin/bleeding-edge-toolchain
+  92. https://islief.com/wiki/index.php/Bleeding_Linux_From_Scratch
+  93. https://www.linuxquestions.org/questions/linux-from-scratch-13/%5Bannoucement%5D-b-lfs-s6-project-4175510228/
+  94. https://wiki.gentoo.org/wiki/Project:Hardened_musl/Bluedragon
+  95. https://github.com/bonsai-linux/bonsai
+  96. https://github.com/MichielDerhaeg/build-linux
+  97. https://buildroot.org/
+  98. http://www.buildyourownlinux.com/
+  99. https://github.com/thirtythreeforty/businesscard-linux
+ 100. https://carbslinux.org/
+ 101. https://github.com/Cavium-Open-Source-Distributions
+ 102. https://chimera-linux.org/
+ 103. https://clearlinux.org/
+ 104. https://github.com/LeeKyuHyuk/clfs-arm
+ 105. https://cloveros.ga/
+ 106. https://github.com/dslm4515/CMLFS
+ 107. https://cblfs.clfs.org/index.php/Main_Page
+ 108. http://git.freesa.org/freesa/cbl
+ 109. https://trac.clfs.org/
+ 110. http://crosstool-ng.github.io/
+ 111. https://github.com/ryanwoodsmall/crosware
+ 112. https://crux.nu/
+ 113. https://cucumberlinux.com/
+ 114. https://dahliaos.io/
+ 115. https://github.com/scottwilliambeasley/debian-from-scratch
+ 116. https://distr1.org/
+ 117. https://gitlab.exherbo.org/diverse/diverse-design
+ 118. https://github.com/reinterpretcat/lfs
+ 119. https://www.dragora.org/en/index.html
+ 120. https://easyos.org/
+ 121. https://github.com/eclectic-linux/design
+ 122. https://chiselapp.com/user/kraileth/repository/e5-musl/home
+ 123. http://ellcc.org/
+ 124. https://eltan.in.net/
+ 125. https://elinux.org/
+ 126. https://www.funtoo.org/Welcome
+ 127. https://github.com/garybgenett/gary-os
+ 128. https://gentoo.org/
+ 129. https://github.com/InBetweenNames/gentooLTO
+ 130. https://github.com/rain-1/gentoo-s6-services
+ 131. https://www.glasnost.org/
+ 132. https://www.glaucuslinux.org/
+ 133. http://www.glendix.org/
+ 134. https://github.com/dm0-/gnuxc
+ 135. https://gobolinux.org/
+ 136. https://hanh-linux.github.io/
+ 137. https://github.com/osresearch/heads
+ 138. https://github.com/iglunix/iglunix
+ 139. https://kisslinux.org/
+ 140. https://linux.kreato.dev/
+ 141. https://github.com/Takeya-Yuki/KSLinux
+ 142. https://langitketujuh.id/
+ 143. https://github.com/djlucas/LFS-s6
+ 144. https://skarnet.org/software/lh-bootstrap
+ 145. https://github.com/libertine-linux/libertine
+ 146. https://github.com/jhuntwork/lightcube-bootstrap-musl
+ 147. https://liguros.gitlab.io/
+ 148. https://github.com/ilmich/lilala-linux
+ 149. https://www.linaro.org/
+ 150. http://linuxfromscratch.org/
+ 151. https://github.com/FSMaxB/lfs-me
+ 152. https://github.com/medvid/make-rootfs
+ 153. https://github.com/managarm/managarm
+ 154. https://github.com/jhuntwork/merelinux
+ 155. https://github.com/mesalock-linux/mesalock-distro
+ 156. https://github.com/metta-systems/metta
+ 157. http://minimal.idzona.com/
+ 158. https://github.com/landley/mkroot
+ 159. https://www.mocaccino.org/
+ 160. http://moebiuslinux.sourceforge.net/
+ 161. https://github.com/eerimoq/monolinux
+ 162. https://morpheus.2f30.org/
+ 163. https://github.com/muevoid/mue-linux
+ 164. https://github.com/GregorR/musl-cross
+ 165. https://github.com/richfelker/musl-cross-make
+ 166. https://github.com/dslm4515/MLFS-S6-Bootscripts
+ 167. https://github.com/dslm4515/Musl-LFS
+ 168. https://github.com/repk/muslpi
+ 169. https://github.com/firasuke/mussel
+ 170. https://mutiny.red/
+ 171. https://github.com/troglobit/myLinux
+ 172. https://github.com/awlsomealex/natick
+ 173. https://github.com/tpimh/nenuzhnix
+ 174. http://netbsd.org/
+ 175. https://github.com/noirlinux
+ 176. https://github.com/xhebox/noname-linux
+ 177. https://github.com/tpimh/ngtc
+ 178. https://web.obarun.org/
+ 179. https://github.com/Obarun/obarun-s6rcserv
+ 180. https://github.com/Obarun/obarun-s6serv
+ 181. https://www.openbsd.org/
+ 182. http://www.openembedded.org/wiki/Main_Page
+ 183. https://www.openmandriva.org/
+ 184. https://openwrt.org/
+ 185. https://github.com/dslm4515/Optimux
+ 186. https://wiki.osdev.org/
+ 187. https://github.com/PandaLinux/base-64
+ 188. https://physixproject.org/
+ 189. https://intestinate.com/pilfs
+ 190. https://github.com/mikejsavage/prelinux
+ 191. https://github.com/pts/pts-tcc
+ 192. https://qlinux.qware.org/doku.php
+ 193. https://github.com/firasuke/mussel
+ 194. https://github.com/dslm4515/Raptix
+ 195. https://github.com/firasuke/mussel
+ 196. https://github.com/smaeul/rc
+ 197. https://github.com/smaeul/rc-user
+ 198. https://github.com/smaeul/rc
+ 199. http://rlsd2.dimakrasner.com/
+ 200. https://github.com/rv8-io
+ 201. https://github.com/Obarun/s6-boot
+ 202. https://github.com/just-containers/s6-overlay
+ 203. http://sabo.xyz/
+ 204. https://www.serpentos.com/
+ 205. https://framagit.org/Ypnose/solyste
+ 206. https://fleshless.org/pages/spark.html
+ 207. https://github.com/spider-linux/spiderlinux
+ 208. https://www.plathome.co.jp/support/labo/ssdlinux/
+ 209. https://github.com/AwlsomeAlex/starlinux
+ 210. https://sta.li/
+ 211. https://github.com/AwlsomeAlex/stelalinux
+ 212. https://superboxon.com/
+ 213. https://github.com/swegbun/swerve
+ 214. https://t2sde.org/
+ 215. https://github.com/AwlsomeAlex/TeoraLinux
+ 216. https://github.com/Sweets/tldrlfs
+ 217. http://www.toms.net/rb/
+ 218. https://notabug.org/rain1/trinity
+ 219. http://umvirt.com/linux/
+ 220. http://projects.malikania.fr/vanilla/
+ 221. https://github.com/venomlinux
+ 222. https://vinelinux.org/
+ 223. https://voidlinux.org/
+ 224. https://github.com/WarmLinux
+ 225. https://wombatlinux.org/
+ 226. https://github.com/wyvertux/wyverkiss
+ 227. https://github.com/wyvertux/wyvertux
+ 228. https://www.yoctoproject.org/
+ 229. https://jm.iq.pl/yosild-my-your-linux-distribution/
+ 230. http://zandra.xyz/
+ 231. https://github.com/rom1nux/zydux-forge
+ 232. https://bitbucket.org/firasuke/awesome
+ 233. https://codeberg.org/firasuke/awesome
+ 234. https://framagit.org/firasuke/awesome
+ 235. https://github.com/firasuke/awesome
+ 236. https://gitlab.com/firasuke/awesome
+ 237. https://notabug.org/firasuke/awesome
+ 238. https://git.sr.ht/~firasuke/awesome
+ 239. https://github.com/topics/awesome
+ 240. https://github.com/topics/projects
+ 241. https://github.com/topics/curated
+ 242. https://github.com/firasuke/awesome#readme
+ 243. https://github.com/firasuke/awesome/blob/main/LICENSE
+ 244. https://github.com/firasuke/awesome/stargazers
+ 245. https://github.com/firasuke/awesome/watchers
+ 246. https://github.com/firasuke/awesome/forks
+ 247. https://github.com/contact/report-content?content_url=https%3A%2F%2Fgithub.com%2Ffirasuke%2Fawesome&report=firasuke+%28user%29
+ 248. https://github.com/firasuke/awesome/releases
+ 249. https://github.com/users/firasuke/packages?repo_name=awesome
+ 250. https://github.com/firasuke/awesome/graphs/contributors
+ 251. https://docs.github.com/site-policy/github-terms/github-terms-of-service
+ 252. https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+ 253. https://github.com/security
+ 254. https://www.githubstatus.com/
+ 255. https://docs.github.com/
+ 256. https://support.github.com/?tags=dotcom-footer
+ 257. https://github.com/pricing
+ 258. https://docs.github.com/
+ 259. https://services.github.com/
+ 260. https://github.blog/
+ 261. https://github.com/about
+ 262. https://github.com/firasuke/awesome
+ 263. https://github.com/firasuke/awesome
+
+   Hidden links:
+ 265. https://github.com/
+ 266. https://github.com/features/actions
+ 267. https://github.com/features/packages
+ 268. https://github.com/features/security
+ 269. https://github.com/features/codespaces
+ 270. https://github.com/features/copilot
+ 271. https://github.com/features/code-review
+ 272. https://github.com/features/issues
+ 273. https://github.com/features/discussions
+ 274. https://github.com/sponsors
+ 275. https://github.com/readme
+ 276. https://github.com/firasuke/awesome
+ 277. https://github.com/firasuke/awesome
+ 278. https://github.com/firasuke/awesome
+ 279. https://github.com/firasuke/awesome
+ 280. https://docs.github.com/articles/which-remote-url-should-i-use
+ 281. https://github.com/firasuke/awesome#awesome
+ 282. https://github.com/firasuke/awesome#mirrors
+ 283. https://github.com/

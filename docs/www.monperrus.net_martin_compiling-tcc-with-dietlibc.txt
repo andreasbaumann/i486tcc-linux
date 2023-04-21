@@ -1,0 +1,53 @@
+                          Compiling tcc with dietlibc
+
+   by Martin Monperrus
+
+   [1]Tcc (aka Tiny C Compiler, or tinycc) is a very lightweight C
+   compiler. [2]Dietlibc is a lighweight libc (as opposed to [3]GNU libc).
+
+   It is possible to compile tcc itself using dietlibc. First download the
+   source code of tcc and install dietlibc (apt-get install dietlibc-dev).
+
+   You have to do the following.
+
+   In config.mak, modify the compiling and linking flags:
+  CFLAGS=-I/usr/include/diet/ -D__dietlibc__ -DCONFIG_TCC_STATIC
+  LDFLAGS=-L/usr/lib/diet/lib/ -nostartfiles
+
+   CONFIG_TCC_STATIC says that dynamic loading (libdl) should not be used.
+   However, there is a dependency to libdl at linking time (-ldl).
+
+   In `Makefile':
+     * remove LIBS+=-ldl.
+     * add crt0.o to linked objects ` $(CC) -o $@ crt0.o $^ $(LIBS)
+       $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $(LINK_LIBTCC)
+
+   [4]crt0.o is the startup file which provides function _start as entry
+   point. Function _start of dietlibc is in a file called start.o. We copy
+   it to crt0.o (since this name is hard coded in tcc, see
+   [5]http://www.monperrus.net/martin/compiling-c-code-with-dietlibc-and-t
+   cc):
+  $ cp /usr/lib/diet/lib/start.o crt0.o
+
+   Then, simply build tcc:
+  $ make
+
+   Results: Using dietlibc, the resulting tcc weighs 211k and libtcc1.a
+   16k. Using the GNU libc, it is respectively 583k and 52k.
+
+   Tagged as:
+     * [6]programming
+
+   Created on January 05, 2014 Edit
+
+   [7]42? No:
+
+References
+
+   1. http://bellard.org/tcc/
+   2. http://www.fefe.de/dietlibc/
+   3. https://www.gnu.org/software/libc/
+   4. http://en.wikipedia.org/wiki/Crt0
+   5. http://www.monperrus.net/martin/compiling-c-code-with-dietlibc-and-tcc
+   6. https://www.monperrus.net/martin/programming
+   7. https://queue.acm.org/detail.cfm?id=3534857

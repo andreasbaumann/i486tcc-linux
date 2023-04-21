@@ -1,0 +1,451 @@
+   [1]musl libc logo musl libc A new libc striving to be fast, simple,
+   lightweight, free, and correct
+
+   ____________________
+     * [2]Alternative Libraries and Programs
+          + [3]Compression/Decompression
+          + [4]Cryptography
+          + [5]Databases
+          + [6]Graphics
+          + [7]Video
+          + [8]X11 alternatives
+          + [9]Compilers/preprocessors
+          + [10]Scripting languages
+          + [11]PDF
+          + [12]Regular Expressions
+     * [13]Code Collections and Basic Libraries/Programs
+     * [14]General Suggestions/Recommendations
+
+                                  Alternatives
+
+   Resource list for alternative libraries and programs that are
+   lightweight, not bloated, efficient or have other useful design
+   characteristics and may be usable with musl.
+
+                       Alternative Libraries and Programs
+
+     * [15]pkgconf - Drop in replacement for pkg-config with no circular
+       dependencies. Does not require glib.
+     * [16]netbsd-curses - Drop in replacement for ncurses and ncursesw,
+       ported from netbsd. considerably smaller than ncurses.
+     * [17]slibtool - Independent reimplementation of slibtool, aiming to
+       maintain compatibility and removing features that are unneeded on
+       modern systems.
+     * [18]cDetect - C replacement for feature detection generally
+       provided by utilities like GNU autotools.
+     * [19]freeglut - Replacement for glut.
+     * [20]libutf - UTF8 library (note that by using musl, UTF8 support is
+       automatically enabled. no need to use any 3rd party library)
+     * [21]gettext-tiny - gettext replacement. Provides an
+       extra-compatible implementation of libintl for musl, or a no-op,
+       along with several no-op gettext utilities, and a complete msgfmt
+       implementation.
+     * [22]gettext-stub - Provides a stub replacement for libintl.
+     * [23]libdrpc - Port of RPC based on Android's libdrpc. Replaces
+       parts of older glibc RPC functionality and/or libtirpc.
+     * [24]libsep - Minimal RPC library to assist compartmentalization of
+       small applications.
+     * [25]minised - Faster but limited earlier version of sed. (note that
+       busybox 1.20.2's sed implementation is 100% POSIX compatible and
+       feature-complete)
+     * [26]ignite - init replacement, works with runit.
+     * [27]linenoise - lightweight readline replacement.
+     * [28]libedit - drop-in replacement for readline ([29]needs a handful
+       of symlinks). about 30% less code. lacks some rare functions but is
+       compatible with a number of readline users, like gdb.
+     * [DEL: [30]termbox - alternative to ncurses for simple terminal
+       apps. 16 colors only. very small, clean, well designed code. :DEL]
+       only up to commit [31]66c3f91b
+     * [32]tinyalsa - alternative to alsalib (interfacing with kernel's
+       ALSA API).
+     * [33]libnl-tiny - drop-in replacement for netlink (libnl 1.2). may
+       need some [34]compatibility CFLAGS.
+     * [35]uuterm - slim terminal emulator written by musl's author.
+     * [36]udhcpc - small DHCP client, part of Busybox. use these [37]two
+       [38]scripts to operate it.
+     * [39]ndhc - small DHCP client, focus on security.
+     * [40]mandoc - alternative to massively bloated groff and
+       accompanying manpage implementation.
+     * [41]moe - A powerful and user-friendly console text editor
+       (alternative to GNU Nano and Joe), but written in C++...
+     * [42]textadept - Highly configurable and customizable text editor
+       written in C (and Lua) and based on Scintilla editor widget.
+       Terminal version works with ncurses or pdcurses. Also check out
+       Scinterm, the ncurses based version of the Scintilla editor
+       component.
+     * [43]slock - minimalist alternative to xlock and xlockmore.
+     * [44]star - Alternative to GNU tar.
+     * [45]uSTL - replacement for the C++ STL (Standard Template Library).
+     * [46]samurai - drop-in replacement for ninja written in C.
+     * [47]ETL - Embedded Template Library. A C++ template library for
+       embedded applications.
+     * [48]svn-lite - read-only replacement for bloated apache.org SVN
+       client. includes svn2git tool. useful for checking out that
+       occasional repo still not migrated to git.
+
+Compression/Decompression
+
+     * [49]Sortix libz cleaned up, modern fork of zlib.
+     * [50]libarchive bsdtar offers a replacement for gnu tar.
+     * [51]Lzip family of data compressors based on the LZMA algorithm.
+       See [Benchmark], and [Quality-assurance].
+     * [52]XZ Embedded small XZ decompressor library.
+     * [53]lzo very fast compression library.
+     * [54]gzfile.c C routines to read gzipped files.
+     * [55]miniz Single C source file Deflate/Inflate compression library
+       with zlib-compatible API, ZIP archive reading/writing, PNG writing.
+     * [56]flate small gzip compatible compressor lib
+     * [57]lz4 extremely fast (BSD-licensed) compression algorithm
+     * [58]lz4 alternate lz4 implementation (BSD-licensed), even smaller
+     * [59]basic compression library non-bloated (zlib-licensed)
+       implementation of several basic compression algorithms.
+
+   [60]Large Text Compression Benchmark
+
+Cryptography
+
+     * [61]TweetNaCl tiny, fully NaCl-compatible high-security
+       cryptography library (single C file)
+     * [62]libtomcrypt public domain cryptography library
+     * [63]kripto lightweight cryptography library written in ISO C99.
+       WIP.
+     * [64]libsodium encryption/decryption library
+     * [65]tropicssl SSL library (BSD) - unmaintained and lacking a few
+       patches for recent vulnerabilities found in PolarSSL.
+     * [66]PolarSSL SSL library (GPL) - commercialized and relicensed fork
+       of tropicssl.
+     * [67]cyassl SSL library (GPL)
+     * [68]axtls SSL library (BSD license)
+     * [69]selene SSL/TLS library (Apache license)
+     * [70]Dropbear replacement for OpenSSH.
+     * [71]LibreSSL drop-in replacement for (and fork of) OpenSSL.
+
+Databases
+
+     * [72]tinyCDB small constant database library. Perl wrappers are
+       available on CPAN.
+     * [73]LMDB high-performance, mmap'd key-value store used in the
+       OpenLDAP project.
+
+Graphics
+
+     * [74]Agar MIT-licensed, lightweight GUI toolkit lib written in C
+     * [75]iup lightweight and portable GUI toolkit written in C, has Lua
+       bindings
+     * [76]mtk lightweight GUI library written in C. currently writes
+       directly to videomem of the milkymist open source hardware
+       platform. requires port to X/SDL/FB.
+     * [77]GraphApp Toolkit for platform-independent graphical user
+       interface programming in the C language.
+     * [78]m2tklib Mini Interactive Interface Toolkit Library - a portable
+       graphical and character user interface (GUI+CUI) library for
+       embedded systems.
+     * [79]ftk GUI library for embedded systems.
+     * [80]SVG library
+     * [81]SDL_svg library
+     * [82]pnglite
+     * [83]simple-png
+     * [84]lodepng single-file implementation to read png files. requires
+       zlib.
+     * [85]picojpeg
+     * [86]SOIL Simple OpenGL Image Library
+     * [87]gleri OpenGL implementation for remote GL usage.
+     * [88]TinyGL OpenGL implementation with software rendering. needs
+       some fixes to work on 64bit arches.
+
+Video
+
+     * [89]mpv video player forked from mplayer2 with tons of junk
+       removed. builds in seconds.
+
+X11 alternatives
+
+     * [90]tinyxlib
+     * [91]nano-x
+     * [92]directfb
+
+Compilers/preprocessors
+
+     * [93]ucpp C99 preprocessor library and program.
+     * [94]mcpp another C99 preprocessor library and program.
+     * [95]sparse mostly C99 compatible semantic analyzer and C frontend
+       written by Linus Torvalds.
+     * [96]firm/cparser C99 compatible C compiler and optimization
+       framework. x86 and SPARC backends.
+     * [97]GPP General Purpose Preprocessor. Has added functionality not
+       available in a standard C preprocessor. Can be used as a
+       preprocessor or working with templates.
+     * [98]vbcc mostly C99 compatible C compiler. open source but non-free
+       LICENSE.
+     * [99]cproc very promising and clean C11 compiler, using QBE as its
+       backend. can compile most C codebases, including GCC 4.7.4. roughly
+       10x faster than GCC 8.
+     * [100]lacc very fast C11 compiler, targetting amd64. not far away
+       from approaching TCC's speed.
+     * [101]pcc fast C99 compiler, targetting various archs. about 20x
+       faster than gcc while achieving ~80% of its performance.
+     * [102]qbe codegen backend for compiler projects. current emits code
+       for amd64 and aarch64. achieves ~70% of performance of GCC -O2,
+       with roughly 10KLOC.
+     * [103]mir JIT codegen backend. supports most 64bit archs, and
+       features a full C11 compiler frontend to generate mir bytecode, and
+       an interpreter for the bytecode. targets 70% of GCC -O2
+       performance.
+     * [104]lightning very versatile JIT codegen backend, using a single
+       input RISC mnemonic language, and featuring codegen for almost all
+       existing architectures.
+
+Scripting languages
+
+     * [105]Lua is a full-fledged small embeddable as well as standalone
+       language. Pretty popular, but some semantic choices may make
+       conscious programmer cringe: accessing non-existent (mistyped)
+       variable returns legitimate value, array indexes start from 1, etc.
+     * [106]Quasar m4 is a small GNU m4-compatible re-implementation
+       derived from the FreeBSD m4.
+     * [107]Squirrel is embeddable language with C-like syntax and minimal
+       number of syntax/semantics idiosyncrasies. Uses reference counting.
+       Core builds to ~250KB for i386. uses C++ though.
+          + [108]General-Purpose Squirrel - fork to make a standalone
+            general-purpose language out of Squirrel core, without
+            compromising on lightweightedness.
+     * [109]jim embedded Tcl scripting engine in ANSI C. compiles to
+       100-200KB depending on feature set.
+     * [110]TinyJS An extremely simple (~2000 line) JavaScript
+       interpreter.
+     * [111]42TinyJS Fork of TinyJS with more functionality.
+     * [112]Quad-Wheel Small but full-ECMA-262 supported JavaScript
+       engine, written in ANSI C.
+     * [113]tinypy Minimalist implementation of python in 64k of code.
+
+PDF
+
+     * [114]mupdf Lightweight PDF viewer.
+     * [115]Poppler versus mupdf
+
+Regular Expressions
+
+   Musl's regular expressions pattern matching routines are based on the
+   [116]TRE library. The Musl version of the code contains at least two
+   bug fixes that were never fixed in the original code. For file pattern
+   matching (fnmatch), musl uses an implementation based on the "Sea of
+   Stars" algorithm.
+
+   Comparing Perl regular expressions implementations to Regex
+   implementations shows pattern matching performance for various cases,
+   but it can be like comparing apples to oranges. Perl regular expression
+   pattern matching is not equivalent to a regular language which can be
+   solved by a finite state automata. Some regex extensions also may not
+   be compliant with the definition of a formal regular language.
+     * [117]Regular Expression Matching Can Be Simple And Fast One
+       comparison between regex and Perl regular expressions.
+     * [118]Regex Benchmark Compares various regular expression methods'
+       performances.
+     * [119]PCRE performance Comparison of PCRE JIT with other regular
+       expression methods' performances. Older performance comparisons
+       don't typically include PCRE JIT which has better performance than
+       standard PCRE. They just use standard PCRE.
+
+                 Code Collections and Basic Libraries/Programs
+
+     * [120]Toybox
+     * [121]Busybox
+     * [122]Heirloom Project
+     * [123]Utilities Chest - a set of Unix utilities written to be simple
+       and small
+     * [124]picobsd
+     * [125]obase Port of OpenBSD userland to Linux
+     * [126]noXCUse New Open XCU Simple Edition; or, No Excuse for bloat
+       and brokenness: a set of Unix utilities developed by musl's author.
+     * [127]pikhq-coreutils a (small) set of Unix utilities.
+     * [128]hardcore-utils a (small) set of Unix utilities.
+     * [129]sbase portable set of suckless Unix utilities
+     * [130]ubase Linux-specific set of suckless Unix utilities
+       (util-linux replacement)
+     * [131]lazy-utils a (small) set of Unix utilities to complement
+       toybox
+     * [132]usul From the main developer of sbase. non-POSIX tabular Unix
+       utilities.
+     * [133]lit cave Has a lot of lightweight replacement programs,
+       including a troff implementation, utilities using framebuffer and a
+       C compiler.
+     * [134]elks The elks tarball includes a collection ("elkscmd") of
+       very lightweight standard Unix programs, taken from Minix and other
+       sources. Also includes lightweight man alternative (bugfixed
+       version is included in hardcore-utils).
+     * [135]skarnet software Various utilities.
+     * [136]Bizarre Sources Init replacement and other small programs.
+
+                      General Suggestions/Recommendations
+
+     * [137]Stuff that rocks Suckless.org recommendations on libraries
+       they prefer.
+     * [138]Harmful software Uriel's alternatives list. Not maintained.
+     * [139]Puppy Linux forum thread on Unbloated resources
+     * [140]choosing an ssl library
+     * [141]Busybox tiny utility recommendations
+     * [142]Unbloated resources in C (beware of stb* from nothings.org
+       since author is ignorant about invoking UB)
+     * [143]embutils
+     * [144]MinGW Useful links I realize the page is for MinGW, but it has
+       several cross-platform library recommendations including a large
+       list of GUIs. It's easier to refer to that page than to try to
+       maintain two sets of library lists (here and at the MinGW wiki) for
+       certain categories.
+
+   You can contribute to this wiki! Submit pull-requests to
+   [145]somasis/musl-wiki.
+   [146]Build status [147]GitHub issues
+   This work is licensed under the [148]Creative Commons
+   Attribution-ShareAlike 3.0 Unported license, unless otherwise noted.
+
+References
+
+   1. https://wiki.musl-libc.org/
+   2. https://wiki.musl-libc.org/alternatives.html#Alternative-Libraries-and-Programs
+   3. https://wiki.musl-libc.org/alternatives.html#Compression/Decompression
+   4. https://wiki.musl-libc.org/alternatives.html#Cryptography
+   5. https://wiki.musl-libc.org/alternatives.html#Databases
+   6. https://wiki.musl-libc.org/alternatives.html#Graphics
+   7. https://wiki.musl-libc.org/alternatives.html#Video
+   8. https://wiki.musl-libc.org/alternatives.html#X11-alternatives
+   9. https://wiki.musl-libc.org/alternatives.html#Compilers/preprocessors
+  10. https://wiki.musl-libc.org/alternatives.html#Scripting-languages
+  11. https://wiki.musl-libc.org/alternatives.html#PDF
+  12. https://wiki.musl-libc.org/alternatives.html#Regular-Expressions
+  13. https://wiki.musl-libc.org/alternatives.html#Code-Collections-and-Basic-Libraries/Programs
+  14. https://wiki.musl-libc.org/alternatives.html#General-Suggestions/Recommendations
+  15. https://github.com/pkgconf/pkgconf
+  16. https://github.com/sabotage-linux/netbsd-curses
+  17. http://git.midipix.org/cgit.cgi/slibtool
+  18. http://sourceforge.net/projects/cdetect/
+  19. http://freeglut.sourceforge.net/
+  20. https://github.com/cls/libutf
+  21. https://github.com/sabotage-linux/gettext-tiny
+  22. http://penma.de/code/gettext-stub/
+  23. https://github.com/idunham/libdrpc
+  24. https://github.com/marinosi/libsep
+  25. http://www.exactcode.com/site/open_source/minised/
+  26. https://github.com/chneukirchen/ignite
+  27. https://github.com/antirez/linenoise
+  28. http://www.thrysoee.dk/editline/
+  29. https://github.com/sabotage-linux/sabotage/blob/master/pkg/libedit#L19
+  30. https://github.com/nsf/termbox
+  31. https://github.com/nsf/termbox/commit/66c3f91b14e24510319bce6b5cc2fecf8cf5abff#commitcomment-3790714
+  32. https://github.com/tinyalsa/tinyalsa
+  33. https://github.com/sabotage-linux/libnl-tiny
+  34. https://github.com/sabotage-linux/sabotage/blob/master/pkg/wpa-supplicant#L20
+  35. http://git.musl-libc.org/cgit/uuterm/
+  36. http://en.wikipedia.org/wiki/Udhcpc
+  37. https://github.com/sabotage-linux/sabotage/blob/master/KEEP/etc/udhcpc-script
+  38. https://github.com/sabotage-linux/sabotage/blob/master/KEEP/bin/dhclient
+  39. https://github.com/niklata/ndhc
+  40. http://mdocml.bsd.lv/
+  41. http://gnu.org/software/moe
+  42. http://foicica.com/textadept/
+  43. http://tools.suckless.org/slock
+  44. http://freecode.com/projects/star
+  45. https://github.com/msharov/ustl
+  46. https://github.com/michaelforney/samurai
+  47. https://www.etlcpp.com/
+  48. https://github.com/rofl0r/svn-lite
+  49. https://sortix.org/libz/
+  50. http://www.libarchive.org/
+  51. http://lzip.nongnu.org/lzip.html
+  52. http://tukaani.org/xz/embedded.html
+  53. http://www.oberhumer.com/opensource/lzo/
+  54. http://wizard.ae.krakow.pl/~jb/gzfile/
+  55. http://code.google.com/p/miniz/
+  56. https://oldgit.suckless.org/flate/
+  57. https://github.com/Cyan4973/lz4
+  58. https://github.com/htruong/lz4
+  59. http://bcl.comli.eu/home-en.html
+  60. http://mattmahoney.net/dc/text.html
+  61. http://tweetnacl.cr.yp.to/
+  62. https://github.com/libtom/libtomcrypt
+  63. https://github.com/lightbit/kripto
+  64. https://github.com/jedisct1/libsodium
+  65. https://github.com/axic/tropicssl
+  66. https://polarssl.org/
+  67. http://yassl.com/yaSSL/Home.html
+  68. http://axtls.sourceforge.net/
+  69. https://github.com/pquerna/selene
+  70. https://matt.ucc.asn.au/dropbear/dropbear.html
+  71. http://www.libressl.org/
+  72. http://www.corpit.ru/mjt/tinycdb.html
+  73. http://symas.com/mdb/
+  74. http://libagar.org/
+  75. http://www.tecgraf.puc-rio.br/iup/
+  76. https://github.com/milkymist/mtk
+  77. http://enchantia.com/software/graphapp/index.html
+  78. https://code.google.com/p/m2tklib/
+  79. https://code.google.com/p/ftk/
+  80. http://www.netsurf-browser.org/projects/libsvgtiny/
+  81. http://www.linuxmotors.com/SDL_svg/
+  82. http://sourceforge.net/projects/pnglite/files/
+  83. https://code.google.com/p/simple-png/
+  84. http://lodev.org/lodepng/
+  85. https://code.google.com/p/picojpeg/
+  86. http://lonesock.net/soil.html
+  87. https://github.com/msharov/gleri
+  88. http://bellard.org/TinyGL/
+  89. http://mpv.io/
+  90. https://github.com/idunham/tinyxlib
+  91. http://www.microwindows.org/
+  92. http://directfb.org/
+  93. http://code.google.com/p/ucpp/
+  94. http://mcpp.sourceforge.net/
+  95. https://git.kernel.org/cgit/devel/sparse/sparse.git/
+  96. http://pp.info.uni-karlsruhe.de/firm/
+  97. http://en.nothingisreal.com/wiki/GPP
+  98. https://github.com/kusma/vbcc
+  99. https://git.sr.ht/~mcf/cproc/
+ 100. https://github.com/larmel/lacc
+ 101. http://pcc.ludd.ltu.se/
+ 102. http://c9x.me/compile/
+ 103. https://github.com/vnmakarov/mir/
+ 104. https://www.gnu.org/software/lightning/
+ 105. http://www.lua.org/
+ 106. http://haddonthethird.net/m4/
+ 107. http://squirrel-lang.org/
+ 108. https://github.com/pfalcon/squirrel-modules
+ 109. http://jim.tcl.tk/
+ 110. http://code.google.com/p/tiny-js/
+ 111. https://code.google.com/p/42tiny-js/
+ 112. http://code.google.com/p/quad-wheel/
+ 113. http://www.tinypy.org/
+ 114. http://www.mupdf.com/
+ 115. http://hzqtc.github.io/2012/04/poppler-vs-mupdf.html
+ 116. http://laurikari.net/tre/
+ 117. http://swtch.com/~rsc/regexp/regexp1.html
+ 118. http://lh3lh3.users.sourceforge.net/reb.shtml
+ 119. http://sljit.sourceforge.net/pcre.html
+ 120. http://landley.net/toybox
+ 121. http://www.busybox.net/
+ 122. http://heirloom.sourceforge.net/
+ 123. https://github.com/eltanin-os/utilchest
+ 124. http://code.google.com/p/freebsd-head/source/browse/release/?r=bbfa6f219c41b6850ef0e7699f439ad5488435ae#release%2Fpicobsd
+ 125. https://github.com/chneukirchen/obase
+ 126. http://git.musl-libc.org/cgit/noxcuse/tree/
+ 127. https://github.com/pikhq/pikhq-coreutils
+ 128. https://github.com/rofl0r/hardcore-utils
+ 129. http://git.suckless.org/sbase
+ 130. http://git.suckless.org/ubase
+ 131. https://github.com/dimkr/lazy-utils
+ 132. http://lubutu.com/soso/usul
+ 133. http://litcave.rudi.ir/
+ 134. http://elks.sourceforge.net/
+ 135. http://skarnet.org/software/
+ 136. http://www.energymech.net/users/proton/
+ 137. http://suckless.org/rocks
+ 138. http://harmful.cat-v.org/software/
+ 139. http://www.murga-linux.com/puppy/viewtopic.php?t=72359
+ 140. http://teholabs.com/?p=445
+ 141. http://busybox.net/tinyutils.html
+ 142. http://bashismal.blogspot.com/2011/10/unbloated-resources-in-c.html
+ 143. http://www.fefe.de/embutils/
+ 144. http://www.mingw.org/wiki/Community_Supplied_Links
+ 145. https://github.com/somasis/musl-wiki
+ 146. https://github.com/somasis/musl-wiki/actions/workflows/main.yml
+ 147. https://github.com/somasis/musl-wiki/issues
+ 148. http://creativecommons.org/licenses/by-sa/3.0

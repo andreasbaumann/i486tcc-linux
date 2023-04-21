@@ -1,0 +1,186 @@
+   #[1]LinuxNews » Feed [2]LinuxNews » Kommentar-Feed [3]LinuxNews » Alte
+   Schätzchen: Linux optimiert für i386 und i486 Kommentar-Feed
+   [4]alternate [5]alternate [6]alternate
+
+   [7]Zum Inhalt springen
+
+   [8]LinuxNews LinuxNews
+
+   [9]LinuxNews
+
+   News Portal rund um Freie Software und Open Source
+   (BUTTON) Menu
+
+     * [10]Startseite
+     * [11]Artikel
+     * [12]Hardware
+     * [13]Meinung
+     * [14]Mobil
+     * [15]Kurz notiert
+     * [16]Softwareperlen
+     * [17]Podcast
+     * [18]Vermischtes
+
+   i386 CPU i386 CPU
+
+Alte Schätzchen: Linux optimiert für i386 und i486
+
+   [19]21. September 2022 [20]Ferdinand Thommes [21]Kurz notiert, [22]News
+   [23]4 Kommentare
+
+   Bereits 2012 fragte der damals bei Red Hat angestellte
+   Kernel-Entwickler Ingo Molnar bei Linus Torvalds an, ob man nicht die
+   Unterstützung für Intels legendären i386-Prozessor fallen lassen
+   könnte, da er massive Mehrarbeit bei der Entwicklung bedeute. Torvalds
+   entgegnete, er sei nicht nostalgisch und gab der Anfrage freie Fahrt.
+   Damit begann bei Linux der Niedergang der 1985 eingeführten
+   Architektur, die bis 2007 produziert wurde.
+
+   Wer noch Maschinen mit i386- oder i486-Prozessoren im Keller hat und
+   denen neues Leben einhauchen möchte, der kann sich jetzt freuen. Die
+   Projekte [24]gray386linux und [25]gray486linux sind genau auf diese
+   Prozessoren zugeschnitten.
+
+Image selbst bauen
+
+   Die Früchte hängen allerdings nicht allzu niedrig, denn ein Image für
+   die alten Schätzchen muss zunächst selbst erstellt werden. Aber wer
+   solche Maschinen aufhebt, wird den Mehraufwand vermutlich nicht
+   scheuen. Zudem lernt man ja auch was dabei. Die Build-Umgebung basiert
+   auf Fedora 35 und dem [wiki
+   title="Nix_(Paketmanager)"]Nix-Paketmanager[/wiki]. Bei der Variante
+   für i386 gilt es zunächst zu unterscheiden, ob eine FPU an Bord ist
+   oder nicht. Beim i486 war der Co-Prozessor (außer beim i486SX) bereits
+   serienmäßig verbaut. Im Verlauf des Build-Prozesses werden dann die
+   Kernel-Header installiert, eine User-Umgebung eingerichtet, eine
+   Musl-Libc und eine Busybox erstellt und optional [26]Dropbear-SSH
+   gebaut. Bei der Bauanleitung für i486 kommt mit Linux 5.19 sogar ein
+   aktueller Kernel zum Einsatz.
+
+Projekt für den Winter
+
+   Auf GitHub gibt es für beide Varianten eine detaillierte Bauanleitung.
+   Vielleicht schlummert hier für den ein oder anderen ein Projekt für die
+   anstehende dunkle Jahreszeit. Viel Spaß dabei. Falls jemand von euch
+   solch ein Projekt angeht, wäre ich erfreut zu erfahren, was ihr
+   letztlich damit anstellt.
+
+   Bild: Intel i386 DX 20 MHz microprocessor von [27]Wojciech Pedzich |
+   Lizenz: [28]CC BY-SA 4.0
+
+Teilt den Beitrag, falls ihr mögt
+
+     * [29]teilen
+     * [30]twittern
+     * [31]teilen
+     * [32]mitteilen
+     * [33]teilen
+
+   [34]cpu[35]i386
+
+Beitrags-Navigation
+
+   [36]Vorheriger Beitrag:Cookie-Dialog-Blocker an Avast verkauft -
+   Mozilla integriert eigenen Blocker
+   [37]Nächster Beitrag:Mullvad stellt Open-Source Security-Token vor
+   Please login to comment
+   4 Kommentare
+   Newest
+   Oldest Most Voted
+   Inline Feedbacks
+   View all comments
+   (BUTTON) Weitere Kommentare anzeigen
+
+   Suchen
+   ____________________ (BUTTON) Suchen
+
+   Archive [Monat auswählen_____]
+
+   Kategorien[Kategorie auswählen_]
+
+   Username oder E-Mail*
+   ____________________
+   Passwort*
+   ____________________
+
+   Only fill in if you are not human
+   [ ] Angemeldet bleiben
+   Anmelden
+   [38]Registrieren
+   [39]Passwort vergessen?
+
+     * [40]RSS Feed
+
+   [41]Mastodon [42]Mastodon
+
+   Copyright 2017 - 2023
+
+     * [43]Datenschutz
+     * [44]Netiqette
+     * [45]Cookie Richtlinie
+     * [46]Impressum
+     * [47]Kontakt
+
+   [48]wpDiscuz
+
+
+   ____________________________________________________________
+   ____________________________________________________________
+   ____________________________________________________________
+   ____________________________________________________________
+   (BUTTON) Insert
+
+References
+
+   Visible links:
+   1. https://linuxnews.de/feed/
+   2. https://linuxnews.de/comments/feed/
+   3. https://linuxnews.de/2022/09/21/alte-schaetzchen-linux-optimiert-fuer-386-und-486/feed/
+   4. https://linuxnews.de/wp-json/wp/v2/posts/30309
+   5. https://linuxnews.de/wp-json/oembed/1.0/embed?url=https%3A%2F%2Flinuxnews.de%2F2022%2F09%2F21%2Falte-schaetzchen-linux-optimiert-fuer-386-und-486%2F
+   6. https://linuxnews.de/wp-json/oembed/1.0/embed?url=https%3A%2F%2Flinuxnews.de%2F2022%2F09%2F21%2Falte-schaetzchen-linux-optimiert-fuer-386-und-486%2F&format=xml
+   7. https://linuxnews.de/2022/09/21/alte-schaetzchen-linux-optimiert-fuer-386-und-486/#content
+   8. https://linuxnews.de/
+   9. https://linuxnews.de/
+  10. https://linuxnews.de/
+  11. https://linuxnews.de/category/artikel/
+  12. https://linuxnews.de/category/hardware/
+  13. https://linuxnews.de/category/meinung/
+  14. https://linuxnews.de/category/mobil/
+  15. https://linuxnews.de/category/kurz-notiert/
+  16. https://linuxnews.de/category/softwareperlen/
+  17. https://linuxnews.de/category/podcast/
+  18. https://linuxnews.de/category/vermischtes/
+  19. https://linuxnews.de/2022/09/21/alte-schaetzchen-linux-optimiert-fuer-386-und-486/
+  20. https://linuxnews.de/author/adminx/
+  21. https://linuxnews.de/category/kurz-notiert/
+  22. https://linuxnews.de/category/news/
+  23. https://linuxnews.de/2022/09/21/alte-schaetzchen-linux-optimiert-fuer-386-und-486/#comments
+  24. https://github.com/marmolak/gray386linux
+  25. https://github.com/marmolak/gray486linux
+  26. https://matt.ucc.asn.au/dropbear/dropbear.html
+  27. https://commons.wikimedia.org/wiki/User:Wojciech_P%C4%99dzich
+  28. https://creativecommons.org/licenses/by-sa/4.0/legalcode
+  29. https://s2f.kytta.dev/?text=Alte%20Sch%C3%A4tzchen%3A%20Linux%20optimiert%20f%C3%BCr%20i386%20und%20i486%20https%3A%2F%2Flinuxnews.de%2F2022%2F09%2F21%2Falte-schaetzchen-linux-optimiert-fuer-386-und-486%2F
+  30. https://twitter.com/share?url=https%3A%2F%2Flinuxnews.de%2F2022%2F09%2F21%2Falte-schaetzchen-linux-optimiert-fuer-386-und-486%2F&text=Alte%20Sch%C3%A4tzchen%3A%20Linux%20optimiert%20f%C3%BCr%20i386%20und%20i486
+  31. https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Flinuxnews.de%2F2022%2F09%2F21%2Falte-schaetzchen-linux-optimiert-fuer-386-und-486%2F
+  32. https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Flinuxnews.de%2F2022%2F09%2F21%2Falte-schaetzchen-linux-optimiert-fuer-386-und-486%2F
+  33. https://www.xing.com/spi/shares/new?url=https%3A%2F%2Flinuxnews.de%2F2022%2F09%2F21%2Falte-schaetzchen-linux-optimiert-fuer-386-und-486%2F
+  34. https://linuxnews.de/tag/cpu/
+  35. https://linuxnews.de/tag/i386/
+  36. https://linuxnews.de/2022/09/20/cookie-dialog-blocker-an-avast-verkauft-mozilla-integriert-eigenen-blocker/
+  37. https://linuxnews.de/2022/09/21/mullvad-stellt-open-source-security-token-vor/
+  38. https://linuxnews.de/neuanmeldung/
+  39. https://linuxnews.de/password-reset/
+  40. https://linuxnews.de/feed/
+  41. https://social.anoxinon.de/@sla
+  42. https://mastodon.cloud/@linuxnews_de
+  43. https://linuxnews.de/datenschutz/
+  44. https://linuxnews.de/netiqette/
+  45. https://linuxnews.de/cookie-richtlinie-2/
+  46. https://linuxnews.de/impressum/
+  47. https://linuxnews.de/kontakt/
+  48. javascript:void(0);
+
+   Hidden links:
+  50. javascript:void(0);

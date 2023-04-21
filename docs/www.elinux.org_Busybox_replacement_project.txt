@@ -1,0 +1,377 @@
+   #[1]eLinux.org (en) [2]eLinux.org Atom feed
+
+Busybox replacement project
+
+   From eLinux.org
+   Jump to: [3]navigation, [4]search
+
+   Summary
+          Write a non-GPL replacement for Busybox
+
+   Proposer
+          Tim Bird
+
+Contents
+
+     * [5]1 Description
+          + [6]1.1 Supported Commands
+     * [7]2 Scope
+     * [8]3 Project Management
+     * [9]4 Contractor Candidates
+     * [10]5 Related work
+     * [11]6 Comments
+     * [12]7 Status
+     * [13]8 FAQ
+          + [14]8.1 additional questions
+
+Description
+
+   Busybox is a widely used program which implements several Linux command
+   line utilities in a single, multi-tool binary. It is provided under the
+   GPL license. Due to its utility and ubiquity, it has been used in a
+   very large number of embedded devices. This includes use by companies
+   who are not as diligent about their GPL commitments as they should be.
+
+   Busybox is arguably the most litigated piece of GPL software in the
+   world. Unfortunately, it is unclear what the remedy should be when a
+   GPL violation occurs with busybox. Litigants have sometimes requested
+   remedies outside the scope of busybox itself, such as review authority
+   over unrelated products, or right of refusal over non-busybox modules.
+   This causes concern among chip vendors and suppliers.
+
+   The purpose of this project is to produce a program that is as capable
+   and useful as busybox for a large majority of embedded Linux projects,
+   such that busybox is easy to replace in existing products and can be
+   supplanted as the default choice for a multi-tool program in most new
+   projects.
+
+Supported Commands
+
+   It is expected that the first major milestone release (version 1.0) of
+   the busybox replacement program will include the following commands:
+   [See the project page.]
+
+Scope
+
+   The scope of the project is dependent on the target use cases that are
+   envisioned for the replacement tool. Busybox is currently used in a
+   very large number of places, and it is impractical to replace it's full
+   functionality in a short time. However, busybox as it currently stands
+   includes very many non-essential programs and features. The overall
+   goal would be to provide essential busybox functionality (e.g. with
+   that contained in busybox version 1.0).
+
+   One additional area of commands which is outside the traditional
+   busybox coverage area, is Android tools provided by toolbox. Toolbox is
+   a non-GPL multi-tool program provided as part of the Android Open
+   Source Project, and used in Android devices. It is limited in
+   functionality, however, compared to busybox, and so many developers
+   install busybox in their Android devices to supplement the command set.
+   Google has a goal of reducing the amount of GPL software in user-space
+   for Android devices. A busybox replacement that implemented the toolbox
+   commands could useful to avoid having Android developer adopt busybox
+   by default. But more importantly, a replacement that just focused on
+   the weaknesses of toolbox could serve this tool supplementation role
+   that busybox fills, with very little effort.
+
+   It is expected that it will require about 6 months of part-time
+   developer work to achieve the first major milestone for the project.
+
+   This project will very likely start with a base of non-GPL software
+   which is already available, and has been scrutinized to be free from
+   GPL legal encumbrances, from the Toybox project
+
+Project Management
+
+   Information about the status and management of this project are at:
+   [15]Busybox replacement
+
+Contractor Candidates
+
+     * Rob Landley
+     * Emile "iMil" Heitor (Beastiebox author)
+
+Related work
+
+     * [1] Busybox - [16]http://busybox.net/
+     * [2] Toybox - [17]http://www.landley.net/toybox/about.html
+     * [3] Bsdbox - [18]http://wiki.freebsd.org/AdrianChadd/BsdBox
+     * [4] Opensolaris busybox -
+       [19]http://hub.opensolaris.org/bin/view/Project+busybox/
+          + by Roland Mainz
+          + See
+            [20]http://mail.opensolaris.org/mailman/listinfo/busybox-dev
+          + I can't find the source, maybe it's part of the ksh93 project?
+     * [5] Beastiebox - [21]http://beastiebox.sourceforge.net/
+
+Comments
+
+   People interested in supporting this project can do one of several
+   things:
+     * If you are an embedded Linux developer, you can start working on
+       the ToyBox code, adding commands or features to it.
+     * If you are a company interested in sponsoring or donating
+       engineering resources to this project, please contact Tim Bird. (I
+       used to have my Sony e-mail address here, but it gave people the
+       wrong impression that this was a Sony project. Please use my gmail
+       account: tbird20d (at) gmail dot com.
+
+Status
+
+   This project is still Under Construction.
+
+   This project is in the proposal and fact-gathering stage, and is still
+   under construction. Please be advised that multiple aspects of this
+   project are still being defined and under consideration. We have not
+   100% committed to using ToyBox as the replacement, although this seems
+   very likely at this point. If the project proceed, then when it is
+   launched, it will likely be announced with more firm details about the
+   roadmap, governance, license and schedule.
+
+FAQ
+
+     * Q. Simply providing the source, as the licence requires, would
+       avoid litigation. Isn't that easier than re-writing busybox?
+     * A. It is true that providing the source would avoid litigation. In
+       most cases, this *is* easier than re-writing busybox. However, in
+       some cases - especially when dealing with a naive or defunct
+       supplier, it can be difficult or impossible to find the 'correct'
+       source for busybox. It would be better not to get into a situation
+       where the lack of correct source from a 3rd party supplier resulted
+       in extreme remedies being required. This project aims to make a
+       useful alternative to busybox which completely eliminates any
+       possibility of infringement, wrongdoing, and risk of litigation for
+       this particular piece of software.
+
+     * Q. Isn't this a lot of work to avoid a relatively small effort
+       (publishing the source to busybox)?
+     * A. It will be some work, but it will likely only have to be done
+       once, and the burden and/or cost of the work can be distributed
+       throughout the industry. The cost to a single company to support
+       this project is very small in comparison to the legal liability and
+       costs should some problem occur with busybox compliance.
+
+     * Q. Is this being done to prevent the SFC from asking for the source
+       to the Linux kernel?
+     * A. No, although it would have that effect. As part of their request
+       to remedy a busybox GPL violation, the SFC does ask for source code
+       unrelated to busybox. Personally, I believe this is improper.
+       However, my main reason for proposing this project is to avoid
+       having the SFC gain review authority over unrelated products
+       produced by a company. The larger the set of Linux-based products
+       that are produced by a company, the greater exposure there is for a
+       possible mistake, and the greater potential costs that would incur
+       in the event of litigation and/or settlement.
+
+     * Q. Wouldn't it be morally better to help companies fulfill their
+       GPL obligations, than to have them avoid GPL software?
+     * A. There are multiple people who provide consulting services to
+       help people fulfill their GPL obligations. This is a good thing and
+       it should be encouraged. Helping companies avoid infringing the
+       license of software they use is good. Also good is providing
+       software for companies that helps them avoid legal entanglements at
+       all. Arguments beyond this get into BSD vs. GPL license wars, which
+       I don't think are productive to engage in here.
+
+     * Q. Tim Bird, the proposer of this project, works for Sony. Is this
+       a Sony project?
+     * A. No. Although Tim is employed by Sony, he spends a portion of his
+       employed time working on behalf of the embedded industry to improve
+       Linux and encourage GPL compliance. As of February 2, 2012, Sony
+       has not endorsed or agreed to support this project. This wiki page
+       is for gathering information and project description information,
+       to present to various companies to solicit support and resources
+       for the project.
+
+     * Q. Can Tim's creation of this proposal be used to infer anything
+       about Sony's compliance record, future compliance intent, or other
+       business practices?
+     * A. Tim has only recently informed his management about this
+       proposal, and Sony has not yet (as of 2/2/12) agreed to support it.
+       So, "no, not really". Sony has a good compliance record, and has
+       strong compliance policies in place. Tim is doing this as part of
+       his (paid for by Sony) role in the industry to address issues which
+       inhibit the adoption of Linux in consumer electronics.
+
+     * Q. If it doesn't affect Sony, why are you doing this? How does the
+       busybox litigation and the remedy terms requested by the SFC
+       inhibit the adoption of Linux in consumer electronics?
+     * A. It is not expected to affect Sony directly, because Sony has
+       good compliance practices. However, any company can make a mistake.
+       There are instances where this litigation and the terms requested
+       by the SFC have resulted in companies dropping their embedded Linux
+       projects. It has also caused even compliant companies to
+       re-evaluate their adoption of Linux. This has a net negative effect
+       (in my opinion) on the adoption of Linux and ultimate amount of GPL
+       software produced. Tim (and Sony) view the production of GPL
+       software as a good thing. It does sound strange that this is the
+       goal when the proposed project exists to replace a piece of GPL
+       software with a non-GPL piece of software, but the overall desired
+       affect of this project is to encourage more companies to adopt GPL
+       software (particularly the Linux kernel), and to comply with the
+       obligations of the GPL license.
+
+   [feel free to add new questions here. The ones above feel a bit
+   'rigged'.]
+
+additional questions
+
+     * Q. What companies using Busybox did the SFC request unrelated
+       source code from - please clarify unrelated?
+     * A. My understanding is that everyone the SFC litigates and
+       eventually settles with is required to pass SFC audits for 3 years.
+       See [22]http://lwn.net/Articles/478337/ I believe that SFC requires
+       auditing of every GPL-based product a company ships, whether or not
+       it had compliance issues.
+
+     * Q. What companies dropped embedded Linux projects in response to
+       litigation from the SFC??
+     * A. LinkSys/Cisco is one example. See
+       [23]http://mjg59.dreamwidth.org/10437.html?thread=301509#cmt301509
+
+     * Q. What compliant companies re-evaluated their adoption of Linux,
+       please clarify 're-evaluate`?
+     * A. Unfortunately, a lot of the reaction to the lawsuits was
+       discussed in private and with the expectation of confidentiality. I
+       am not at liberty to provide details here from my experience (this
+       is Tim writing.)
+
+   Retrieved from
+   "[24]https://elinux.org/index.php?title=Busybox_replacement_project&old
+   id=110216"
+   [25]Category:
+     * [26]Project proposals 2012
+
+Navigation menu
+
+Personal tools
+
+     * [27]Log in
+     * [28]Request account
+
+Namespaces
+
+     * [29]Page
+     * [30]Discussion
+
+   [ ]
+
+Variants
+
+Views
+
+     * [31]Read
+     * [32]View source
+     * [33]View history
+
+   [ ]
+
+More
+
+Search
+
+   ____________________ Search Go
+
+Navigation
+
+     * [34]Main Page
+     * [35]Community portal
+     * [36]Current events
+     * [37]Recent changes
+     * [38]Help
+     * [39]Volunteering
+
+Where else to find us
+
+     * [40]Mastodon
+     * [41]Discord
+     * [42]Twitter (@elinux)
+     * [43]#elinux on Libera.Chat
+     * [44]Facebook (@elinux.org)
+     * [45]Mailing Lists
+     * [46]Matrix
+
+Tools
+
+     * [47]What links here
+     * [48]Related changes
+     * [49]Special pages
+     * [50]Printable version
+     * [51]Permanent link
+     * [52]Page information
+
+     * This page was last edited on 22 March 2012, at 14:10.
+     * Content is available under [53]a Creative Commons
+       Attribution-ShareAlike 3.0 Unported License unless otherwise noted.
+
+     * [54]Privacy policy
+     * [55]About eLinux.org
+     * [56]Disclaimers
+
+     * [57]a Creative Commons Attribution-ShareAlike 3.0 Unported License
+     * [58]Powered by MediaWiki
+
+References
+
+   Visible links:
+   1. https://www.elinux.org/opensearch_desc.php
+   2. https://www.elinux.org/index.php?title=Special:RecentChanges&feed=atom
+   3. https://www.elinux.org/Busybox_replacement_project#mw-head
+   4. https://www.elinux.org/Busybox_replacement_project#p-search
+   5. https://www.elinux.org/Busybox_replacement_project#Description
+   6. https://www.elinux.org/Busybox_replacement_project#Supported_Commands
+   7. https://www.elinux.org/Busybox_replacement_project#Scope
+   8. https://www.elinux.org/Busybox_replacement_project#Project_Management
+   9. https://www.elinux.org/Busybox_replacement_project#Contractor_Candidates
+  10. https://www.elinux.org/Busybox_replacement_project#Related_work
+  11. https://www.elinux.org/Busybox_replacement_project#Comments
+  12. https://www.elinux.org/Busybox_replacement_project#Status
+  13. https://www.elinux.org/Busybox_replacement_project#FAQ
+  14. https://www.elinux.org/Busybox_replacement_project#additional_questions
+  15. https://www.elinux.org/Busybox_replacement
+  16. http://busybox.net/
+  17. http://www.landley.net/toybox/about.html
+  18. http://wiki.freebsd.org/AdrianChadd/BsdBox
+  19. http://hub.opensolaris.org/bin/view/Project+busybox/
+  20. http://mail.opensolaris.org/mailman/listinfo/busybox-dev
+  21. http://beastiebox.sourceforge.net/
+  22. http://lwn.net/Articles/478337/
+  23. http://mjg59.dreamwidth.org/10437.html?thread=301509#cmt301509
+  24. https://elinux.org/index.php?title=Busybox_replacement_project&oldid=110216
+  25. https://www.elinux.org/Special:Categories
+  26. https://www.elinux.org/Category:Project_proposals_2012
+  27. https://www.elinux.org/index.php?title=Special:UserLogin&returnto=Busybox+replacement+project
+  28. https://www.elinux.org/Special:RequestAccount
+  29. https://www.elinux.org/Busybox_replacement_project
+  30. https://www.elinux.org/index.php?title=Talk:Busybox_replacement_project&action=edit&redlink=1
+  31. https://www.elinux.org/Busybox_replacement_project
+  32. https://www.elinux.org/index.php?title=Busybox_replacement_project&action=edit
+  33. https://www.elinux.org/index.php?title=Busybox_replacement_project&action=history
+  34. https://www.elinux.org/Main_Page
+  35. https://www.elinux.org/eLinux.org:Community_portal
+  36. https://www.elinux.org/eLinux.org:Current_events
+  37. https://www.elinux.org/Special:RecentChanges
+  38. https://www.mediawiki.org/wiki/Special:MyLanguage/Help:Contents
+  39. https://www.elinux.org/Sitesupport-url
+  40. https://fosstodon.org/@elinux
+  41. https://discord.com/channels/910986089798447144/910986089798447147
+  42. https://twitter.com/elinux
+  43. irc:///#elinux@irc.libera.chat
+  44. https://www.facebook.com/elinuxorg-750739005020534/
+  45. http://www.elinux.org/ELinuxWiki:Mailing_List
+  46. https://matrix.to/#/#elinux:matrix.org
+  47. https://www.elinux.org/Special:WhatLinksHere/Busybox_replacement_project
+  48. https://www.elinux.org/Special:RecentChangesLinked/Busybox_replacement_project
+  49. https://www.elinux.org/Special:SpecialPages
+  50. https://www.elinux.org/index.php?title=Busybox_replacement_project&printable=yes
+  51. https://www.elinux.org/index.php?title=Busybox_replacement_project&oldid=110216
+  52. https://www.elinux.org/index.php?title=Busybox_replacement_project&action=info
+  53. https://creativecommons.org/licenses/by-sa/3.0/
+  54. https://www.elinux.org/eLinux.org:Privacy_policy
+  55. https://www.elinux.org/eLinux.org:About
+  56. https://www.elinux.org/eLinux.org:General_disclaimer
+  57. https://creativecommons.org/licenses/by-sa/3.0/
+  58. https://www.mediawiki.org/
+
+   Hidden links:
+  60. https://www.elinux.org/Main_Page

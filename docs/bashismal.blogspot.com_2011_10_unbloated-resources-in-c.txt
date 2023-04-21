@@ -1,0 +1,184 @@
+   #[1]Technosaurus's Linux Tome - Atom [2]Technosaurus's Linux Tome - RSS
+   [3]Technosaurus's Linux Tome - Atom
+
+[4]Technosaurus's Linux Tome
+
+   Tips and tricks they don't want you to know about.
+
+Friday, October 21, 2011
+
+unbloated resources in C
+
+   Here is a list of alternative libraries written in C, mostly with
+   liberal (BSDish) licenses
+   Ssl/encryption ... [5]libtomcrypt
+   Imaging ... [6]stb_image (nothings.org) or nanojpeg+lodepng+webp
+   Ecmascript (aka javascript) ... see-3.1.1424.tar.gz (currently
+   unmaintained)
+   OpenGL ... [7]tinyGL <<== SDL implementation
+   Html5 ... [8]hubbub
+   Css ... [9]libcss
+   Svg ... [10]libtinysvg
+   Lua ... [11]stua (nothings.org)
+   Freetype ... [12]stb_freetype
+   Tcl ... [13]jimtcl
+   Ogg ... [14]stb_ogg
+   Gcc ... [15]llvm+clang or [16]tinycc (lgpl)
+   Perl ... microperl (distributed with perl)
+   Python ... [17]tinypy
+   GUI ... [18]sdl, [19]agar,  [20]picogui, [21]anttweakbar
+   Gnu-utils ... Google's [22]toolbox, [23]asmutils (gpl2), [24]busybox
+   (gpl2), [25]embutils (gpl2), [26]toybox (gpl2)...
+   Video ... [27]Webm,  [28]theora
+   glibc...[29]bionic, [30]musl (lgpl), [31]uclibc
+   (lgpl), [32]dietlibc(gpl2), [33]newlibc  or a bsdlibc...
+   If you really want to use C++ without the bloat of libstdc++, try one
+   of these standard template libraries:
+   ... [34]libcxx, [35]uclibc++, [36]stlport, [37]eastl, [38]ustl,
+   [39]stdcxx, ... the [40]sgi stl
+   more to follow
+   Posted by [41]technosaurus at [42]9:05AM
+   [43]Email This[44]BlogThis![45]Share to Twitter[46]Share to
+   Facebook[47]Share to Pinterest
+
+1 comment:
+
+    1. [48]Unknown[49]July 26, 2018 at 6:11AM
+       I'm looking for an unbloated C PDF viewer. Noticed your mupdf-GPL2
+       archive at github. Since I can't find anything better, I'm
+       investigating using the mupdf library. I'm looking at the last GPL3
+       version rather than GPL2 though. I have pdftxt working with it and
+       replaced the build system with CDetect and generated makefiles. I'm
+       also looking into adding large file support. Would be interested in
+       comparing notes on modifying/updating older versions of mupdf to
+       get better functionality and stability from them.
+       I also like to find unbloated C resources. I didn't see it
+       mentioned in your list but nanosvg is really good. (After I found
+       it, it was also incorporated in SDL_image and FLTK). I use BSD
+       gettext instead of the GNU version of libintl/gettext and I use BSD
+       gzip and librarchive. I'm investigating switching to libressl or
+       possibly bearssl instead of openssl. I thought BSD-curses looked
+       like an interesting alternative to ncurses. Haven't experimented
+       with it much because I'm mainly using pdcurses with SDL 2 backend
+       instead of using it for command line applications. swiss seems like
+       an interesting alternative to busybox and toybox. I also like some
+       of the Minix alternatives and sbase. I'm using picoGL (not tinyGL)
+       and with some patching, it has sufficient functionality to get
+       Emilia pinball running. Looking into adding some other capabilities
+       so I can port a few programs to systems that may not have OpenGL
+       readily available.
+       Some of the programs I'm experimenting with and/or patching are
+       listed here:
+       http://www.distasis.com/cpp/lmports.htm Others are in the works.
+       Love finding useful alternatives and customizing them. Would enjoy
+       hearing from you if you want compare resources or
+       patches/customizations further.
+       Reply[50]Delete
+       Replies
+            Reply
+
+   Add comment
+   Load more...
+
+   [51]Newer Post [52]Older Post [53]Home
+   Subscribe to: [54]Post Comments (Atom)
+
+Blog Archive
+
+     * [55]|>  [56]2016 (1)
+          + [57]|>  [58]March (1)
+
+     * [59]v  [60]2011 (5)
+          + [61]|>  [62]December (1)
+          + [63]v  [64]October (4)
+               o [65]localizing shell scripts without bashisms, gettext...
+               o [66]Stop waiting on wait
+               o [67]unbloated resources in C
+               o [68]getting an ip address
+
+About Me
+
+   [69]technosaurus
+
+   [70]View my complete profile
+
+   Simple theme. Powered by [71]Blogger.
+
+References
+
+   Visible links:
+   1. http://bashismal.blogspot.com/feeds/posts/default
+   2. http://bashismal.blogspot.com/feeds/posts/default?alt=rss
+   3. http://bashismal.blogspot.com/feeds/1063357794335486547/comments/default
+   4. http://bashismal.blogspot.com/
+   5. http://libtom.org/?page=features&newsitems=5&whatfile=crypt
+   6. http://nothings.org/stb_image.c
+   7. https://github.com/kimperator/TinySDGL/
+   8. http://www.netsurf-browser.org/projects/hubbub/
+   9. http://www.netsurf-browser.org/projects/libcss/
+  10. http://www.netsurf-browser.org/projects/libsvgtiny/
+  11. http://nothings.org/stb.h
+  12. http://nothings.org/stb/stb_truetype.h
+  13. http://repo.or.cz/w/jimtcl.git
+  14. http://nothings.org/stb_vorbis
+  15. http://llvm.org/
+  16. http://repo.or.cz/w/tinycc.git
+  17. http://code.google.com/p/tinypy/
+  18. http://hg.libsdl.org/SDL/
+  19. http://libagar.org/
+  20. http://picogui.org/
+  21. http://www.antisphere.com/Wiki/tools:anttweakbar
+  22. https://github.com/android/platform_system_core
+  23. http://asm.sourceforge.net/asmutils.html
+  24. http://busybox.net/
+  25. http://www.fefe.de/embutils/
+  26. http://landley.net/code/toybox/
+  27. http://www.webmproject.org/
+  28. http://theora.org/
+  29. https://github.com/android/platform_bionic
+  30. http://www.etalabs.net/musl/
+  31. http://uclibc.org/
+  32. http://www.fefe.de/dietlibc/
+  33. http://sourceware.org/newlib/
+  34. http://libcxx.llvm.org/
+  35. http://cxx.uclibc.org/
+  36. http://www.stlport.org/
+  37. https://github.com/paulhodge/EASTL
+  38. http://ustl.sourceforge.net/
+  39. http://stdcxx.apache.org/
+  40. http://www.sgi.com/tech/stl/
+  41. https://www.blogger.com/profile/03530733230643941968
+  42. http://bashismal.blogspot.com/2011/10/unbloated-resources-in-c.html
+  43. https://www.blogger.com/share-post.g?blogID=3562778082254253680&postID=1063357794335486547&target=email
+  44. https://www.blogger.com/share-post.g?blogID=3562778082254253680&postID=1063357794335486547&target=blog
+  45. https://www.blogger.com/share-post.g?blogID=3562778082254253680&postID=1063357794335486547&target=twitter
+  46. https://www.blogger.com/share-post.g?blogID=3562778082254253680&postID=1063357794335486547&target=facebook
+  47. https://www.blogger.com/share-post.g?blogID=3562778082254253680&postID=1063357794335486547&target=pinterest
+  48. https://www.blogger.com/profile/05093947546245253383
+  49. http://bashismal.blogspot.com/2011/10/unbloated-resources-in-c.html?showComment=1532610691271#c7343650239849554757
+  50. https://www.blogger.com/delete-comment.g?blogID=3562778082254253680&postID=7343650239849554757
+  51. http://bashismal.blogspot.com/2011/10/stop-waiting-on-wait.html
+  52. http://bashismal.blogspot.com/2011/10/getting-ip-address.html
+  53. http://bashismal.blogspot.com/
+  54. http://bashismal.blogspot.com/feeds/1063357794335486547/comments/default
+  55. javascript:void(0)
+  56. http://bashismal.blogspot.com/2016/
+  57. javascript:void(0)
+  58. http://bashismal.blogspot.com/2016/03/
+  59. javascript:void(0)
+  60. http://bashismal.blogspot.com/2011/
+  61. javascript:void(0)
+  62. http://bashismal.blogspot.com/2011/12/
+  63. javascript:void(0)
+  64. http://bashismal.blogspot.com/2011/10/
+  65. http://bashismal.blogspot.com/2011/10/localizing-shell-scripts-without.html
+  66. http://bashismal.blogspot.com/2011/10/stop-waiting-on-wait.html
+  67. http://bashismal.blogspot.com/2011/10/unbloated-resources-in-c.html
+  68. http://bashismal.blogspot.com/2011/10/getting-ip-address.html
+  69. https://www.blogger.com/profile/03530733230643941968
+  70. https://www.blogger.com/profile/03530733230643941968
+  71. https://www.blogger.com/
+
+   Hidden links:
+  73. https://www.blogger.com/post-edit.g?blogID=3562778082254253680&postID=1063357794335486547&from=pencil
+  74. https://www.blogger.com/comment/frame/3562778082254253680?po=1063357794335486547&hl=en

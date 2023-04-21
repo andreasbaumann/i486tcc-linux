@@ -70,8 +70,15 @@ dependencies
 
 - vis
   - libevent
-  - optionally lua
+  - libtermcap
   - netbsd-curses
+  - optionally lua
+- tmux
+  - libevent
+  - netbsd-curses (compat.h:379: error: incompatible types for redefinition of 'forkpty',
+    some non-compiling fallback when there is no curses?)
+- mandoc
+  - zlib
   
 kernel options
 --------------
@@ -132,14 +139,23 @@ bugs
 - we heavily use tools from the host (perl, python, make, m4, etc.) from
   the host (but we don't want those tools inside our system also). So
   self-hosting will be tricky.
-  
+- mandoc needs zlib unconditionally, if we don't have compressed man pages,
+  we need to patch this and add a NO_COMPRESSION flag to 'configure.local'.
+- a poweroff sending SIGUSR1 to sinit would be nice, also shutdown fails
+  by leaving users logged in (stuck in shell) and it doesn't unmount /.
+  (umount2 / error)
+- minimal binary seed: not that important that we have a small enough requirement
+  list to start with, currently:
+  - host C compiler
+  - host C library to link against first tcc
+  - tons of tools which are not really binary seed 
+    (they are just used to produce binaries)
+
 other approaches
 ----------------
 
 linux-486
 ---------
-
-https://github.com/tcsullivan/linux-486
 
 nice ideas, preinit decompresses lzma compressed files, uses the
 chromium Linux syscall wrapper to be a standalone binary (as
@@ -226,12 +242,64 @@ sabotage
 They use an old gcc without a lot of depenendencies (C++, libraries, etc.)
 to build the toolchain for stage 0. This is similar to us using tcc.
 This is the first distro based on musl which made musl much more suitable
-to build a Linux userspace upon.
+to build a Linux userspace upon. Since alpine linux switched to musl,
+sabotage seems to be not heavily developed anymore.
 
 links
 -----
 
-- Sabotage Linux:
-  - http://sabo.xyz/
-  - https://sabotage-linux.neocities.org/
-  - https://sabotage-linux.neocities.org/blog/11/
+- Other similar distributions or projects
+  - Linux-i486
+    - https://github.com/tcsullivan/linux-486
+  - Aboriginal Linux/Mkroot/miniconfig:
+    - https://github.com/landley/aboriginal
+    - https://github.com/landley/mkroot
+    - https://landley.net/aboriginal/documentation.html
+  - Morpheus
+    - https://git.2f30.org/morpheus/
+  - Oasis
+    - https://git.sr.ht/~mcf/oasis
+  - Graylinux
+    - https://github.com/marmolak/gray386linux
+    - https://github.com/marmolak/gray486linux
+    - https://linuxnews.de/alte-schaetzchen-linux-optimiert-fuer-386-und-486/
+  - Sabotage Linux:
+    - http://sabo.xyz/
+    - https://sabotage-linux.neocities.org/
+    - https://sabotage-linux.neocities.org/blog/11/
+  - others:
+    - https://www.glaucuslinux.org/
+- C Compilers
+  - https://repo.or.cz/w/tinycc.git
+- C Libraries
+  - https://www.fefe.de/dietlibc
+    (https://www.monperrus.net/martin/compiling-tcc-with-dietlibc: sadly
+    has issues and was never designed to use tcc in the first place)
+- Terminal stuff
+  - https://github.com/sabotage-linux/netbsd-curses/
+  - https://www.leonerd.org.uk/code/libtermkey/
+- Editors
+  - https://github.com/martanne/vis
+  - https://joe-editor.sourceforge.io/
+  - https://ex-vi.sourceforge.net/
+- Boot process
+  - device management
+    - https://git.suckless.org/smdev
+  - init systems
+    - git://git.suckless.org/sinit
+    - https://github.com/bbenne10/rc
+    - https://github.com/hut/minirc
+- minimal userland
+  - https://github.com/ibara/oksh
+  - git://git.suckless.org/sbase
+  - git://git.suckless.org/ubase
+  - https://git.andreasbaumann.cc/cgit/abase/
+  - https://beastiebox.sourceforge.net/
+- Link collections of interesting software
+  - https://suckless.org/rocks/
+  - https://suckless.org/other_projects/
+  - https://github.com/firasuke/awesome
+  - https://wiki.musl-libc.org/alternatives.html
+  - http://bashismal.blogspot.com/2011/10/unbloated-resources-in-c.html
+- historical stuff
+  - https://www.elinux.org/Busybox_replacement_project

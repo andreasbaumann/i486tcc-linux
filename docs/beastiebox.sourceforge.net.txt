@@ -1,0 +1,76 @@
+Welcome to the BeastieBox project Homepage
+
+   [beastiebox.png]
+
+   BeastieBox is an attempt to bring a [1]Busybox-like tool to the BSD
+   world (and yes, I'm aware of [2]crunchgen). BeastieBox aims to be small
+   while keeping as much features as possible.
+
+   While in its early stages, it is capable of being used as a replacement
+   for some well-known UNIX commands using the BusyBox method of linking
+   wanted commands to the "beastiebox" binary
+
+   Three modes are currently available: a semi-static mode, where all
+   commands will be statically linked to the main executable, still
+   dynamically linked over libc and libm, a full static mode, where the
+   produced binary is statically linked over all needed libraries, and a
+   dynamic mode, where commands are available as shared objects. As an
+   example, when using dynamic mode, "beastiebox" binary will load
+   libifconfig.so when invoking the ifconfig command.
+
+   As of now, the following commands are available :
+
+   ifconfig, route, sh, ls, init, ln, mount, mount_ffs, df, cat, rm, fsck,
+   fsck_ffs, ps, kill, dmesg, hostname, cp, mv, test, [, sed, ping, less,
+   more, sysctl, pfctl, wiconfig, traceroute, stty, date, reboot, halt,
+   poweroff, chmod, umount, ex, vi, fdisk, disklabel, tar, getty, login,
+   [3]mksh
+
+   Most of these commands are ports of [4]NetBSD 4.0 userland commands,
+   but some of them, in order to minimize dependencies and size, are older
+   NetBSD versions, older BSD versions (i.e. 4.4BSD Lite2), or BSD-license
+   compatible software. The goal is to obtain a functionnal BSD UN*X
+   system fitting into 500K in semi-static mode, in order to be used in
+   embedded hardware like Wireless routers, ADSL boxes, multimedia hard
+   drives and such. As of today, BeastieBox is about 700K.
+
+   As you may have guessed, the current work is done under NetBSD, but
+   should easily be ported to FreeBSD, OpenBSD and DragonFlyBSD.
+
+   BeastieBox is a work-in-progress, I'm doing this on my spare time and a
+   "stable" version will probably be out... when it's ready ;) Until then,
+   either look at it, play with it, port it or provide some help, but
+   please do not request anything. We'll see that another day.
+
+   BeastieBox is covered by a two-clauses [5]BSD License.
+
+   Now if you're still motivated, you can try BeastieBox this way :
+$ cvs -d :pserver:anonymous@beastiebox.cvs.sourceforge.net:/cvsroot/beastiebox l
+ogin
+$ cvs -d :pserver:anonymous@beastiebox.cvs.sourceforge.net:/cvsroot/beastiebox c
+o beastiebox
+
+   And from there, read the README file
+
+   If you're just curious, you can also browse [6]BeastieBox cvsweb
+
+   Here's a screenshot of NetBSD 4.0 kernel booting on BeastieBox
+   (symlinks are for eye's pleasure only) :
+   [beastiebox-minibsd.png]
+
+   Have fun
+
+   Emile "[7]iMil" Heitor
+
+   [8]SourceForge.net Logo
+
+References
+
+   1. http://www.busybox.net/
+   2. http://www.freebsd.org/cgi/man.cgi?query=crunchgen&sektion=1
+   3. http://www.mirbsd.org/mksh.htm
+   4. http://cvsweb.netbsd.org/bsdweb.cgi/src/?only_with_tag=netbsd-4-0
+   5. http://en.wikipedia.org/wiki/BSD_license
+   6. http://beastiebox.cvs.sourceforge.net/viewvc/beastiebox/beastiebox/
+   7. http://imil.net/
+   8. http://sourceforge.net/

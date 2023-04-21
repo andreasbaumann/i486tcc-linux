@@ -259,7 +259,7 @@ if [ ! -d "${BASE}/root/stage1/include/linux" ]; then
 	rm -rf "linux-${LINUX_KERNEL_VERSION}"
 	tar xf "${BASE}/downloads/linux-${LINUX_KERNEL_VERSION}.tar.gz"
 	cd "linux-${LINUX_KERNEL_VERSION}"
-	CC=false make V=1 ARCH=x86 INSTALL_HDR_PATH="${BASE}/root/stage1" headers_install
+	CC=false make ARCH=x86 INSTALL_HDR_PATH="${BASE}/root/stage1" headers_install
 	cd ..
 else
 	echo "stage1 kernel headers exist"
@@ -354,8 +354,7 @@ else
 	echo "stage1 sdhcp exists"
 fi
 
-
-
+# for vi
 if [ ! -f "${BASE}/root/stage1/lib/libncurses.a" ]; then
 	rm -rf "netbsd-curses-${NETBSD_NCURSES_VERSION}"
 	tar xf "${BASE}/downloads/netbsd-curses-${NETBSD_NCURSES_VERSION}.tar.gz"
@@ -369,6 +368,7 @@ else
 	echo "stage1 netbsd-curses exists"
 fi
 
+# for vis
 if [ ! -f "${BASE}/root/stage1/lib/libtermkey.a" ]; then
 	rm -rf "libtermkey-${LIBTERMKEY_VERSION}"
 	tar xf "${BASE}/downloads/libtermkey-${LIBTERMKEY_VERSION}.tar.gz"
@@ -384,6 +384,7 @@ else
 	echo "stage1 libtermkey exists"
 fi
 
+# for vi, tmux
 if [ ! -f "${BASE}/root/stage1/lib/libevent.a" ]; then
 	rm -rf "libevent-${LIBEVENT_VERSION}"
 	tar xf "${BASE}/downloads/libevent-${LIBEVENT_VERSION}.tar.gz"
@@ -429,6 +430,7 @@ else
 	echo "stage1 tmux exists"
 fi
 
+# for mandoc
 if [ ! -f "${BASE}/root/stage1/lib/libz.a" ]; then
 	rm -rf "zlib-${ZLIB_VERSION}"
 	tar xf "${BASE}/downloads/zlib-${ZLIB_VERSION}.tar.gz"
@@ -476,6 +478,7 @@ else
 fi
 
 if [ ! -f "${BASE}/root/stage1/boot/bzImage" ]; then
+	echo "Building the Linux kernel.."
 	rm -rf "linux-${LINUX_KERNEL_VERSION}"
 	tar xf "${BASE}/downloads/linux-${LINUX_KERNEL_VERSION}.tar.gz"
 	cd "linux-${LINUX_KERNEL_VERSION}"
