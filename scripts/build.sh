@@ -28,6 +28,7 @@ SMDEV_VERSION="8d075"
 SINIT_VERSION="28c44"
 SDHCP_VERSION="8455f"
 UFLBBL_VERSION="d8680"
+LIBEVENT_VERSION="2.1.12-stable"
 VIS_VERSION="c9737"
 LIBTERMKEY_VERSION="0.22"
 NETBSD_NCURSES_VERSION="0.3.2"
@@ -104,6 +105,12 @@ fi
 
 if [ ! -f "${BASE}/downloads/netbsd-curses-${NETBSD_NCURSES_VERSION}.tar.gz" ]; then
 	wget -O "${BASE}/downloads/netbsd-curses-${NETBSD_NCURSES_VERSION}.tar.gz" "https://github.com/sabotage-linux/netbsd-curses/archive/refs/tags/v${NETBSD_NCURSES_VERSION}.tar.gz"
+fi
+
+if [ ! -f "${BASE}/downloads/libevent-${LIBEVENT_VERSION}.tar.gz" ]; then
+	cd "${BASE}/downloads/"
+	wget "https://github.com/libevent/libevent/releases/download/release-${LIBEVENT_VERSION}/libevent-${LIBEVENT_VERSION}.tar.gz"
+	cd ..
 fi
 
 if [ ! -f "${BASE}/downloads/vis-${VIS_VERSION}.tar.gz" ]; then
@@ -241,6 +248,19 @@ else
 	echo "stage1 musl C library exists"
 fi
 
+# install kernel headers (we don't think musl does any trickery to
+# them or depends on them being installed)
+
+if [ ! -d "${BASE}/root/stage1/include/linux" ]; then
+	rm -rf "linux-${LINUX_KERNEL_VERSION}"
+	tar xf "${BASE}/downloads/linux-${LINUX_KERNEL_VERSION}.tar.gz"
+	cd "linux-${LINUX_KERNEL_VERSION}"
+	CC=false make V=1 ARCH=x86 INSTALL_HDR_PATH="${BASE}/root/stage1" headers_install
+	cd ..
+else
+	echo "stage1 kernel headers exist"
+fi
+
 # test if the stage 1 compiler is working
 
 if [ ! -x "${BASE}/root/stage1/bin/test-stage1" ]; then
@@ -358,6 +378,20 @@ if [ ! -f "${BASE}/root/stage1/lib/libtermkey.a" ]; then
 	cd ..
 else
 	echo "stage1 libtermkey exists"
+fi
+
+if [ ! -f "${BASE}/root/stage1/lib/libevent.a" ]; then
+	rm -rf "libevent-${LIBEVENT_VERSION}"
+	tar xf "${BASE}/downloads/libevent-${LIBEVENT_VERSION}.tar.gz"
+	cd "libevent-${LIBEVENT_VERSION}"
+	CC="${BASE}/root/stage1/bin/i386-tcc" \
+	./configure --prefix="${BASE}/root/stage1" \
+		--enable-static --disable-shared --disable-openssl
+	make V=1
+	make install PREFIX="${BASE}/root/stage1"
+	cd ..
+else
+	echo "stage1 libevent exists"
 fi
 
 if [ ! -x "${BASE}/root/stage1/bin/vi" ]; then
