@@ -107,6 +107,10 @@ if [ ! -f "${BASE}/downloads/netbsd-curses-${NETBSD_NCURSES_VERSION}.tar.gz" ]; 
 	wget -O "${BASE}/downloads/netbsd-curses-${NETBSD_NCURSES_VERSION}.tar.gz" "https://github.com/sabotage-linux/netbsd-curses/archive/refs/tags/v${NETBSD_NCURSES_VERSION}.tar.gz"
 fi
 
+if [ ! -f "${BASE}/downloads/libtermkey-${LIBTERMKEY_VERSION}.tar.gz" ]; then
+	wget -O "${BASE}/downloads/libtermkey-${LIBTERMKEY_VERSION}.tar.gz" "https://www.leonerd.org.uk/code/libtermkey/libtermkey-${LIBTERMKEY_VERSION}.tar.gz"
+fi
+
 if [ ! -f "${BASE}/downloads/libevent-${LIBEVENT_VERSION}.tar.gz" ]; then
 	cd "${BASE}/downloads/"
 	wget "https://github.com/libevent/libevent/releases/download/release-${LIBEVENT_VERSION}/libevent-${LIBEVENT_VERSION}.tar.gz"
