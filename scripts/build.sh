@@ -18,6 +18,9 @@ set -e
 SCRIPT=$(readlink -f "$0")
 BASE=$(dirname ${SCRIPT})/..
 
+#CPUS=$(nproc)
+CPUS=1
+
 LINUX_KERNEL_VERSION="6.2.11"
 TINYCC_VERSION="85b27"
 MUSL_VERSION="1.2.3"
@@ -182,8 +185,8 @@ if [ ! -x "${BASE}/root/stage0/bin/i386-tcc" ]; then
 	patch -Np1 < "../../../patches/tcc-asm.patch"
 	./configure --enable-static --prefix="${BASE}/root/stage0" \
 		--config-musl --enable-cross
-	make
-	make install
+	make -j$CPUS
+	make -j$CPUS install
 	cd ..
 else
 	echo "stage0 tcc-i386 binary exists"
@@ -200,8 +203,8 @@ if [ ! -f "${BASE}/root/stage0/lib/libc.a" ]; then
 	CC="${BASE}/root/stage0/bin/i386-tcc" ./configure \
 		--prefix="${BASE}/root/stage0" \
 		--target=i386-linux-musl --disable-shared
-	make AR="${BASE}/root/stage0/bin/i386-tcc -ar" RANLIB=echo
-	make install
+	make -j$CPUS AR="${BASE}/root/stage0/bin/i386-tcc -ar" RANLIB=echo
+	make -j$CPUS install
 	cd ..
 else
 	echo "stage0 musl C library exists"
@@ -223,8 +226,8 @@ if [ ! -x "${BASE}/root/stage1/bin/i386-tcc" ]; then
 	./configure --enable-static --prefix="${BASE}/root/stage1" \
 		--cc="${BASE}/root/stage0/bin/i386-tcc" --config-musl \
 		--enable-cross
-	make
-	make install
+	make -j$CPUS
+	make -j$CPUS install
 	ln -fs tcc/i386-libtcc1.a "${BASE}/root/stage1/lib/."
 	cd ..
 else
@@ -245,8 +248,8 @@ if [ ! -f "${BASE}/root/stage1/lib/libc.a" ]; then
 	./configure \
 		--prefix="${BASE}/root/stage1" \
 		--target=i386-linux-musl --disable-shared
-	make AR="${BASE}/root/stage1/bin/i386-tcc -ar" RANLIB=echo
-	make install
+	make -j$CPUS AR="${BASE}/root/stage1/bin/i386-tcc -ar" RANLIB=echo
+	make -j$CPUS install
 	cd ..
 else
 	echo "stage1 musl C library exists"
@@ -259,7 +262,7 @@ if [ ! -d "${BASE}/root/stage1/include/linux" ]; then
 	rm -rf "linux-${LINUX_KERNEL_VERSION}"
 	tar xf "${BASE}/downloads/linux-${LINUX_KERNEL_VERSION}.tar.gz"
 	cd "linux-${LINUX_KERNEL_VERSION}"
-	CC=false make ARCH=x86 INSTALL_HDR_PATH="${BASE}/root/stage1" headers_install
+	CC=false make -j$CPUS ARCH=x86 INSTALL_HDR_PATH="${BASE}/root/stage1" headers_install
 	cd ..
 else
 	echo "stage1 kernel headers exist"
@@ -286,8 +289,8 @@ if [ ! -x "${BASE}/root/stage1/bin/oksh" ]; then
 	./configure \
 		--prefix="${BASE}/root/stage1" \
 		--disable-shared --enable-static
-	make LDFLAGS=-static
-	make install
+	make -j$CPUS LDFLAGS=-static
+	make -j$CPUS install
 	ln -s oksh "${BASE}/root/stage1/bin/sh"
 	cd ..
 else
@@ -298,8 +301,8 @@ if [ ! -x "${BASE}/root/stage1/bin/sbase-box" ]; then
 	rm -rf "sbase-${SBASE_VERSION}"
 	tar xf "${BASE}/downloads/sbase-${SBASE_VERSION}.tar.gz"
 	cd "sbase-${SBASE_VERSION}"
-	make sbase-box CC="${BASE}/root/stage1/bin/i386-tcc" LDFLAGS=-static
-	make sbase-box-install PREFIX="${BASE}/root/stage1"
+	make -j$CPUS sbase-box CC="${BASE}/root/stage1/bin/i386-tcc" LDFLAGS=-static
+	make -j$CPUS sbase-box-install PREFIX="${BASE}/root/stage1"
 	cd ..
 else
 	echo "stage1 sbase exists"
@@ -310,8 +313,8 @@ if [ ! -x "${BASE}/root/stage1/bin/ubase-box" ]; then
 	tar xf "${BASE}/downloads/ubase-${UBASE_VERSION}.tar.gz"
 	cd "ubase-${UBASE_VERSION}"
 	patch -Np1 < "../../../patches/ubase-sysmacros.patch"
-	make ubase-box CC="${BASE}/root/stage1/bin/i386-tcc" LDFLAGS=-static
-	make ubase-box-install PREFIX="${BASE}/root/stage1"
+	make -j$CPUS ubase-box CC="${BASE}/root/stage1/bin/i386-tcc" LDFLAGS=-static
+	make -j$CPUS ubase-box-install PREFIX="${BASE}/root/stage1"
 	cd ..
 else
 	echo "stage1 ubase exists"
@@ -322,8 +325,8 @@ if [ ! -x "${BASE}/root/stage1/bin/smdev" ]; then
 	tar xf "${BASE}/downloads/smdev-${SMDEV_VERSION}.tar.gz"
 	cd "smdev-${SMDEV_VERSION}"
 	patch -Np1 < "../../../patches/smdev-sysmacros.patch"
-	make CC="${BASE}/root/stage1/bin/i386-tcc" LDFLAGS=-static
-	make install PREFIX="${BASE}/root/stage1"
+	make -j$CPUS CC="${BASE}/root/stage1/bin/i386-tcc" LDFLAGS=-static
+	make -j$CPUS install PREFIX="${BASE}/root/stage1"
 	cd ..
 else
 	echo "stage1 smdev exists"
@@ -334,8 +337,8 @@ if [ ! -x "${BASE}/root/stage1/bin/sinit" ]; then
 	tar xf "${BASE}/downloads/sinit-${SINIT_VERSION}.tar.gz"
 	cd "sinit-${SINIT_VERSION}"
 	cp "${BASE}/configs/sinit-config.h" config.h
-	make CC="${BASE}/root/stage1/bin/i386-tcc" LDFLAGS=-static
-	make install PREFIX="${BASE}/root/stage1"
+	make -j$CPUS CC="${BASE}/root/stage1/bin/i386-tcc" LDFLAGS=-static
+	make -j$CPUS install PREFIX="${BASE}/root/stage1"
 	cd ..
 else
 	echo "stage1 smdev exists"
@@ -345,8 +348,8 @@ if [ ! -x "${BASE}/root/stage1/bin/sdhcp" ]; then
 	rm -rf "sdhcp-${SDHCP_VERSION}"
 	tar xf "${BASE}/downloads/sdhcp-${SDHCP_VERSION}.tar.gz"
 	cd "sdhcp-${SDHCP_VERSION}"
-	make CC="${BASE}/root/stage1/bin/i386-tcc" LDFLAGS=-static
-	make install PREFIX="${BASE}/root/stage1"
+	make -j$CPUS CC="${BASE}/root/stage1/bin/i386-tcc" LDFLAGS=-static
+	make -j$CPUS install PREFIX="${BASE}/root/stage1"
 	mv "${BASE}/root/stage1/sbin/sdhcp" "${BASE}/root/stage1/bin"
 	rmdir "${BASE}/root/stage1/sbin"
 	cd ..
@@ -360,8 +363,8 @@ if [ ! -f "${BASE}/root/stage1/lib/libncurses.a" ]; then
 	tar xf "${BASE}/downloads/netbsd-curses-${NETBSD_NCURSES_VERSION}.tar.gz"
 	cd "netbsd-curses-${NETBSD_NCURSES_VERSION}"
 	patch -Np1 < "../../../patches/netbsd-curses-attributes.patch"
-	CC="${BASE}/root/stage1/bin/i386-tcc" LDFLAGS='-static' make all-static
-	CC="${BASE}/root/stage1/bin/i386-tcc" LDFLAGS='-static' make install-static \
+	CC="${BASE}/root/stage1/bin/i386-tcc" LDFLAGS='-static' make -j$CPUS all-static
+	CC="${BASE}/root/stage1/bin/i386-tcc" LDFLAGS='-static' make -j$CPUS install-static \
 		PREFIX="${BASE}/root/stage1"
 	cd ..
 else
@@ -392,8 +395,8 @@ if [ ! -f "${BASE}/root/stage1/lib/libevent.a" ]; then
 	CC="${BASE}/root/stage1/bin/i386-tcc" \
 	./configure --prefix="${BASE}/root/stage1" \
 		--enable-static --disable-shared --disable-openssl
-	make V=1
-	make install PREFIX="${BASE}/root/stage1"
+	make -j$CPUS
+	make -j$CPUS install PREFIX="${BASE}/root/stage1"
 	cd ..
 else
 	echo "stage1 libevent exists"
@@ -409,7 +412,7 @@ if [ ! -x "${BASE}/root/stage1/bin/vi" ]; then
 	CC="${BASE}/root/stage1/bin/i386-tcc"  \
 	./configure --prefix="${BASE}/root/stage1" \
 		--disable-lua
-	make LDFLAGS=-static
+	make -j$CPUS LDFLAGS=-static
 	cp vis "${BASE}/root/stage1/bin/vi"
 	cd ..
 else
@@ -423,8 +426,8 @@ if [ ! -x "${BASE}/root/stage1/bin/tmux" ]; then
 	CC="${BASE}/root/stage1/bin/i386-tcc" \
 	./configure --prefix="${BASE}/root/stage1" \
 		--enable-static
-	make LIBS="-lncursesw -levent_core -lterminfo"
-	make install PREFIX="${BASE}/root/stage1"
+	make -j$CPUS LIBS="-lncursesw -levent_core -lterminfo"
+	make -j$CPUS install PREFIX="${BASE}/root/stage1"
 	cd ..
 else
 	echo "stage1 tmux exists"
@@ -438,8 +441,8 @@ if [ ! -f "${BASE}/root/stage1/lib/libz.a" ]; then
 	CC="${BASE}/root/stage1/bin/i386-tcc" \
 	./configure --prefix="${BASE}/root/stage1" \
 		--static
-	make
-	make install PREFIX="${BASE}/root/stage1"
+	make -j$CPUS
+	make -j$CPUS install PREFIX="${BASE}/root/stage1"
 	cd ..
 else
 	echo "stage1 zlib exists"
@@ -453,14 +456,15 @@ if [ ! -x "${BASE}/root/stage1/bin/man" ]; then
 		PREFIX=${BASE}/root/stage1
 		BINDIR=/bin
 		SBINDIR=/bin
+		MANDIR=/share
 		CC="${BASE}/root/stage1/bin/i386-tcc"
 		CFLAGS="-static -I${BASE}/root/stage1/include"
 		LDFLAGS="-static -L${BASE}/root/stage1/lib"
 		BINM_PAGER=more
 EOF
 	./configure 
-	make
-	make install DESTDIR="${BASE}/root/stage1"
+	make -j$CPUS
+	make -j$CPUS install DESTDIR="${BASE}/root/stage1"
 	cd ..
 else
 	echo "stage1 mandoc exists"
@@ -470,8 +474,8 @@ if [ ! -x "${BASE}/root/stage1/bin/abase-box" ]; then
 	rm -rf "abase-${ABASE_VERSION}"
 	tar xf "${BASE}/downloads/abase-${ABASE_VERSION}.tar.gz"
 	cd "abase-${ABASE_VERSION}"
-	make abase-box CC="${BASE}/root/stage1/bin/i386-tcc" LDFLAGS=-static
-	make abase-box-install PREFIX="${BASE}/root/stage1"
+	make -j$CPUS abase-box CC="${BASE}/root/stage1/bin/i386-tcc" LDFLAGS=-static
+	make -j$CPUS abase-box-install PREFIX="${BASE}/root/stage1"
 	cd ..
 else
 	echo "stage1 abase exists"
@@ -488,8 +492,8 @@ if [ ! -f "${BASE}/root/stage1/boot/bzImage" ]; then
 	# cd linux-6.2.11/
 	# cp ../linux-6.2.10/.config .
 	# make menuconfig
-	# make -j 16 bzImage
-	# make -j 16 modules
+	# make -j$CPUS bzImage
+	# make -j$CPUS modules
 	# find . -name '*.ko' | xargs tar cvf ~/modules.tar
 	false
 	mkdir "${BASE}/root/stage1/boot"
