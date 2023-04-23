@@ -1,0 +1,234 @@
+   #[1]Gentoo Forums Forum Index [2]Search [3]FAQ [4]View previous topic
+   [5]View next topic [6]Unsupported Software [7]Gentoo Website [8]Gentoo
+   Forums [9]Gentoo Bugzilla [10]Gentoo Packages
+
+   Gentoo Forums
+   [11]Gentoo Forums
+   [12]Gentoo Forums
+   [13]Quick Search: ______________________________ in [All available]
+
+     [14]FAQ | [15]Search | [16]Memberlist | [17]Usergroups |
+   [18]Statistics | [19]Profile | [20]Log in to check your private
+   messages | [21]Log in | [22]Register
+
+                  [23]How does gentoo startup / init work?
+   [24]View unanswered posts
+   [25]View posts from last 24 hours
+
+   [26]Reply to topic    [27]Gentoo Forums Forum Index [28]Unsupported
+   Software
+
+                            [29]View previous topic :: [30]View next topic
+   Author Message
+   defer-
+   Tux's lil' helper
+   Tux's lil' helper
+   Joined: 11 Jun 2007
+   Posts: 140
+   Location: Finland
+   [31]Post Posted: Fri Sep 19, 2014 12:18 pm    Post subject: How does
+   gentoo startup / init work? [32]Reply with quote
+     __________________________________________________________________
+
+   I would like to create custom init to get fast startup and shutdown
+   times. I created sinit[1] ebuild and installed it. I chaged savedconfig
+   and created /etc/rc script. My current setup boots fine to X but
+   shutdown and module loading doesn't work.
+   How does Gentoo sysvinit/openrc startup work? What does init execute
+   and how does openrc execute init scripts on startup or shutdown? What
+   is needed for working system?
+   [1] [33]http://git.suckless.org/sinit/
+   [2] /etc/rc
+
+                                       Code:
+                             #!/usr/bin/env bash
+                        if [[ "$1" = "start" ]]; then
+                           echo "Starting up Gentoo Linux"
+                                   mkdir -p /proc
+                                    mkdir -p /sys
+                 mount -n -t proc -o nosuid,noexec,nodev proc /proc
+                 mount -n -t sysfs -o nosuid,noexec,nodev sysfs /sys
+                   mount -n -t tmpfs -o nosuid,mode=0755 dev /dev
+                                  mkdir -p /dev/pts
+                mount -n -t devpts -o gid=5,mode=0620 devpts /dev/pts
+                                 echo Running smdev
+                                      smdev -s
+                      echo Setting smdev as the kernel hotplug
+                     echo /bin/smdev > /proc/sys/kernel/hotplug
+                             echo Loading kernel modules
+           find /sys -name 'modalias' -type f -exec cat '{}' + | sort -u |
+                      xargs modprobe -b -a 2>/dev/null
+                         echo Remounting root as read-write
+                                mount -o remount,rw /
+                              echo Mounting filesystems
+                                      mount -a
+                                 hostname dfr-laptop
+                      /sbin/agetty --noclear 38400 tty1 linux &
+                      /sbin/agetty --noclear 38400 tty2 linux &
+                      elif [[ "$1" = "reboot" ]]; then
+                            echo "Rebooting Gentoo Linux"
+                                  killall5 -s KILL
+                          echo Remounting root as read-only
+                                mount -o remount,ro /
+                             echo Unmounting filesystems
+                                      umount -a
+                                        sync
+                                       sleep 1
+                                        wait
+                                       reboot
+                     elif [[ "$1" = "shutdown" ]]; then
+                          echo "Shutting down Gentoo Linux"
+                                  killall5 -s KILL
+                          echo Remounting root as read-only
+                                mount -o remount,ro /
+                             echo Unmounting filesystems
+                                      umount -a
+                                        sync
+                                       sleep 1
+                                        wait
+                                        halt
+                                    else
+                               echo "Unknown command"
+                                     fi
+
+   _________________
+   [34]https://github.com/defer-
+   [35]Back to top
+   [36]View user's profile [37]Send private message
+   steveL
+   Watchman
+   Watchman
+   Joined: 13 Sep 2006
+   Posts: 5153
+   Location: The Peanut Gallery
+   [38]Post Posted: Fri Sep 19, 2014 10:27 pm    Post subject: [39]Reply
+   with quote
+     __________________________________________________________________
+
+   First off, lose the awfully fscked-up shebang: #!/usr/bin/env bash is
+   wrong on so many levels. Just use #!/bin/sh and learn to write
+   [40]portable sh.
+   Most of that looks ok, but I'd separate out into functions, and use a
+   simple case.
+   [41]Back to top
+   [42]View user's profile [43]Send private message
+   steveL
+   Watchman
+   Watchman
+   Joined: 13 Sep 2006
+   Posts: 5153
+   Location: The Peanut Gallery
+   [44]Post Posted: Sun Oct 12, 2014 12:56 am    Post subject: Re: How
+   does gentoo startup / init work? [45]Reply with quote
+     __________________________________________________________________
+
+                                             defer- wrote:
+    How does Gentoo sysvinit/openrc startup work? What does init execute
+    and how does openrc execute init scripts on startup or shutdown? What
+                        is needed for working system?
+
+   As with every Linux (and indeed Unix that I know of), "init" means
+   pid1: it doesn't do very much, but it is configured via /etc/inittab --
+   the file is pretty well-commented. Though you really shouldn't edit it
+   in general, in your case you likely need to.
+   pid1 must be robust, and simply-coded, since it must run for the entire
+   uptime of the machine. It is the first process started by the kernel,
+   and if it exits (or crashes), the kernel panics (ie: completely halts)
+   and all your in-flight data is lost, FS may be corrupted, etc. ie: Game
+   Over.
+   For this reason, it's not worth redoing pid1: complexity is much better
+   handled elsewhere, in the default case by openrc (command: /sbin/rc)
+   which you can see is run by init on entry to the various run-levels. So
+   we still use sysvinit, since there's nothing more that would sanely be
+   added to pid1. ie: [46]sys-apps/sysvinit
+   Read man 8 init for more information; man runscript and man rc if you
+   want to know more about openrc.
+   [47]Back to top
+   [48]View user's profile [49]Send private message
+   Display posts from previous: [All Posts] [Oldest First]  Go
+
+     [50]Reply to topic    [51]Gentoo Forums Forum Index [52]Unsupported
+                         Software All times are GMT
+                                 Page 1 of 1
+
+         Jump to: [Unsupported Software_______________________]   Go
+
+                  You cannot post new topics in this forum
+                  You cannot reply to topics in this forum
+                  You cannot edit your posts in this forum
+                 You cannot delete your posts in this forum
+                   You cannot vote in polls in this forum
+
+    [53]Links: [54]forums.gentoo.org | [55]www.gentoo.org |
+   [56]bugs.gentoo.org | [57]wiki.gentoo.org | [58]forum-mods@gentoo.org
+
+   Copyright 2001-2023 Gentoo Foundation, Inc. Designed by [59]Kyle Manna
+      © 2003; Style derived from original subSilver theme. | Hosting by
+   [60]Gossamer Threads Inc. © | Powered by [61]phpBB 2.0.23-gentoo-p11 ©
+                           2001, 2002 phpBB Group
+                             [62]Privacy Policy
+
+References
+
+   1. https://forums.gentoo.org/./index.php?sid=36d954b355b4c2cc0e3f7562d9922a52
+   2. https://forums.gentoo.org/./search.php?sid=36d954b355b4c2cc0e3f7562d9922a52
+   3. https://forums.gentoo.org/./faq.php?sid=36d954b355b4c2cc0e3f7562d9922a52
+   4. https://forums.gentoo.org/viewtopic-t-1000292-view-previous.html-sid-36d954b355b4c2cc0e3f7562d9922a52.html?sid=36d954b355b4c2cc0e3f7562d9922a52
+   5. https://forums.gentoo.org/viewtopic-t-1000292-view-next.html-sid-36d954b355b4c2cc0e3f7562d9922a52.html?sid=36d954b355b4c2cc0e3f7562d9922a52
+   6. https://forums.gentoo.org/viewforum-f-51.html-sid-36d954b355b4c2cc0e3f7562d9922a52.html?sid=36d954b355b4c2cc0e3f7562d9922a52
+   7. http://www.gentoo.org/search/www-gentoo-org.xml
+   8. http://www.gentoo.org/search/forums-gentoo-org.xml
+   9. http://www.gentoo.org/search/bugs-gentoo-org.xml
+  10. http://www.gentoo.org/search/packages-gentoo-org.xml
+  11. https://forums.gentoo.org/index.php?sid=36d954b355b4c2cc0e3f7562d9922a52
+  12. https://forums.gentoo.org/index.php?sid=36d954b355b4c2cc0e3f7562d9922a52
+  13. https://forums.gentoo.org/search.php?sid=36d954b355b4c2cc0e3f7562d9922a52
+  14. https://forums.gentoo.org/faq.php?sid=36d954b355b4c2cc0e3f7562d9922a52
+  15. https://forums.gentoo.org/search.php?sid=36d954b355b4c2cc0e3f7562d9922a52
+  16. https://forums.gentoo.org/memberlist.php?sid=36d954b355b4c2cc0e3f7562d9922a52
+  17. https://forums.gentoo.org/groupcp.php?sid=36d954b355b4c2cc0e3f7562d9922a52
+  18. https://forums.gentoo.org/statistics.php?sid=36d954b355b4c2cc0e3f7562d9922a52
+  19. https://forums.gentoo.org/profile.php?mode=editprofile&sid=36d954b355b4c2cc0e3f7562d9922a52
+  20. https://forums.gentoo.org/privmsg.php?folder=inbox&sid=36d954b355b4c2cc0e3f7562d9922a52
+  21. https://forums.gentoo.org/login.php?sid=36d954b355b4c2cc0e3f7562d9922a52
+  22. https://forums.gentoo.org/profile.php?mode=register&sid=36d954b355b4c2cc0e3f7562d9922a52
+  23. https://forums.gentoo.org/viewtopic-t-1000292-start-0-postdays-0-postorder-asc-highlight-.html?sid=36d954b355b4c2cc0e3f7562d9922a52
+  24. https://forums.gentoo.org/search.php?search_id=unanswered&sid=36d954b355b4c2cc0e3f7562d9922a52
+  25. https://forums.gentoo.org/search.php?search_id=last&sid=36d954b355b4c2cc0e3f7562d9922a52
+  26. https://forums.gentoo.org/posting.php?mode=reply&t=1000292&sid=36d954b355b4c2cc0e3f7562d9922a52
+  27. https://forums.gentoo.org/index.php?sid=36d954b355b4c2cc0e3f7562d9922a52
+  28. https://forums.gentoo.org/viewforum-f-51.html?sid=36d954b355b4c2cc0e3f7562d9922a52
+  29. https://forums.gentoo.org/viewtopic-t-1000292-view-previous.html?sid=36d954b355b4c2cc0e3f7562d9922a52
+  30. https://forums.gentoo.org/viewtopic-t-1000292-view-next.html?sid=36d954b355b4c2cc0e3f7562d9922a52
+  31. https://forums.gentoo.org/viewtopic-p-7619944.html?sid=36d954b355b4c2cc0e3f7562d9922a52#7619944
+  32. https://forums.gentoo.org/posting.php?mode=quote&p=7619944&sid=36d954b355b4c2cc0e3f7562d9922a52
+  33. http://git.suckless.org/sinit/
+  34. https://github.com/defer-
+  35. https://forums.gentoo.org/viewtopic-t-1000292-start-0.html#top
+  36. https://forums.gentoo.org/profile.php?mode=viewprofile&u=167926&sid=36d954b355b4c2cc0e3f7562d9922a52
+  37. https://forums.gentoo.org/privmsg.php?mode=post&u=167926&sid=36d954b355b4c2cc0e3f7562d9922a52
+  38. https://forums.gentoo.org/viewtopic-p-7620224.html?sid=36d954b355b4c2cc0e3f7562d9922a52#7620224
+  39. https://forums.gentoo.org/posting.php?mode=quote&p=7620224&sid=36d954b355b4c2cc0e3f7562d9922a52
+  40. http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html
+  41. https://forums.gentoo.org/viewtopic-t-1000292-start-0.html#top
+  42. https://forums.gentoo.org/profile.php?mode=viewprofile&u=146493&sid=36d954b355b4c2cc0e3f7562d9922a52
+  43. https://forums.gentoo.org/privmsg.php?mode=post&u=146493&sid=36d954b355b4c2cc0e3f7562d9922a52
+  44. https://forums.gentoo.org/viewtopic-p-7631534.html?sid=36d954b355b4c2cc0e3f7562d9922a52#7631534
+  45. https://forums.gentoo.org/posting.php?mode=quote&p=7631534&sid=36d954b355b4c2cc0e3f7562d9922a52
+  46. http://savannah.nongnu.org/projects/sysvinit
+  47. https://forums.gentoo.org/viewtopic-t-1000292-start-0.html#top
+  48. https://forums.gentoo.org/profile.php?mode=viewprofile&u=146493&sid=36d954b355b4c2cc0e3f7562d9922a52
+  49. https://forums.gentoo.org/privmsg.php?mode=post&u=146493&sid=36d954b355b4c2cc0e3f7562d9922a52
+  50. https://forums.gentoo.org/posting.php?mode=reply&t=1000292&sid=36d954b355b4c2cc0e3f7562d9922a52
+  51. https://forums.gentoo.org/index.php?sid=36d954b355b4c2cc0e3f7562d9922a52
+  52. https://forums.gentoo.org/viewforum-f-51.html?sid=36d954b355b4c2cc0e3f7562d9922a52
+  53. https://forums.gentoo.org/sitemap/index.html
+  54. https://forums.gentoo.org/index.php?sid=36d954b355b4c2cc0e3f7562d9922a52
+  55. http://www.gentoo.org/
+  56. https://bugs.gentoo.org/
+  57. https://wiki.gentoo.org/
+  58. mailto:forum-mods@gentoo.org
+  59. http://www.frozenliquid.net/
+  60. http://www.gossamer-threads.com/
+  61. http://www.phpbb.com/
+  62. https://wiki.gentoo.org/wiki/Foundation:Privacy_Policy

@@ -1,0 +1,239 @@
+                    Setting up Stali Linux as XEN/PVH guest
+
+   eventually [1]build your own and
+
+mkdir -p /root/guests/stali/lala/
+cd /root/guests/stali/
+
+dd if=/dev/zero of=stali.reiser4 bs=1GB count=0 seek=10
+mkfs.reiser4 --discard --force --yes stali.reiser4
+mount stali.reiser4 lala/
+
+git clone http://git.sta.li/rootfs-x86_64
+mv rootfs-x86_64/* lala/
+rm -rf rootfs-x86_64/
+
+    mkdir lala/lib/
+    mkdir lala/lib/modules/
+    tar xzf /data/kernels/5.2.21.domureiser4.modules.tar.gz -C lala/lib/modules/
+
+cp -pi lala/etc/fstab lala/etc/fstab.dist
+vi lala/etc/fstab
+
+/dev/xvda1      /       reiser4 rw,noatime,discard              0 1
+tmpfs           /tmp    tmpfs   nodev,nosuid,mode=1777          0 0
+tmpfs           /dev/shm tmpfs  defaults                        0 0
+
+mv -i lala/etc/rc.init lala/etc/rc.init.dist
+chmod -x lala/etc/rc.init.dist
+
+rm -f lala/etc/rc.conf*
+vi lala/etc/rc.init
+
+#!/bin/sh
+
+echo rc.init PATH is $PATH
+
+umask 022
+
+/bin/mount -n -t proc -o nosuid,noexec,nodev proc /proc
+/bin/mount -n -t sysfs -o nosuid,noexec,nodev sysfs /sys
+
+# we have /dev on the disk not as tmpfs nor devtmpfs
+/bin/umount /dev
+/bin/mount -n -t devpts -o gid=5,mode=0620 devpts /dev/pts
+
+/bin/mount -o remount,rw /
+/bin/mount -a
+
+echo Loading TMEM
+insmod /lib/modules/5.2.21.domureiser4/kernel/drivers/xen/tmem.ko && echo done |
+| echo FAILED
+
+/bin/hostname stali
+
+/bin/ip addr add 127.0.0.1/8 dev lo broadcast + scope host
+/bin/ip link set lo up
+
+/bin/ip addr add 10.1.1.9/24 dev eth0
+/bin/ip link set eth0 up
+/bin/ip route add 10.1.1.254/24 dev eth0
+
+test -f /etc/random-seed && /bin/cat /etc/random-seed >/dev/urandom
+/bin/dd if=/dev/urandom of=/etc/random-seed count=1 bs=512 2>/dev/null
+
+ulimit -c unlimited
+
+# usage: /bin/getty [tty] [term] [cmd] [args...]
+/bin/respawn /bin/getty /dev/hvc0 xterm /bin/sh
+
+chmod +x lala/etc/rc.init
+
+echo 127.0.0.1 localhost stali > lala/etc/hosts # new file
+echo nameserver 10.1.1.254 > lala/etc/resolv.conf # new file
+
+cp -i lala/etc/rc.exit lala/etc/rc.exit.dist
+chmod -x lala/etc/rc.exit.dist
+vi lala/etc/rc.exit
+
+(remove the call to unused rc.conf)
+
+   re-wrap sinit altogether
+
+ls -lF lala/bin/poweroff lala/bin/reboot # no exist
+
+echo /bin/kill -s USR1 1 > lala/bin/poweroff
+echo /bin/kill -s INT 1 > lala/bin/reboot
+
+chmod +x lala/bin/poweroff lala/bin/reboot
+
+   create device files
+
+mkdir -p lala/{dev/pts,dev/shm,proc,tmp,sys,log,run}/
+
+mknod -m 600 lala/dev/console c 5 1
+mknod -m 600 lala/dev/hvc0 c 229 0
+
+mknod -m 660 lala/dev/ptmx c 5 2
+mknod -m 660 lala/dev/tty c 5 0
+grep ^tty lala/etc/group
+chown root:tty lala/dev/ptmx
+chown root:tty lala/dev/tty
+
+mknod -m 666 lala/dev/null c 1 3
+mknod -m 666 lala/dev/zero c 1 5
+
+mknod -m 444 lala/dev/random c 1 8
+mknod -m 444 lala/dev/urandom c 1 9
+
+ln -s /proc/self/fd lala/dev/fd
+ln -s /proc/self/fd/0 lala/dev/stdin
+ln -s /proc/self/fd/1 lala/dev/stdout
+ln -s /proc/self/fd/2 lala/dev/stderr
+ln -s /proc/kcore lala/dev/core
+
+   and for xen
+
+mkdir -p lala/dev/xen/
+
+mknod -m 660 lala/dev/xen/evtchn c 10 60
+mknod -m 660 lala/dev/xen/gntalloc c 10 58
+mknod -m 660 lala/dev/xen/gntdev c 10 59
+mknod -m 660 lala/dev/xen/hypercall c 10 56
+mknod -m 660 lala/dev/xen/privcmd c 10 57
+mknod -m 660 lala/dev/xen/xenbus c 10 61
+
+   then finish-up
+
+#chroot lala/ passwd -d root
+
+du -sh lala/
+# 213M
+
+umount lala/
+rmdir lala/
+
+Skeleton
+
+vi stali
+
+kernel = "/data/kernels/vmlinuz"
+root = "/dev/xvda1 ro console=hvc0 mitigations=off"
+#extra = "init=/bin/bash"
+name = "stali"
+vcpus = 2
+memory = 1024
+disk = ['tap:tapdisk:aio:/root/guests/stali/stali.reiser4,xvda1,w']
+vif = [ 'bridge=guestbr0, vifname=stali0',
+    'bridge=guestbr0, vifname=stali1' ]
+type = "pvh"
+
+xl create stali -c
+
+Acceptance
+
+lsmod
+free -m
+curl -I http://146.112.62.105/
+curl -I https://www.opendns.com/
+
+TODO
+
+   make /var/ alive again and get rid of /log/ and /run/
+
+   note: /run/ is required while logging in
+
+fopen /run/utmp: No such file or directory
+
+     * add nvi or elvis, ping, ksh or bash, net-tools
+     * add fsck.*
+     * add openssh daemon
+     * minimize rc.init and push /dev/pts /proc /sys mount points to
+       /etc/fstab only
+     * networking does not work so far
+
+Additional notes
+
+   otherwise within rc.init
+
+/bin/mknod -m 600 /dev/console c 5 1
+/bin/mknod -m 600 /dev/hvc0 c 229 0
+/bin/mknod -m 666 /dev/null c 1 3
+/bin/mknod -m 666 /dev/zero c 1 5
+/bin/mknod -m 666 /dev/ptmx c 5 2
+/bin/mknod -m 666 /dev/tty c 5 0
+/bin/mknod -m 444 /dev/random c 1 8
+/bin/mknod -m 444 /dev/urandom c 1 9
+ln -s /proc/self/fd fd
+ln -s /proc/self/fd/0 stdin
+ln -s /proc/self/fd/1 stdout
+ln -s /proc/self/fd/2 stderr
+ln -s /proc/kcore core
+
+   it is worth noting that kernel's dev mount options look like this
+
+devtmpfs /dev devtmpfs rw,relatime,size=3563240k,nr_inodes=890810,mode=755 0 0
+
+TODO
+
+   need those
+     * ksh93
+     * vi
+
+   also need to solve
+
+[    0.824455] random: dd: uninitialized urandom read (512 bytes read)
+
+Resources
+
+   [2]https://sta.li/
+
+   [3]https://core.suckless.org/sinit/
+
+   [4]http://www.linuxfromscratch.org/lfs/view/6.1/chapter06/devices.html
+
+   [5]https://git.suckless.org/ubase/files.html
+
+   [6]https://git.suckless.org/sbase/files.html
+
+   [7]https://gitlab.com/garbeam/src/-/blob/master/bin/ubase/halt.8
+
+   [8]HOME | [9]GUIDES | [10]LECTURES | [11]LAB | [12]SMTP HEALTH |
+   [13]HTML5
+   Copyright © 2023 Pierre-Philipp Braun
+
+References
+
+   1. https://pub.nethence.com/xen/guest-stali-source
+   2. https://sta.li/
+   3. https://core.suckless.org/sinit/
+   4. http://www.linuxfromscratch.org/lfs/view/6.1/chapter06/devices.html
+   5. https://git.suckless.org/ubase/files.html
+   6. https://git.suckless.org/sbase/files.html
+   7. https://gitlab.com/garbeam/src/-/blob/master/bin/ubase/halt.8
+   8. https://nethence.com/
+   9. https://pub.nethence.com/
+  10. https://nethence.com/lectures/
+  11. https://lab.nethence.com/
+  12. https://nethence.com/smtp/
+  13. https://html5.validator.nu/?doc=http://pub.nethence.com/xen/guest-stali

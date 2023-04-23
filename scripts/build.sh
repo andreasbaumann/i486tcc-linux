@@ -18,8 +18,8 @@ set -e
 SCRIPT=$(readlink -f "$0")
 BASE=$(dirname ${SCRIPT})/..
 
-#CPUS=$(nproc)
-CPUS=1
+CPUS=$(nproc)
+#CPUS=1
 
 LINUX_KERNEL_VERSION="6.2.11"
 TINYCC_VERSION="85b27"
@@ -561,18 +561,15 @@ if [ ! -f "${BASE}/root/stage1/boot/bzImage" ]; then
 	rm -rf "linux-${LINUX_KERNEL_VERSION}"
 	tar xf "${BASE}/downloads/linux-${LINUX_KERNEL_VERSION}.tar.gz"
 	cd "linux-${LINUX_KERNEL_VERSION}"
-	echo "TODO: implement kernel building, using miniconfig.."
-	# TODO:
-	# tar xf linux-6.2.11.tar.xz
-	# cd linux-6.2.11/
-	# cp ../linux-6.2.10/.config .
-	# make menuconfig
-	# make -j$CPUS bzImage
-	# make -j$CPUS modules
-	# find . -name '*.ko' | xargs tar cvf ~/modules.tar
-	false
-	mkdir "${BASE}/root/stage1/boot"
-	mkdir "${BASE}/root/stage1/lib/modules"
+	# this configuration is based on tinyconfig, then enabling things as
+	# specified in the README
+	cp "${BASE}/configs/linux-config" .config
+	make -j$CPUS bzImage
+	test -d "${BASE}/root/stage1/boot" || mkdir "${BASE}/root/stage1/boot"
+	cp arch/i386/boot/bzImage "${BASE}/root/stage1/boot"
+	#make -j$CPUS modules
+	#mkdir "${BASE}/root/stage1/lib/modules"
+	#find . -name '*.ko' | xargs tar -cf - | tar -C "${BASE}/root/stage1/lib/modules" -xf -
 	cd ..
 else
 	echo "stage1 kernel exists"
@@ -606,6 +603,7 @@ fi
 
 if [ ! -f "${BASE}/floppy.img" ]; then
 	touch EOF
+	cp "${BASE}/root/stage1/boot/bzImage" .
 	tar cvf data.tar -b1 bzImage ramdisk.img EOF
 	cat "${BASE}/root/stage1/boot/boot.img" data.tar > "${BASE}/floppy.img"
 	split -d -b 1474560 floppy.img floppy
