@@ -1,0 +1,319 @@
+   O6MaE6Ra wlog [ [1]home [2]not me [3]wlog [4]gallery [5]server
+   [6]scripts [7]links ]
+     __________________________________________________________________
+
+   [8]<- go back
+     __________________________________________________________________
+
+                        runit fast boot and init scripts
+
+   by z411 @ 2016-12-02 [ [9]tech ]
+
+   Since I moved away from Debian and systemd again I've been trying new
+   options for my init system, like s6, openbox init and suckless init
+   (sinit). After trying out Void Linux, runit, which provides service
+   supervision, seemed like a fine option so I installed it on my Gentoo
+   machine.
+
+   Turns out it's pretty simple and it works, but I wanted a fast boot.
+
+   By default once you install runit, even if you use runit-init you'll
+   end up using the same old SysV init scripts in one way or another. To
+   get a fast boot you have to write your own. So that's what I did.
+
+   With my init scripts I could get a ~3 second boot; that's including the
+   kernel which takes up most of the boot time; the userspace itself gets
+   up to an usable state in around 500ms. This machine started with
+   systemd in ~7 seconds, so I'm pretty sure people with faster machines
+   will get an ever faster boot.
+
+   For those who don't know, runit works with 3 stages. Stage 1, which
+   runs at boot; stage 2, which starts up services in parallel and keeps
+   running until shutdown, and stage 3 which does the actual shutdown
+   process. I'll share my scripts for each one.
+
+Init stages
+
+  /etc/runit/1
+
+#!/bin/sh
+export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
+
+echo "mounting pseudo filesystems ..."
+mount -o nosuid,noexec,nodev -t proc proc /proc &
+mount -o nosuid,noexec,nodev -t sysfs sys /sys &
+mount -o mode=0755,noatime -t tmpfs tmpfs /run &
+mount -o remount,mode=0755,relatime -t devtmpfs dev /dev &
+wait
+
+mkdir -p -m0755 /dev/pts /run/shm
+ln -s sda6 /dev/root
+ln -s /run/shm /dev/shm
+mkdir -p -m1777 /dev/mqueue
+
+mount -o noexec,nosuid,nodev -n -t mqueue mqueue /dev/mqueue &
+mount -o mode=0620,gid=5,nosuid,noexec -n -t devpts devpts /dev/pts &
+mount -o mode=1777,nosuid,nodev -n -t tmpfs shm /run/shm &
+wait
+
+echo "starting udev ..."
+/sbin/udevd --daemon
+udevadm trigger --action=add --type=subsystems &
+udevadm trigger --action=add --type=devices &
+
+echo "fscking ..."
+fsck -A -T -a -t noopts=_netdev &
+
+echo "setting hostname ..."
+cat /etc/hostname > /proc/sys/kernel/hostname &
+
+echo "enabling swap ..."
+swapon -a &
+
+echo "setting sysctl ..."
+sysctl -q --system &
+
+wait
+
+echo "remounting root read-write ..."
+mount -o remount,rw /
+
+echo "mounting local filesystems ..."
+mount -a -t "nosysfs,nonfs,nonfs4,nosmbfs,nocifs" -O no_netdev &
+
+echo "clearing /tmp ..."
+rm -rf /tmp/* /tmp/.* > /dev/null 2>&1
+
+echo "creating /var/lock"
+rm -fr /var/lock
+rm -rf /run/lock
+mkdir /run/lock
+ln -s /run/lock /var/lock
+
+# use the keymap you need here
+echo "setting keymap ..."
+loadkeys en
+
+echo "setting up network ..."
+dhcpcd enp2s0 -L >/dev/null 2>&1 &
+
+# use this if you want a static configuration:
+#ip link set lo up
+#ip link set enp2s0 up
+#ip addr add 192.168.0.6/24 broadcast 192.168.0.255 dev enp2s0
+#ip route add default via 192.168.0.1
+
+# i don't use wlan but here's an example if you need it.
+
+#echo "connecting to wifi ..."
+#modprobe -v rtl8723be 2>&1 >/dev/null
+#wait
+#ip link set dev wlo1 up &
+#ip link set dev lo up &
+#wait
+#dhcpcd wlo1 -L >/dev/null 2>&1 &
+
+echo "restoring alsa state ..."
+alsactl restore
+
+touch /etc/runit/stopit
+chmod 0 /etc/runit/stopit
+
+   That's stage 1 (boot stage). The trick is not to let udev wait until
+   the devices settle. This lets you reach a tty very fast, and let the
+   devices load in the background. Waiting for the devices to settle isn't
+   necessary unless you run a service which needs that, which is very rare
+   nowadays.
+
+  /etc/runit/2
+
+#!/bin/sh
+
+PATH=/command:/usr/local/bin:/usr/local/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/
+X11R6/bin
+
+echo "starting services ..."
+
+exec env - PATH=$PATH \
+runsvdir /etc/service 'log: ....................................................
+................................................................................
+................................................................................
+................................................................................
+................................................................................
+.......................'
+
+   This runs the services in the /etc/service directory; you might want to
+   change this if your distribution installs them in a different directory
+   by default (like /service).
+
+  /etc/runit/3
+
+#!/bin/bash
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+trap ':' INT QUIT TSTP
+
+echo "fixing console state ..."
+chvt 1
+{ stty sane ; echo ; } >/dev/console
+
+echo "sending signal 15 ..."
+killall5 -15 || [ $? -eq 2 ]
+
+test -f /run/init.hwclock && hwclock --systohc --localtime --noadjfile
+
+echo "stopping services ..."
+sv force-stop /var/service/* &>/dev/null || :
+
+echo "storing alsa state ..."
+alsactl store
+
+local psz=$(( $(sysctl -n kernel.random.poolsize 2>/dev/null || echo 4096) / 409
+6 ))
+(umask 077; dd if=/dev/urandom of=/var/lib/misc/random-seed count=$psz 2>/dev/nu
+ll)
+
+echo "shutting down network ..."
+ip link set group default down
+
+echo "halting ..."
+halt -w
+
+echo "sending signal 9 ..."
+killall5 -9 || [ $? -eq 2 ]
+
+echo "umounting filesytems..."
+sync; sync
+rm -f /etc/mtab~* /etc/mtab.fuselock
+
+# Unmounting loopback devices first:
+for d in $(grep '^/dev/loop' /proc/mounts | cut -d ' ' -f 2 | tac); do
+eval "umount -d -r -f $'$d'"
+done
+
+# Unmounting all real filesystems except root:
+for d in $(egrep -v '^\S+ (/|/dev|/dev/.*|/proc|/proc/.*|/run|/sys|/sys/.*) ' /p
+roc/mounts | cut -d ' ' -f 2 | tac); do
+eval "umount -r -f $'$d'"
+done
+
+# Switching off swap
+umount -a -t tmpfs 2>/dev/null || :
+swapoff -a
+
+   That's stage 3 (shutdown). Read them first to check if everything is
+   fine; you might need to change some things depending on your system
+   requirements.
+
+TTYs
+
+   But before you go on and reboot your machine, you also need to set up
+   the ttys first. They can be loaded as services by runit, so that they
+   can be restarted automatically when you log off.
+
+   Services in runit are simple directories in the /etc/sv directory with
+   a run executable script inside them, and an optional finish script.
+   What runit does is simply run the run script, and if it exits for some
+   reason, it restarts it automatically. When the service is required to
+   exit (ie. at shutdown) it TERMs it and runs finish if available.
+
+   A service for your TTY would be something like this:
+
+  /etc/sv/getty-tty1/run
+
+#!/bin/sh
+exec chpst -P /sbin/agetty 38400 tty1 linux
+# or if you use mingetty
+#exec chpst -P /sbin/mingetty tty1
+
+   And the finish script:
+
+  /etc/sv/getty-tty1/finish
+
+#!/bin/sh
+exec utmpset -w tty1
+
+   Repeat the process if you want more ttys. Now you must enable them.
+   Enabling services in runit is as simple as creating a symbolic link in
+   the directory for enabled services. In my case it's /etc/service.
+# ln -s /etc/sv/getty-tty1 /etc/service
+
+   Now you should be able to reboot. To use runit temporarily, in your
+   boot loader edit the kernel line and add init=/sbin/runit-init at the
+   end. Boot it, and runit should handle the system boot now. You should
+   get to the tty pretty fast. If it doesn't work, just reboot the system
+   without the init kernel option and you should be back to your previous
+   init system.
+
+Other services
+
+   You can make the rest of the services you need in the same way, but
+   make sure the service doesn't fork! For example, mpd:
+
+  /etc/sv/mpd/run
+
+#!/bin/sh
+exec chpst -umpd mpd --no-daemon /etc/mpd.conf
+
+   Note that runit includes the chpst, which is able to run services as
+   another user if necessary.
+
+   Or ssh:
+
+  /etc/sv/sshd/run
+
+#!/bin/sh
+exec /usr/sbin/sshd -D
+
+   That's it. To enable and run them you just make a symbolic link like
+   you did with the tty service. It's actually much simpler than systemd,
+   SysV and BSD scripts, and it's very reliable.
+
+Service management
+
+   To manage services please see man sv. Some examples:
+# Stop ssh service
+sv d sshd
+# Start it again
+sv u sshd
+# See its state
+sv s sshd
+# See state of all services, including disabled ones
+sv s /etc/sv/*
+# Reboot the system
+runit-init 6
+# Shutdown the system
+runit-init 0
+
+   [10]Here's a script that handles enabling, disabling and listing
+   services (add/del/ls) easily.
+
+   That's it for now. I've been pretty happy with it. To make the change
+   permanent add the init kernel option permanently to your boot loader
+   configuration file.
+
+   I can also recommend minirc for a similar alternative; you can pair it
+   with openbox init or sinit; but as runit keeps track of services and is
+   able to restart them and has tools to work with them, so far it feels
+   the most reliable while being simple and fast. It's my favorite init
+   replacement now and more distributions besides Void Linux should try it
+   out. Let's hope Devuan gives it a bit of attention.
+
+   [11]Tweet | [12]Permalink | 12:16
+
+   web * omaera · org
+
+References
+
+   1. https://omaera.org/
+   2. https://omaera.org/notme
+   3. https://omaera.org/wlog/
+   4. https://omaera.org/gal/
+   5. https://omaera.org/server
+   6. https://omaera.org/scripts
+   7. https://omaera.org/links
+   8. https://omaera.org/wlog/
+   9. https://omaera.org/wlog/tech/
+  10. https://omaera.org/junk/ksv
+  11. https://twitter.com/intent/tweet?url=https%3A%2F%2Fomaera.org%2Fwlog%2Ftech%2Frunit_init&text=runit+fast+boot+and+init+scripts&via=z411_cl
+  12. https://omaera.org/wlog/tech/runit_init

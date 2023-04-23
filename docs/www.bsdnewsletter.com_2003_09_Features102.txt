@@ -1,0 +1,257 @@
+                               BSDnewsletter.com
+
+      [1]Front | [2]Info | [3]Lists | [4]Newsfeeds | [5]Study Guide |
+   [6]What is BSD? [7]RSS
+
+   BSD Links
+   · [8]Advocacy
+   · [9]Drivers
+   · [10]Events
+   · [11]Flavours
+   · [12]FAQs
+   · [13]Guides
+   · [14]Programming
+   · [15]Security
+   · [16]Software
+   · [17]User Groups
+   Building tiny systems with embedded NetBSD
+   By Brian Rose
+
+Overview
+
+   NetBSD is an extremely flexible operating system that is designed to be
+   portable across various architectures. This feature makes it attractive
+   for embedded developers. In this article, I will demonstrate a process
+   for creating a very small kernel that can boot, either to a shell
+   prompt or to a login screen.
+
+   Booting to the shell prompt allows the developer to quickly give life
+   to a system and perform some basic interactions. The shell itself can
+   be a powerful management tool, combined with the right collection of
+   programs. Doing this requires only the kernel and two binaries.
+
+   Booting to a login prompt provides a little added security by
+   controlling access to the machine. This would be useful in devices
+   where the console can be accessed by the user, and you need to control
+   what the user has access to. There are a few added files in this setup,
+   and to keep things small, you will need to manually trim some of them.
+   But this is still a very easy process.
+
+The minimum single user system
+
+   The first stage of embedded development usually involves getting a
+   skeleton operating system up and running. Assuming you are using one of
+   NetBSD many supported platforms, this is quite easy. I used a PC
+   booting off of a floppy drive. But this method can also be easily
+   adapted to handle diskless clients that boot off a network.
+
+   At an absolute minimum, you will need the kernel, the /dev nodes for
+   your system, and a /sbin/init file. You can craft the init program
+   yourself, putting all of your application code into it. This may be a
+   good solution when you only have one application that you would like to
+   run.
+
+   Another option is to use the stock init program and a shell to call
+   your application. This is a bit easier than writing your own init
+   program, and it also allows you to add functionality to your system by
+   simply adding more tools from the stock system. The shell itself is a
+   powerful tool that can make future development much easier. This is the
+   method that will be illustrated here.
+
+Building the kernel
+
+   The first thing that needs to be done is to build a kernel with a built
+   in ramdisk. The ramdisk will hold the kernel's root filesystem. A good
+   kernel configuration to start with is the INSTALL_TINY configuration.
+   This kernel has all the important stuff in it, without a lot of bloat.
+   Make sure that it has the following lines in it.
+
+   in sys/arch/[arch]/conf
+$ cp INSTALL_TINY MYTINY
+$ vi MYTINY
+
+# Enable the hooks used for initializing the root memory-disk.
+options     MEMORY_DISK_HOOKS
+options     MEMORY_DISK_IS_ROOT         # force root on memory disk
+options     MEMORY_DISK_SERVER=1        # make the ramdisk writeable
+#options    MEMORY_DISK_ROOT_SIZE=2880  # 1.44M, same as a floppy
+options     MEMORY_DISK_ROOT_SIZE=8192  # 4Meg
+options     MEMORY_RBFLAGS=0            # don't force single user
+
+   This configuration includes ramdisk support, has the kernel boot from
+   the ramdisk, allows the ramdisk to be written to, sets the size a 8192
+   sectors (512 bytes each), and allows the kernel to boot into multiuser
+   mode (if the files are available).
+
+   You will also need to check the ramdisk driver to make sure that it
+   supports the MEMORY_RBFLAGS option. In my 1.6.0 system, it did not, so
+   I needed to add the following code.
+
+   in sys/dev/md_root.c
+ /*
+  * This is called during open (i.e. mountroot)
+  */
+
+ ##  #ifndef MEMORY_RBFLAGS
+ ##  #define MEMORY_RBFLAGS RB_SINGLE
+ ##  #endif
+
+ void
+ md_open_hook(int unit, struct md_conf *md)
+ {
+
+     //            ............................... added code
+     if (unit == 0 && (MEMORY_RBFLAGS & RB_SINGLE) ) {
+
+     /* The root ramdisk only works single-user. */
+     boothowto |= RB_SINGLE;
+     }
+ }
+
+   Once this is done, build your kernel.
+$ config MYTINY
+$ cp ../compile/MYTINY
+$ make depend; make
+
+Creating the crunched binaries
+
+   Although you could copy the binaries from your host into your mini
+   filesystem, a more efficient way (sizewise) to do this is to use a
+   utility called crunchgen. Many programs in the NetBSD system are linked
+   statically. For example, each program that uses the utility library
+   (libutil) has one copy of the library linked to it. Several programs on
+   the system produce redundant copies of the libraries used by the
+   programs. Crunchgen takes the programs' object files and merges them
+   into one uber-program. This crunched binary is then linked to the
+   libraries, so only one copy of the library is needed for the whole
+   system.
+
+   "But how do I use the different programs?", you ask. The answer lies in
+   hard links. A hard link is like a filesystem's alias for a program. For
+   example, If I have a program called print_my_error, I can link that to
+   the alias myerr. Then when I invoke myerr, the filesystem simply
+   follows the link and runs the program print_my_error. I can even make
+   the two program names have slightly different behavior. This is done by
+   having print_my_error look at argv[0] that is passed to the main()
+   function. If it is myerr, then I can have it do a special task.
+
+   This is how crunchgen works. It takes all of its constituent programs
+   and globs them together. Then in the crunched binary's main routine,
+   there is logic that examines argv[0] and calls the main routine for the
+   appropriate constituent.
+
+   To make a crunched binary, you need to know what binaries you want,
+   where their sources are located, and what libraries they use. Once you
+   settle on what binaries to use, simply search the /usr/src folder for
+   the sources. The layout of /usr/src is straightforward. To look for the
+   source for /sbin/init, you would look in /usr/src/sbin/init. To find
+   the /usr/bin/login, go to /usr/src/usr.bin/login. To find out which
+   libraries are used, open up the program's Makefile, and look for the
+   LDADD lines. You should see entries like "-lutil -lcrypt".
+
+   Sometimes, programs in the NetBSD distribution are simply hardlinks to
+   another program. For example, mount_mfs is an alias for newfs. You will
+   find no /usr/src/sbin/mount_mfs directory. So how do you find out where
+   the sources are for mount_mfs? Search through the makefiles for "LINKS=
+   ${BINDIR}/newfs ${BINDIR}/mount_mfs". This shows you that the Makefile
+   will link mount_mfs to newfs.
+$  find /usr/src -name Makefile -exec grep mount_mfs {} \;
+MAN=    newfs.8 mount_mfs.8
+LINKS=  ${BINDIR}/newfs ${BINDIR}/mount_mfs
+MLINKS= mount_mfs.8 mfs.8
+
+   Armed with this information, you can now create your crunchgen
+   configuration file. This is just a list of the above information. There
+   are some additional features, which I will outline below.
+
+srcdirs /usr/src/bin /usr/src/sbin
+
+progs init sh reboot ls
+
+ln sh -sh
+
+special init objpaths /usr/src/sbin/init/obj/init.smallprog.o
+
+
+# libraries used by the programs
+# ---------------- Minimum single user files
+# init : -lutil -lcrypt
+# sh : -ll -ledit -ltermcap
+# ---------------- Useful utilities
+# ls : -
+# reboot : -lutil
+#
+libs -lutil -lcrypt -ll -ledit -ltermcap
+
+   The first line tells crunchgen where to look for sources. It looks for
+   the sources by appending the program name onto the listed directories.
+   The progs line is the list of programs that you want included in your
+   binary. The ln lines tell crunchgen about aliases that are used for
+   some of the programs. The shell is sometimes invoked as -sh, so the
+   crunched binary will recognize "-sh" as "sh". Also, as noted above,
+   some binaries are simply aliases for other programs. The crunched
+   binary needs to be on the lookout for these aliases as well.
+
+   The special line tells crunchgen that init should not be built from
+   source, but rather just use the specified object file. In this case, I
+   built the init program with the SMALLPROG #define, so I don't get the
+   annoying "Enter pathname of shell or RETURN for sh:" prompt when the
+   system starts in single user mode. Instead, it will silently drop to
+   the shell prompt. To do this, I build my special init program this way.
+$ cd /usr/src/sbin/init
+$ make -D SMALLPROG
+$ cp obj/init.o obj/init.smallprog.o
+
+   This functionality makes it easy to customize your system without too
+   much trouble. You could create a customized version of a standard
+   program and use that in your embedded builds, while keeping the
+   original for other purposes.
+
+   Finally, the last line tells crunchgen which libraries to link to.
+   Again, you can get this information by looking through the Makefiles
+   for the constituent programs and noting the LDADD lines. I've had
+   trouble with library ordering, so if you have errors indicating
+   unresolved externals, and you know you included the library, try moving
+   the "missing" library closer to the front of the list. This worked for
+   me.
+
+   Once your crunchgen file is crafted, build it with the following
+   commands. The finished executable will be named after your conf file,
+   but without the conf extension.
+$ crunchgen -m Makefile mytiny.conf
+$ make -f Makefile objs exe
+
+   [18]Continue to page 2: Creating the filesystem image and the minimum
+   multi user system.
+
+   September 16, 2013 11:24:32
+     __________________________________________________________________
+
+     [19]Front | [20]Information | [21]Lists | [22]Newsfeeds | [23]Study
+                                    Guide
+
+References
+
+   1. http://www.bsdnewsletter.com/
+   2. http://www.bsdnewsletter.com/info/
+   3. http://www.bsdnewsletter.com/lists/
+   4. http://www.bsdnewsletter.com/newsfeeds/
+   5. http://www.bsdnewsletter.com/bsda-book/
+   6. http://www.bsdnewsletter.com/bsd/
+   7. http://www.bsdnewsletter.com/newsfeeds/bsdnewsletter.rdf
+   8. http://www.bsdnewsletter.com/Advocacy/
+   9. http://www.bsdnewsletter.com/Drivers/
+  10. http://www.bsdnewsletter.com/Events/
+  11. http://www.bsdnewsletter.com/Flavours/
+  12. http://www.bsdnewsletter.com/Frequently_Asked_Questions/
+  13. http://www.bsdnewsletter.com/Guides/
+  14. http://www.bsdnewsletter.com/Programming/
+  15. http://www.bsdnewsletter.com/Security/
+  16. http://www.bsdnewsletter.com/Software/
+  17. http://www.bsdnewsletter.com/User_Groups/
+  18. http://www.bsdnewsletter.com/2003/09/Features102b.html
+  19. http://www.bsdnewsletter.com/
+  20. http://www.bsdnewsletter.com/info/
+  21. http://www.bsdnewsletter.com/lists/
+  22. http://www.bsdnewsletter.com/newsfeeds/
+  23. http://www.bsdnewsletter.com/bsda-book/

@@ -1,0 +1,108 @@
+   #[1]contents [2]index [3]prev [4]next
+
+   [5]Skip to site navigation (Press enter)
+
+[6][Tinycc-devel] "error: invalid displacement" i386 1f 'L..1' does not get
+resolved
+
+   [7]Volodymyr Boyko [8]Sat, 16 Apr 2022 19:10:50 -0700
+Hi
+I'm trying to assemble the following snippet of code:
+
+.global sigsetjmp
+.global __sigsetjmp
+.type sigsetjmp,@function
+.type __sigsetjmp,@function
+sigsetjmp:
+__sigsetjmp:
+        mov 8(%esp),%ecx
+        jecxz 1f
+
+        mov 4(%esp),%eax
+        popl 24(%eax)
+        mov %ebx,28+8(%eax)
+        mov %eax,%ebx
+
+.hidden ___setjmp
+        call ___setjmp
+
+        pushl 24(%ebx)
+        mov %ebx,4(%esp)
+        mov %eax,8(%esp)
+        mov 28+8(%ebx),%ebx
+
+.hidden __sigsetjmp_tail
+        jmp __sigsetjmp_tail
+
+1:      jmp ___setjmp
+but getting this error:
+src/signal/i386/sigsetjmp.s:8: error: invalid displacement
+After renaming/moving the label around I assume the issue is that local
+labels cannot be forward;1b and my_label moved to the top do work fine.
+TCC commit  d3e466462967cb0c5c24beb498b9d76fcd581fdf (mob)
+
+BR
+Volodymyr
+
+_______________________________________________
+Tinycc-devel mailing list
+Tinycc-devel@nongnu.org
+[9]https://lists.nongnu.org/mailman/listinfo/tinycc-devel
+
+     * [10]Previous message
+     * [11]View by thread
+     * [12]View by date
+     * [13]Next message
+
+     * [Tinycc-devel] "error: invalid displacement" i38... Volodymyr Boyko
+     *
+          + [14]Re: [Tinycc-devel] "error: invalid displacement&...
+            Michael Matz
+
+Reply via email to
+
+   Volodymyr Boyko
+   [15]The Mail Archive
+   Search the site ____________________ Submit
+     * [16]The Mail Archive home
+     * [17]tinycc-devel - all messages
+     * [18]tinycc-devel - about the list
+     * [19]Expand
+     * [20]Previous message
+     * [21]Next message
+
+     * [22]The Mail Archive home
+     * [23]Add your mailing list
+     * [24]FAQ
+     * [25]Support
+     * [26]Privacy
+     * CAHy8DWZCee0s8or7gGV5qqFMTaHJMLSSV9SAnVs1Sb33aYQqMQ@mail.gmail.com
+
+References
+
+   1. https://www.mail-archive.com/tinycc-devel@nongnu.org/index.html#10196
+   2. https://www.mail-archive.com/tinycc-devel@nongnu.org/maillist.html#10196
+   3. https://www.mail-archive.com/tinycc-devel@nongnu.org/msg10194.html
+   4. https://www.mail-archive.com/tinycc-devel@nongnu.org/msg10201.html
+   5. https://www.mail-archive.com/tinycc-devel@nongnu.org/msg10196.html#nav
+   6. https://www.mail-archive.com/search?l=tinycc-devel@nongnu.org&q=subject:%22%5C%5BTinycc%5C-devel%5C%5D+%5C%22error%5C%3A+invalid+displacement%5C%22+i386+1f+%27L..1%27+does+not+get+resolved%22&o=newest
+   7. https://www.mail-archive.com/search?l=tinycc-devel@nongnu.org&q=from:%22Volodymyr+Boyko%22
+   8. https://www.mail-archive.com/search?l=tinycc-devel@nongnu.org&q=date:20220416
+   9. https://lists.nongnu.org/mailman/listinfo/tinycc-devel
+  10. https://www.mail-archive.com/tinycc-devel@nongnu.org/msg10194.html
+  11. https://www.mail-archive.com/tinycc-devel@nongnu.org/index.html#10196
+  12. https://www.mail-archive.com/tinycc-devel@nongnu.org/maillist.html#10196
+  13. https://www.mail-archive.com/tinycc-devel@nongnu.org/msg10201.html
+  14. https://www.mail-archive.com/tinycc-devel@nongnu.org/msg10201.html
+  15. https://www.mail-archive.com/
+  16. https://www.mail-archive.com/
+  17. https://www.mail-archive.com/tinycc-devel@nongnu.org/
+  18. https://www.mail-archive.com/tinycc-devel@nongnu.org/info.html
+  19. https://www.mail-archive.com/search?l=tinycc-devel@nongnu.org&q=subject:%22%5C%5BTinycc%5C-devel%5C%5D+%5C%22error%5C%3A+invalid+displacement%5C%22+i386+1f+%27L..1%27+does+not+get+resolved%22&o=newest&f=1
+  20. https://www.mail-archive.com/tinycc-devel@nongnu.org/msg10194.html
+  21. https://www.mail-archive.com/tinycc-devel@nongnu.org/msg10201.html
+  22. https://www.mail-archive.com/
+  23. https://www.mail-archive.com/faq.html#newlist
+  24. https://www.mail-archive.com/faq.html
+  25. https://www.mail-archive.com/faq.html#support
+  26. https://www.mail-archive.com/faq.html#privacy

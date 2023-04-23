@@ -1,0 +1,384 @@
+   #[1]Medium [2]alternate
+
+   [3]Open in app
+
+   [4]Sign up
+
+   [5]Sign In
+   ____________________
+   Write
+
+   [6]Sign up
+
+   [7]Sign In
+   (BUTTON)
+
+   Anuradha Weeraman
+   [8]Anuradha Weeraman
+   [9]Follow
+
+   Mar 9, 2020
+   ·
+   4 min read
+   (BUTTON)
+   (BUTTON)
+   (BUTTON)
+   (BUTTON)
+   [10](BUTTON)
+   [11](BUTTON)
+
+   Save
+   (BUTTON)
+   (BUTTON)
+   (BUTTON)
+   (BUTTON)
+
+Building a tiny Linux kernel
+
+   Today we will go over the process of building a tiny Linux kernel, and
+   booting into a shell. To start with, fetch the Linux source tree that
+   you'd like to try this out on. I'm using staging tree for this post.
+   You can get it here:
+$ git clone git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/staging.git
+
+   To get an initial config that's very minimalist:
+$ make tinyconfig
+
+   Here's a comparison of the config options enabled by tinyconfig to a
+   stock kernel that come with my Debian distribution:
+$ grep "=y" .config | wc -l
+247
+$ grep "=m" .config | wc -l
+0
+$ grep "=y" /boot/config-5.4.0-4-amd64 | wc -l
+2071
+$ grep "=m" /boot/config-5.4.0-4-amd64 | wc -l
+3401
+
+   Let's try to build it:
+$ time make -j16
+scripts/kconfig/conf  --syncconfig Kconfig
+  SYSTBL  arch/x86/include/generated/asm/syscalls_32.h
+  SYSHDR  arch/x86/include/generated/uapi/asm/unistd_32.h
+  SYSHDR  arch/x86/include/generated/uapi/asm/unistd_64.h
+  SYSHDR  arch/x86/include/generated/uapi/asm/unistd_x32.h
+  WRAP    arch/x86/include/generated/uapi/asm/bpf_perf_event.h
+.
+.
+.
+.
+Setup is 13788 bytes (padded to 13824 bytes).
+System is 417 kB
+CRC 435fb428
+Kernel: arch/x86/boot/bzImage is ready  (#1)real 0m15.468s
+user 2m12.094s
+sys 0m14.603s
+
+   The kernel builds to around ~430k. This is a 32-bit kernel by default,
+   so let's enable 64-bit support:
+$ make menuconfig
+
+   Enable the TTY for console support:
+
+   and support for printk to see console output as the kernel boots:
+
+   Build again:
+Setup is 13596 bytes (padded to 13824 bytes).
+System is 737 kB
+CRC d273f4d
+Kernel: arch/x86/boot/bzImage is ready  (#4)real 0m6.045s
+user 0m40.808s
+sys 0m3.958s
+
+   The size has gone up somewhat, nearly double what we started off with.
+   If you're only supporting a serial interface, even this additional
+   bloat can be avoided to keep the size of the image down.
+
+   Boot the kernel with qemu:
+$ qemu-system-x86_64 -kernel arch/x86/boot/bzImage
+
+   The kernel boots and panics when attempting to start init, as expected.
+   In order to boot into a shell as we originally set out to do, we will
+   need a filesystem and a shell that can be started by the kernel as PID
+   1. Let us create a bare bones ram disk image that we can use to boot
+   into a minimal busybox shell.
+
+   There are plenty of ways to achieve this, and here's just one way:
+$ git clone [12]git@github.com:aweeraman/kernel-utils.git
+$ kernel-utils/create-initrd.sh
+Creating initrd filesystem... ok
+Building dependencies...
+Cloning into 'busybox'...
+remote: Enumerating objects: 29, done.
+remote: Counting objects: 100% (29/29), done.
+remote: Compressing objects: 100% (23/23), done.
+remote: Total 110424 (delta 16), reused 14 (delta 6), pack-reused 110395
+Receiving objects: 100% (110424/110424), 37.05 MiB | 5.40 MiB/s, done.
+Resolving deltas: 100% (87061/87061), done.
+Building initrd... 4882 blocks
+
+   Before we can use this ram disk, we need to enable init RAM disk
+   (initrd) support in the kernel:
+
+   I have only included support for gzip compression and disabled the
+   rest.
+
+   We will also need to enable ELF-support to be able to start up the
+   shell:
+
+   This time, when booting the kernel, pass in the -initrd argument and
+   specify the initrd image that we created earlier, in addition to an
+   argument to the kernel to specify the binary that it should look for in
+   the ram disk and execute once the kernel has finished booting, which is
+   in this case is `/bin/sh'.
+$ qemu-system-x86_64 -kernel arch/x86/boot/bzImage -initrd kernel-utils/initramf
+s.cpio.gz -append "init=/bin/sh"
+
+   And we have a shell.
+
+   Let's enable the /proc filesystem so we can run some standard commands:
+
+   Mount the proc file system after booting, so you can use commands like
+   `ps' and `free':
+
+   Here's the size of the kernel that we just built:
+Setup is 13788 bytes (padded to 13824 bytes).
+System is 793 kB
+
+   Note that this is the size of the compressed kernel on disk and the
+   actual memory used at boot time is comparable to the size of the
+   generated vmlinux file, which in this case is 12MB. You would need at
+   least that much memory to load the kernel into memory, plus 8-16MB
+   additionally for the user space. Here's the minimum memory
+   configuration that allowed me to boot this kernel in qemu:
+$ qemu-system-x86_64 -kernel arch/x86/boot/bzImage -initrd kernel-utils/initramf
+s.cpio.gz -append "init=/bin/sh" -m 29M
+
+   Just for kicks, I disabled printk and booted up the kernel, that put me
+   into a shell almost immediately:
+
+   Finally, the compressed kernel size comes down to:
+Setup is 13788 bytes (padded to 13824 bytes).
+System is 749 kB
+
+   --
+
+   --
+   (BUTTON)
+
+   2
+   (BUTTON)
+   [13](BUTTON)
+
+[14]More from Anuradha Weeraman
+
+   [15]Follow
+   [16](BUTTON)
+
+   Technologist and Software Architect with interests in operating
+   systems, AI, security and emerging tech. http://anuradha.dev
+
+   Love podcasts or audiobooks? Learn on the go with our new app.
+   [17]Try Knowable
+
+Recommended from Medium
+
+   UpNote
+   [18]
+
+   UpNote
+
+   in
+   [19]
+
+   UpNote: Elegant Cross-platform Note-taking App
+   [20]
+
+   What's new in UpNote 3.8.2
+   M@
+   [21]
+
+   M@
+   [22]
+
+   #0092: Don't get me started on consciousness
+   Shivam Pandey
+   [23]
+
+   Shivam Pandey
+   [24]
+
+   Editing A commit message
+   Pierre-Marie Poitevin
+   [25]
+
+   Pierre-Marie Poitevin
+   [26]
+
+   Leetcode 1491: Average Salary Excluding the Minimum and Maximum Salary
+   Ilya Nevolin
+   [27]
+
+   Ilya Nevolin
+
+   in
+   [28]
+
+   Geek Culture
+   [29]
+
+   Booking API for Remote and Distributed Teams
+   ERP Advisors Group
+   [30]
+
+   ERP Advisors Group
+   [31]
+
+   What the Salesforce Acquisition of Slack Means Now and for the Future
+   Kevin Jasaitis
+   [32]
+
+   Kevin Jasaitis
+   [33]
+
+   Soul Searching.
+   Ahmed Driouech
+   [34]
+
+   Ahmed Driouech
+   [35]
+
+   Programmers' success stories
+
+   [36]About[37]Help[38]Terms[39]Privacy
+     __________________________________________________________________
+
+Get the Medium app
+
+   [40]A button that says 'Download on the App Store', and if clicked it
+   will lead you to the iOS App store
+   [41]A button that says 'Get it on, Google Play', and if clicked it will
+   lead you to the Google Play store
+   Anuradha Weeraman
+   [42]
+
+Anuradha Weeraman
+
+   [43]346 Followers
+
+   Technologist and Software Architect with interests in operating
+   systems, AI, security and emerging tech. [44]http://anuradha.dev
+   [45]Follow
+   [46](BUTTON)
+   [47]
+
+   Help
+   [48]
+
+   Status
+   [49]
+
+   Writers
+   [50]
+
+   Blog
+   [51]
+
+   Careers
+   [52]
+
+   Privacy
+   [53]
+
+   Terms
+   [54]
+
+   About
+   [55]
+
+   Text to speech
+
+References
+
+   Visible links:
+   1. https://weeraman.com/osd.xml
+   2. android-app://com.medium.reader/https/medium.com/p/8c07579ae79d
+   3. https://rsci.app.link/?%24canonical_url=https%3A%2F%2Fmedium.com%2Fp%2F8c07579ae79d&%7Efeature=LoOpenInAppButton&%7Echannel=ShowPostUnderUser&source=---two_column_layout_nav----------------------------------
+   4. https://medium.com/m/signin?operation=register&redirect=https%3A%2F%2Fweeraman.com%2Fbuilding-a-tiny-linux-kernel-8c07579ae79d&source=post_page---two_column_layout_nav-----------------------global_nav-----------
+   5. https://medium.com/m/signin?operation=login&redirect=https%3A%2F%2Fweeraman.com%2Fbuilding-a-tiny-linux-kernel-8c07579ae79d&source=post_page---two_column_layout_nav-----------------------global_nav-----------
+   6. https://medium.com/m/signin?operation=register&redirect=https%3A%2F%2Fweeraman.com%2Fbuilding-a-tiny-linux-kernel-8c07579ae79d&source=post_page---two_column_layout_nav-----------------------global_nav-----------
+   7. https://medium.com/m/signin?operation=login&redirect=https%3A%2F%2Fweeraman.com%2Fbuilding-a-tiny-linux-kernel-8c07579ae79d&source=post_page---two_column_layout_nav-----------------------global_nav-----------
+   8. https://weeraman.com/?source=post_page-----8c07579ae79d--------------------------------
+   9. https://medium.com/m/signin?actionUrl=https%3A%2F%2Fmedium.com%2F_%2Fsubscribe%2Fuser%2Fade561389abc&operation=register&redirect=https%3A%2F%2Fweeraman.com%2Fbuilding-a-tiny-linux-kernel-8c07579ae79d&user=Anuradha+Weeraman&userId=ade561389abc&source=post_page-ade561389abc----8c07579ae79d---------------------follow_byline-----------
+  10. https://medium.com/m/signin?actionUrl=https%3A%2F%2Fmedium.com%2F_%2Fbookmark%2Fp%2F8c07579ae79d&operation=register&redirect=https%3A%2F%2Fweeraman.com%2Fbuilding-a-tiny-linux-kernel-8c07579ae79d&source=--------------------------bookmark_header-----------
+  11. https://medium.com/m/signin?actionUrl=https%3A%2F%2Fmedium.com%2F_%2Fbookmark%2Fp%2F8c07579ae79d&operation=register&redirect=https%3A%2F%2Fweeraman.com%2Fbuilding-a-tiny-linux-kernel-8c07579ae79d&source=--------------------------bookmark_header-----------
+  12. mailto:git@github.com
+  13. https://medium.com/m/signin?actionUrl=https%3A%2F%2Fmedium.com%2F_%2Fbookmark%2Fp%2F8c07579ae79d&operation=register&redirect=https%3A%2F%2Fweeraman.com%2Fbuilding-a-tiny-linux-kernel-8c07579ae79d&source=--------------------------bookmark_footer-----------
+  14. https://weeraman.com/?source=post_page-----8c07579ae79d--------------------------------
+  15. https://medium.com/m/signin?actionUrl=https%3A%2F%2Fmedium.com%2F_%2Fsubscribe%2Fuser%2Fade561389abc%2F8c07579ae79d&operation=register&redirect=https%3A%2F%2Fweeraman.com%2Fbuilding-a-tiny-linux-kernel-8c07579ae79d&user=Anuradha+Weeraman&userId=ade561389abc&source=post_page-ade561389abc----8c07579ae79d---------------------follow_footer-----------
+  16. https://medium.com/m/signin?actionUrl=%2F_%2Fapi%2Fsubscriptions%2Fnewsletters%2F8666f959ec65&operation=register&redirect=https%3A%2F%2Fweeraman.com%2Fbuilding-a-tiny-linux-kernel-8c07579ae79d&newsletterV3=ade561389abc&newsletterV3Id=8666f959ec65&user=Anuradha+Weeraman&userId=ade561389abc&source=-----8c07579ae79d---------------------subscribe_user-----------
+  17. https://knowable.fyi/?utm_source=medium&utm_medium=referral&utm_campaign=medium-post-footer&source=post_page-----8c07579ae79d--------------------------------
+  18. https://upnote.medium.com/?source=post_internal_links---------0----------------------------
+  19. https://medium.com/upnote?source=post_internal_links---------0----------------------------
+  20. https://upnote.medium.com/whats-new-in-upnote-3-8-2-dd83d0f0fb5d?source=post_internal_links---------0----------------------------
+  21. https://matthewsinclair.com/?source=post_internal_links---------1----------------------------
+  22. https://matthewsinclair.com/0092-dont-get-me-started-on-consciousness-4f957bef0e05?source=post_internal_links---------1----------------------------
+  23. https://sjtgshivam.medium.com/?source=post_internal_links---------2----------------------------
+  24. https://sjtgshivam.medium.com/editing-a-commit-message-5d17dfdedbe2?source=post_internal_links---------2----------------------------
+  25. https://poitevinpm.medium.com/?source=post_internal_links---------3----------------------------
+  26. https://poitevinpm.medium.com/leetcode-1491-average-salary-excluding-the-minimum-and-maximum-salary-b632ee215489?source=post_internal_links---------3----------------------------
+  27. https://spurwing.medium.com/?source=post_internal_links---------4----------------------------
+  28. https://medium.com/geekculture?source=post_internal_links---------4----------------------------
+  29. https://spurwing.medium.com/booking-api-for-remote-and-distributed-teams-5505469aada?source=post_internal_links---------4----------------------------
+  30. https://erpadvisorsgroup.medium.com/?source=post_internal_links---------5----------------------------
+  31. https://erpadvisorsgroup.medium.com/what-the-salesforce-acquisition-of-slack-means-now-and-for-the-future-ca4c00cfd5c0?source=post_internal_links---------5----------------------------
+  32. https://jasaitiskevin21.medium.com/?source=post_internal_links---------6----------------------------
+  33. https://jasaitiskevin21.medium.com/soul-searching-834a606856d5?source=post_internal_links---------6----------------------------
+  34. https://medium.com/@driouechahmed20?source=post_internal_links---------7----------------------------
+  35. https://medium.com/@driouechahmed20/programmers-success-stories-f850ccecaca3?source=post_internal_links---------7----------------------------
+  36. https://medium.com/about?autoplay=1&source=post_page-----8c07579ae79d--------------------------------
+  37. https://help.medium.com/hc/en-us?source=post_page-----8c07579ae79d--------------------------------
+  38. https://policy.medium.com/medium-terms-of-service-9db0094a1e0f?source=post_page-----8c07579ae79d--------------------------------
+  39. https://policy.medium.com/medium-privacy-policy-f03bf92035c9?source=post_page-----8c07579ae79d--------------------------------
+  40. https://itunes.apple.com/app/medium-everyones-stories/id828256236?pt=698524&mt=8&ct=post_page&source=post_page-----8c07579ae79d--------------------------------
+  41. https://play.google.com/store/apps/details?id=com.medium.reader&source=post_page-----8c07579ae79d--------------------------------
+  42. https://weeraman.com/?source=---two_column_layout_sidebar----------------------------------
+  43. https://weeraman.com/followers?source=---two_column_layout_sidebar----------------------------------
+  44. http://anuradha.dev/
+  45. https://medium.com/m/signin?actionUrl=https%3A%2F%2Fmedium.com%2F_%2Fsubscribe%2Fuser%2Fade561389abc&operation=register&redirect=https%3A%2F%2Fweeraman.com%2Fbuilding-a-tiny-linux-kernel-8c07579ae79d&user=Anuradha+Weeraman&userId=ade561389abc&source=post_page-ade561389abc--two_column_layout_sidebar-----------------------follow_profile-----------
+  46. https://medium.com/m/signin?actionUrl=%2F_%2Fapi%2Fsubscriptions%2Fnewsletters%2F8666f959ec65&operation=register&redirect=https%3A%2F%2Fweeraman.com%2Fbuilding-a-tiny-linux-kernel-8c07579ae79d&newsletterV3=ade561389abc&newsletterV3Id=8666f959ec65&user=Anuradha+Weeraman&userId=ade561389abc&source=---two_column_layout_sidebar-----------------------subscribe_user-----------
+  47. https://help.medium.com/hc/en-us?source=---two_column_layout_sidebar----------------------------------
+  48. https://medium.statuspage.io/?source=---two_column_layout_sidebar----------------------------------
+  49. https://about.medium.com/creators/?source=---two_column_layout_sidebar----------------------------------
+  50. https://blog.medium.com/?source=---two_column_layout_sidebar----------------------------------
+  51. https://medium.com/jobs-at-medium/work-at-medium-959d1a85284e?source=---two_column_layout_sidebar----------------------------------
+  52. https://policy.medium.com/medium-privacy-policy-f03bf92035c9?source=---two_column_layout_sidebar----------------------------------
+  53. https://policy.medium.com/medium-terms-of-service-9db0094a1e0f?source=---two_column_layout_sidebar----------------------------------
+  54. https://medium.com/about?autoplay=1&source=---two_column_layout_sidebar----------------------------------
+  55. https://speechify.com/medium?source=---two_column_layout_sidebar----------------------------------
+
+   Hidden links:
+  57. https://medium.com/?source=---two_column_layout_nav----------------------------------
+  58. https://medium.com/m/signin?operation=register&redirect=https%3A%2F%2Fmedium.com%2Fnew-story&source=---two_column_layout_nav-----------------------new_post_sidenav-----------
+  59. https://medium.com/search?source=---two_column_layout_nav----------------------------------
+  60. https://weeraman.com/?source=post_page-----8c07579ae79d--------------------------------
+  61. https://medium.com/m/signin?actionUrl=https%3A%2F%2Fmedium.com%2F_%2Fvote%2Fp%2F8c07579ae79d&operation=register&redirect=https%3A%2F%2Fweeraman.com%2Fbuilding-a-tiny-linux-kernel-8c07579ae79d&user=Anuradha+Weeraman&userId=ade561389abc&source=-----8c07579ae79d---------------------clap_footer-----------
+  62. https://medium.com/m/signin?actionUrl=https%3A%2F%2Fmedium.com%2F_%2Fvote%2Fp%2F8c07579ae79d&operation=register&redirect=https%3A%2F%2Fweeraman.com%2Fbuilding-a-tiny-linux-kernel-8c07579ae79d&user=Anuradha+Weeraman&userId=ade561389abc&source=-----8c07579ae79d---------------------clap_footer-----------
+  63. https://upnote.medium.com/?source=post_internal_links---------0----------------------------
+  64. https://upnote.medium.com/whats-new-in-upnote-3-8-2-dd83d0f0fb5d?source=post_internal_links---------0----------------------------
+  65. https://matthewsinclair.com/?source=post_internal_links---------1----------------------------
+  66. https://matthewsinclair.com/0092-dont-get-me-started-on-consciousness-4f957bef0e05?source=post_internal_links---------1----------------------------
+  67. https://sjtgshivam.medium.com/?source=post_internal_links---------2----------------------------
+  68. https://sjtgshivam.medium.com/editing-a-commit-message-5d17dfdedbe2?source=post_internal_links---------2----------------------------
+  69. https://poitevinpm.medium.com/?source=post_internal_links---------3----------------------------
+  70. https://poitevinpm.medium.com/leetcode-1491-average-salary-excluding-the-minimum-and-maximum-salary-b632ee215489?source=post_internal_links---------3----------------------------
+  71. https://spurwing.medium.com/?source=post_internal_links---------4----------------------------
+  72. https://spurwing.medium.com/booking-api-for-remote-and-distributed-teams-5505469aada?source=post_internal_links---------4----------------------------
+  73. https://erpadvisorsgroup.medium.com/?source=post_internal_links---------5----------------------------
+  74. https://erpadvisorsgroup.medium.com/what-the-salesforce-acquisition-of-slack-means-now-and-for-the-future-ca4c00cfd5c0?source=post_internal_links---------5----------------------------
+  75. https://jasaitiskevin21.medium.com/?source=post_internal_links---------6----------------------------
+  76. https://jasaitiskevin21.medium.com/soul-searching-834a606856d5?source=post_internal_links---------6----------------------------
+  77. https://medium.com/@driouechahmed20?source=post_internal_links---------7----------------------------
+  78. https://medium.com/@driouechahmed20/programmers-success-stories-f850ccecaca3?source=post_internal_links---------7----------------------------
+  79. https://medium.com/?source=post_page-----8c07579ae79d--------------------------------
+  80. https://weeraman.com/?source=---two_column_layout_sidebar----------------------------------

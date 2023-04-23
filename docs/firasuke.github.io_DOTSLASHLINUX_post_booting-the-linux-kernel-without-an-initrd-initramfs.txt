@@ -1,0 +1,595 @@
+   #[1]DOTSLASHLINUX RSS
+
+[2]DOTSLASHLINUX
+
+     * [3]HOME
+     * [4]SEARCH
+     * [5]RSS
+
+   Kindly support DOTSLASHLINUX on [6]Patreon to keep the website up and
+   running while remaining ads free.
+
+Booting the Linux Kernel Without an initrd/initramfs
+
+   [7]Facebook [8]Twitter [9]Google+ [10]Reddit [11]LinkedIn
+   [12]noinitrd
+   Firas Khalil Khana | 29/04/2017
+
+   No, this is not a myth... It's not a legend... It's the truth and it's
+   doable!
+   As you probably guessed from the title, in this article we'll uncover
+   the truth behind booting the linux kernel without using an initrd or an
+   initramfs!
+   Before we even start, booting without an initrd/initramfs might speed
+   up your boot time by 100ms to 500ms. However, on some setups it may
+   slow down your boot time by 800ms to 1sec!
+   Prerequisites:
+   You should compile your own kernel.
+   You should compile your own kernel.
+   You should compile your own kernel.
+   You should compile your own kernel.
+   I know this may sound like a nightmare for some of you, but that's why
+   DOTSLASHLINUX was created. Plus don't worry the kernel configuration
+   series is coming really soon, so look up to it!
+   Here's what we're going to do:
+   1- Remove initrd/initramfs support from the linux kernel.
+   2- Remove UUIDs from kernel command line parameters and /etc/fstab.
+   3- Build all modules into the linux kernel.
+   4- Tell the bootloader where root is located and what filesystem it's
+   using.
+   5- Reboot and get that rescue cd/usb since no one makes it in his 1st
+   attempt :)
+   It doesn't really matter what distro you use (that is if you know that
+   your distro isn't going to break with the slightest change), but for
+   those who want to tag along with me then I'll be using my all time
+   favorite distro Gentoo Linux. The version of the kernel's source files
+   that I'm using is 4.14.13.
+     __________________________________________________________________
+
+1- Removing initrd/initramfs Support from the Linux Kernel
+
+   If you're using Gentoo Linux, simply navigate to:
+cd /usr/src/linux
+
+   Now make sure you have ncurses installed and run:
+make menuconfig
+
+   Now go to General Setup then search for CONFIG_BLK_DEV_INITRD and
+   disable it:
+  RCU Subsystem  --->
+  < > Kernel .config support
+  (14) Kernel log buffer size (16 => 64KB, 17 => 128KB)
+  (14) CPU kernel log buffer size contribution (13 => 8 KB, 17 => 128KB)
+  (12) Temporary per-CPU NMI log buffer size (12 => 4KB, 13 => 8KB)
+  [ ] Memory placement aware NUMA scheduler
+  [ ] Control Group support  ----
+  [ ] Checkpoint/restore support
+  [ ] Namespaces support  ----
+  [ ] Automatic process group scheduling
+  [ ] Enable deprecated sysfs features to support old userspace tools
+  -*- Kernel->user space relay support (formerly relayfs)
+  [ ] Initial RAM filesystem and RAM disk (initramfs/initrd) support
+  Compiler optimization level (Optimize for performance)  --->
+  [*] Configure standard kernel features (expert users)  --->
+  [ ] Enable bpf() system call
+  -*- Use full shmem filesystem
+  [ ] Enable AIO support
+  [*] Enable madvise/fadvise syscalls
+  [ ] Enable userfaultfd() system call
+  [ ] Enable PCI quirk workarounds
+  [ ] Enable membarrier() system call
+  [ ] Embedded system
+  Kernel Performance Events And Counters  --->
+  [ ] Enable VM event counters for /proc/vmstat
+  [ ] Enable SLUB debugging support
+  [*] Disable heap randomization
+  Choose SLAB allocator (SLUB (Unqueued Allocator))  --->
+  [ ] SLAB freelist randomization
+  [ ] SLUB per cpu partial cache
+  [ ] Profiling support
+  [ ] Kprobes
+  [ ] Optimize very unlikely/likely branches
+  [ ]   Static key selftest
+  [ ] GCC plugins  ----
+  Stack Protector buffer overflow detection (None)  --->
+  (28) Number of bits to use for ASLR of mmap base address
+  [ ] Use a virtually-mapped stack
+  GCOV-based kernel profiling  --->
+     __________________________________________________________________
+
+2- Remove these UUIDs!
+
+   Udev won't start until root is mounted, so you can't use UUIDs before
+   that happens. Therefore, remove your UUID entries from your kernel
+   command line parameters and from your /etc/fstab. Some may argue that
+   these are filesystem UUIDs and are unrelated to udev and that what I
+   mentioned previously is called PARTUUID, I won't disagree as that is
+   correct, but for the sake of simplicity just follow this tutorial.
+   For example, if your root was on /dev/sda1 and you had:
+   root=UUID="be9683c1-e42c-4a2b-18ad-97cc96b13ada
+   as a kernel command line parameter or inside your /etc/fstab, then
+   simply change it to:
+   root=/dev/sda1
+   For example, I'm using LILO as my bootloader and here's my
+   /etc/lilo.conf:
+lba32
+boot=/dev/sda
+default=gentoo
+
+image=/boot/vmlinuz-4.14.13-gentoo-DOTSLASHLINUX
+        label=gentoo
+        read-only
+        root=/dev/sda1
+        append="rootfstype=ext4"
+
+   And here's my /etc/fstab:
+# (fs)                  (mountpoint)    (type)          (opts)          (dump/pa
+ss)
+/dev/sda1               /                        ext4            noatime
+0 1
+     __________________________________________________________________
+
+3- Build Necessary Modules into the Linux Kernel
+
+   There are still necessary modules that need to be built into the linux
+   kernel to be able to boot without an initrd/initramfs. These include
+   modules for filesystems and block devices.
+   If you're using ext4, navigate to Filesystems and make sure that
+   CONFIG_EXT4_FS is built-in:
+  [ ] Second extended fs support
+  [ ] The Extended 3 (ext3) filesystem
+  [*] The Extended 4 (ext4) filesystem
+  [ ]   Use ext4 for ext2 file systems
+  [ ]   Ext4 POSIX Access Control Lists
+  [ ]   Ext4 Security Labels
+  [ ]   Ext4 Encryption
+  [ ]   EXT4 debugging support
+  [ ] JBD2 (ext4) debugging support
+  [ ] Reiserfs support
+  [ ] JFS filesystem support
+  [ ] XFS filesystem support
+  [ ] GFS2 file system support
+  [ ] OCFS2 file system support
+  [ ] Btrfs filesystem support
+  [ ] NILFS2 file system support
+  [ ] F2FS filesystem support
+  [ ] Direct Access (DAX) support
+  [ ] Enable filesystem export operations for block IO
+  [*] Enable POSIX file locking API
+  [ ]   Enable Mandatory file locking
+  [ ] FS Encryption (Per-file encryption)
+  [ ] Dnotify support
+  [*] Inotify support for userspace
+  [*] Filesystem wide access notification
+  [ ] Quota support
+  [ ] Kernel automounter version 4 support (also supports v3)
+  [*] FUSE (Filesystem in Userspace) support
+  [ ]   Character device in Userspace support
+  [ ] Overlay filesystem support
+  Caches  --->
+  CD-ROM/DVD Filesystems  --->
+  DOS/FAT/NT Filesystems  --->
+  Pseudo filesystems  --->
+  [ ] Miscellaneous filesystems  ----
+  [ ] Network File Systems  ----
+  -*- Native language support  ---
+  [ ] Distributed Lock Manager (DLM)  ----
+
+   Now you need to check what block devices are you using (to be more
+   precise, the block device where your root resides on), find out its
+   kernel module and mark it as built-in. This is simple, fire up a
+   terminal emulator and type:
+lspci -kk
+
+   In my case I'm using a Toshiba MQ01ABD100 which is a SATA HDD that uses
+   the ahci kernel module:
+00:1f.2 SATA controller: Intel Corporation 8 Series/C220 Series Chipset Family 6
+-port SATA Controller 1 [AHCI mode] (rev 04)
+            Subsystem: Toshiba America Info Systems 8 Series/C220 Series Chipset
+ Family 6-port SATA Controller 1 [AHCI mode]
+            Kernel driver in use: ahci
+
+   So I navigated to Device Drivers and then to Serial ATA and Parallel
+   ATA drivers (libata) and marked CONFIG_SATA_AHCI as built-in:
+  --- Serial ATA and Parallel ATA drivers (libata)
+  [ ]   Verbose ATA error reporting
+  [*]   ATA ACPI Support
+  [*]     SATA Zero Power Optical Disc Drive (ZPODD) support
+  [ ]   SATA Port Multiplier support
+  *** Controllers with non-SFF native interface ***
+  [*]   AHCI SATA support
+  [ ]   Platform AHCI SATA support
+  [ ]   Initio 162x SATA support (Very Experimental)
+  [ ]   ACard AHCI variant (ATP 8620)
+  [ ]   Silicon Image 3124/3132 SATA support
+  [ ]   ATA SFF support (for legacy IDE and PATA)
+
+   If you didn't manage to find what module is used by your block
+   device(s), then kindly follow the small guide written at the beginning
+   of [13]The Linux Kernel Configuration Guide Part 11 - Device Drivers
+   -->.
+     __________________________________________________________________
+
+4- Notifying the Bootloader of the changes
+
+   Now we need to tell our bootloader the info that the initrd/initramfs
+   would tell to the kernel. That is the location of root and the
+   filesystem of root.
+   If you're using grub, fire up your favorite editor and edit
+   /etc/default/grub:
+vim /etc/default/grub
+
+# Copyright 1999-2015 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+#
+# To populate all changes in this file you need to regenerate your
+# grub configuration file afterwards:
+#     'grub2-mkconfig -o /boot/grub/grub.cfg'
+#
+# See the grub info page for documentation on possible variables and
+# their associated values.
+
+GRUB_DISTRIBUTOR="Gentoo"
+
+# Default menu entry
+GRUB_DEFAULT=0
+
+# Boot the default entry this many seconds after the menu is displayed
+GRUB_TIMEOUT=0
+#GRUB_TIMEOUT_STYLE=menu
+
+# Append parameters to the linux kernel command line
+GRUB_CMDLINE_LINUX="root=/dev/sda1 rootfstype=ext4"
+#
+# Examples:
+#
+# Boot with network interface renaming disabled
+# GRUB_CMDLINE_LINUX="net.ifnames=0"
+#
+# Boot with systemd instead of sysvinit (openrc)
+# GRUB_CMDLINE_LINUX="init=/usr/lib/systemd/systemd"
+
+# Append parameters to the linux kernel command line for non-recovery entries
+#GRUB_CMDLINE_LINUX_DEFAULT=""
+
+# Uncomment to disable graphical terminal (grub-pc only)
+#GRUB_TERMINAL=console
+
+# The resolution used on graphical terminal.
+# Note that you can use only modes which your graphic card supports via VBE.
+# You can see them in real GRUB with the command `vbeinfo'.
+#GRUB_GFXMODE=640x480
+
+# Set to 'text' to force the Linux kernel to boot in normal text
+# mode, 'keep' to preserve the graphics mode set using
+# 'GRUB_GFXMODE', 'WIDTHxHEIGHT'['xDEPTH'] to set a particular
+# graphics mode, or a sequence of these separated by commas or
+# semicolons to try several modes in sequence.
+#GRUB_GFXPAYLOAD_LINUX=
+
+# Path to theme spec txt file.
+# The starfield is by default provided with use truetype.
+# NOTE: when enabling custom theme, ensure you have required font/etc.
+#GRUB_THEME="/boot/grub/themes/starfield/theme.txt"
+
+# Background image used on graphical terminal.
+# Can be in various bitmap formats.
+#GRUB_BACKGROUND="/boot/grub/mybackground.png"
+
+# Uncomment if you don't want GRUB to pass "root=UUID=xxx" parameter to kernel
+#GRUB_DISABLE_LINUX_UUID=true
+
+# Uncomment to disable generation of recovery mode menu entries
+#GRUB_DISABLE_RECOVERY=true
+
+# Uncomment to disable generation of the submenu and put all choices on
+# the top-level menu.
+# Besides the visual affect of no sub menu, this makes navigation of the
+# menu easier for a user who can't see the screen.
+#GRUB_DISABLE_SUBMENU=y
+
+# Uncomment to play a tone when the main menu is displayed.
+# This is useful, for example, to allow users who can't see the screen
+# to know when they can make a choice on the menu.
+#GRUB_INIT_TUNE="60 800 1"
+
+   However, if you're lucky enough to use LILO (like me xD), then the
+   following configuration file will do:
+lba32
+boot=/dev/sda
+default=gentoo
+
+image=/boot/vmlinuz-4.14.13-gentoo-DOTSLASHLINUX
+        label=gentoo
+        read-only
+        root=/dev/sda1
+        append="rootfstype=ext4"
+
+   This'll also work as well:
+lba32
+boot=/dev/sda
+default=gentoo
+
+image=/boot/vmlinuz-4.14.13-gentoo-DOTSLASHLINUX
+        label=gentoo
+        read-only
+        append="root=/dev/sda1 rootfstype=ext4"
+
+   You may have to delete your initd/initramfs from your /boot and the
+   initrd/initramfs entries in your bootloader's configuration files.
+   Don't forget to recompile your kernel and to update your bootloader (if
+   you're using GRUB2 or LILO) before rebooting.
+     __________________________________________________________________
+
+Conclusion
+
+   Booting without an initrd/initramfs is 100% doable so don't think it's
+   impossible. You may fail on your 1st attempt but don't give up, just
+   keep on trying different combinations every time you compile your
+   kernel and you should be good to go.
+   I'm using Gentoo Linux and can confirm that you can achieve a bootable
+   kernel without initrd/initramfs. If your kernel is panicking then debug
+   the problem and keep trying until it works. If you have a question as
+   well then lemme know in the comments section below.
+
+18 Comments
+
+   oldskool linux hacker
+
+   17/05/2017
+     __________________________________________________________________
+
+   This is how we did it in `94.
+
+   tbe
+
+   18/05/2017
+     __________________________________________________________________
+
+   This is how I've done it ever since `94. Slackware is fine to this day
+   without initrd.
+
+   atbd
+
+   01/07/2017
+     __________________________________________________________________
+
+   For more minimalist setup and if you have/like uefi, it can boot
+   directly your kernel. You just need efi support in the kernel and your
+   vmlinuz as /boot/efi/boot/bootx64.efi :)
+
+   DOTSLASHLINUX
+
+   01/07/2017
+     __________________________________________________________________
+
+   @atbd, thanks for the suggestion. Unfortunately, my laptop has a buggy
+   uefi implementation and all available UEFI solutions didn't work for
+   me. Thus, I sticked with mbr. It's a toshiba laptop from late 2013 and
+   has both BIOS/uefi. Although I'm able to boot using UEFI, boot time
+   increases dramatically because of the buggy firmware telling me that no
+   bootable media found (lasts for like 5 seconds) then proceeds to boot
+   properly. Thanks for stopping by though fellow son of a tux ;P
+
+   hiraa
+
+   13/07/2017
+     __________________________________________________________________
+
+   can we make a bootable live CD from it
+
+   DOTSLASHLINUX
+
+   13/07/2017
+     __________________________________________________________________
+
+   @hiraa, thanks for stopping by! I think it's not about whether we can
+   or can't because it's possible, but it'll be a really hard task to get
+   it working on different setups as today's systems and setups are much
+   more complicated than the ones used in the 90s and pre 2010. You'll
+   have to include pretty much all the modules for every block device you
+   can think of (or at least the ones for the setups you're going to boot
+   on). Even by doing that you'll have a pretty hard time getting the
+   kernel to boot properly. I'd suggest asking the devs responsible for
+   maintaining Slackware GNU/Linux and Crux GNU/Linux live bootable ISOs
+   on how they do it. On the other hand booting without an initrd on a
+   specific setup isn't that hard at all.
+
+   Francesco Turco
+
+   21/10/2017
+     __________________________________________________________________
+
+   What about encryption? Is it possible to disable initramfs and continue
+   encrypting the root filesystem with LUKS?
+
+   DOTSLASHLINUX
+
+   21/10/2017
+     __________________________________________________________________
+
+   @Francesco Turco, Thanks for stopping by! Unfortunately that is not
+   possible at the moment as an initrd/initramfs is needed to decrypt the
+   root file system before it's mounted.
+
+   Although there were several attempts to fully dm-crypt the rootfs
+   without using an initrd/initramfs (some include storing the key between
+   the MBR and the root partition) but none are working as far as I know.
+
+   Some say that it might work using a plain cryptsetup and GRUB2, but I
+   think that beats the purpose of not using an initrd/initramfs for the
+   sake of minimalism as GRUB2 is considered bloated compared to LILO and
+   EXTLINUX (that is if GRUB2 worked in the first place as you won't be
+   able to map crypt...).
+
+   Others may pass the key on the kernel command line, but that beats the
+   purpose of encrypting your system in the first place.
+
+   But don't worry, I'm still experimenting with full disk encryption
+   without an initrd/initramfs. I'll post an article once I get everything
+   working perfectly.
+
+   cyberhoffman
+
+   31/10/2017
+     __________________________________________________________________
+
+   I suppose there should be something more in kernel config than just
+   compile in hard controller support (ahci in my case too) and disabling
+   CONFIG_BLK_DEV_INITRD. I had added these options: "CONFIG_SATA_AHCI=y",
+   "CONFIG_EXT4_FS=y", "CONFIG_CMDLINE="root=/dev/sda2 rootfstype=ext4"",
+   "# CONFIG_BLK_DEV_INITRD is not set", compiled the kernel and copied it
+   in efi - "cp /boot/vmlinuz-4.12.12-gentoo
+   /boot/efi/EFI/Boot/bootx64.efi" (I boot system directly from efi, using
+   initramfs is it ok) but got only kernel panic after reboot - it couldnt
+   find root partition.
+
+   DOTSLASHLINUX
+
+   31/10/2017
+     __________________________________________________________________
+
+   @cyberhoffman, thanks for stopping by and taking the time to write the
+   steps you went through in order to boot without an initrd/initramfs on
+   a GPT/EFI setup.
+
+   The thing is, the kernel options needed (in any article) are listed and
+   explained thoroughly in the 18-part kernel configuration series, in
+   which I've explained what options I've chosen for booting without
+   initrd/initramfs, booting with microcode prebuilt into the kernel,
+   options required for bumblebee to work properly...etc
+
+   If you had the time I'd advise you to check the kernel configuration
+   series and compare them to your setup to see what options I went with.
+
+   The thing is, my late 2013 laptop has a very buggy UEFI implementation
+   (which would show no bootable media found for like 5-10 seconds before
+   actually booting... let alone the other bugs it has) ; thus, I wasn't
+   able to properly attempt a no initrd/initramfs boot on an EFI system...
+   and I really apologize for not being able to do that...
+
+   I'm counting on the support of DOTSLASHLINUX readers to help me get my
+   hands on more hardware to tamper with it and post the results here,
+   other than that I'm stuck with this old laptop :P
+
+   Thanks again for your time! Let me know if you needed anything else.
+
+   alf
+
+   06/11/2017
+     __________________________________________________________________
+
+   Is it possible to use plymouth without initramfs? I'm sorry for the
+   newbie questions as I'm just exposed to linux.
+
+   DOTSLASHLINUX
+
+   10/11/2017
+     __________________________________________________________________
+
+   @alf, Thanks for stopping by! I'm afraid that isn't possible as (at
+   least as far as I know) plymouth needs an initramfs to be built in and
+   it's highly unlikely that it would be possible to get build it within
+   the kernel itself.
+
+   Hope that helps! Let me know if you have any more questions!
+
+   alf
+
+   10/11/2017
+     __________________________________________________________________
+
+   I follow your tutorial, no initramfs and built in ucode into my custom
+   kernel. since plymouth depend on systemd and my os uses systemd,
+   plymouth works flawlessly. it even perform better since I include i915
+   into my kernel. since I use arch linux, I think it is easier to compile
+   kernel using Arch Build System.
+
+   thanks for your tutorial. Now my system boots faster and perform
+   better.
+
+   DOTSLASHLINUX
+
+   10/11/2017
+     __________________________________________________________________
+
+   @alf, You're most welcome! I'm super glad that you found my tutorials
+   useful, and I highly appreciate taking some of your time to write a
+   comment!
+
+   Have a great day!
+
+   PCmaniak
+
+   02/12/2017
+     __________________________________________________________________
+
+   Thank you for great article. My first kernel was built by genkernel
+   (yes it's gentoo). I built my second kernel myself and it did not start
+   because I did not build initramfs, so I had to run genkernel again with
+   initramfs only option. Slowly I figured out how to boot without
+   initramfs. But I modified fstab and grub only. Some how it boots with
+   .config still set to BLK_DEV_INITRD [=y] without initrams. Got to
+   correct it. On the next kernel upgrade. I am on 4.12 now. Thanks again!
+
+   DOTSLASHLINUX
+
+   02/12/2017
+     __________________________________________________________________
+
+   @PCmaniak, You're most welcome! Thanks for stopping by fellow Gentoo
+   user :P
+
+   Let me know if you have any questions regarding the process.
+
+   Ken
+
+   07/01/2018
+     __________________________________________________________________
+
+   Thanks so much for this method vs the use of initrd. Glad to see it
+   become a part of the Gentoo Wiki, AND, that is being recommended more
+   and more by the gentoo community.
+
+   DOTSLASHLINUX
+
+   02/12/2017
+     __________________________________________________________________
+
+   @Ken, you're welcome, glad that you found it useful!
+
+   It's true that using an initrd/initramfs just adds complexity and the
+   burden of maintaining an extra filesystem when your setup is extremely
+   minimal as you won't need it most of the times. Although it has its
+   uses, but for the sake of minimalism it would be better to do without
+   it.
+
+Leave A Comment
+
+   ____________________
+   ____________________________________________________________
+   ____________________________________________________________
+   ____________________________________________________________
+   ____________________________________________________________
+   ____________________________________________________________
+   (BUTTON) Submit
+
+Copyrights © 2017-2018 [14]DOTSLASHLINUX | Licensed under [15]CC BY 4.0
+
+References
+
+   1. https://firasuke.github.io/feed.xml
+   2. https://firasuke.github.io/DOTSLASHLINUX
+   3. https://firasuke.github.io/
+   4. https://firasuke.github.io/page/search/
+   5. https://firasuke.github.io/index.xml
+   6. https://www.patreon.com/DOTSLASHLINUX
+   7. https://www.facebook.com/sharer.php?u=https%3a%2f%2ffirasuke.github.io%2fDOTSLASHLINUX%2fpost%2fbooting-the-linux-kernel-without-an-initrd-initramfs%2f
+   8. https://www.twitter.com/intent/tweet?source=https%3a%2f%2ffirasuke.github.io%2fDOTSLASHLINUX%2fpost%2fbooting-the-linux-kernel-without-an-initrd-initramfs%2f&text=https%3a%2f%2ffirasuke.github.io%2fDOTSLASHLINUX%2fpost%2fbooting-the-linux-kernel-without-an-initrd-initramfs%2f
+   9. https://plus.google.com/share?url=https%3a%2f%2ffirasuke.github.io%2fDOTSLASHLINUX%2fpost%2fbooting-the-linux-kernel-without-an-initrd-initramfs%2f
+  10. https://www.reddit.com/submit?url=https%3a%2f%2ffirasuke.github.io%2fDOTSLASHLINUX%2fpost%2fbooting-the-linux-kernel-without-an-initrd-initramfs%2f
+  11. http://www.linkedin.com/shareArticle?mini=true&url=https%3a%2f%2ffirasuke.github.io%2fDOTSLASHLINUX%2fpost%2fbooting-the-linux-kernel-without-an-initrd-initramfs%2f&source=https%3a%2f%2ffirasuke.github.io%2fDOTSLASHLINUX%2fpost%2fbooting-the-linux-kernel-without-an-initrd-initramfs%2f
+  12. https://firasuke.github.io/img/noinitrd.png
+  13. https://firasuke.github.io/post/the-linux-kernel-configuration-guide-part-11-device-drivers/
+  14. https://firasuke.github.io/
+  15. https://creativecommons.org/licenses/by/4.0/

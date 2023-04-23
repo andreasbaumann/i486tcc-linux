@@ -1,0 +1,278 @@
+                               BSDnewsletter.com
+
+      [1]Front | [2]Info | [3]Lists | [4]Newsfeeds | [5]Study Guide |
+   [6]What is BSD? [7]RSS
+
+   Building tiny systems with embedded NetBSD (page 2)
+   [8]Back to page one
+
+Creating the filesystem image
+
+   Now that our binaries are all wrapped up, the next thing to do is to
+   populate the filesystem. This involves linking all the programs to the
+   crunched binary and copying or creating the necessary data files. This
+   is easily done with the following commands. Don't forget to set the
+   permissions to root:wheel!
+$ mkdir files/bin files/sbin files/dev
+
+$ cp /dev/MAKEDEV files/dev
+$ cd files/dev
+$ ./MAKEDEV floppy ramdisk wscons
+$ cd ../..
+
+$ cp work/mytiny files/sbin/init
+$ ln files/sbin/init files/bin/sh
+$ ln files/sbin/init files/bin/ls
+$ ln files/sbin/init files/sbin/reboot
+
+$ su root
+# chown -R root:wheel files
+# exit
+
+   With the filesystem populated, we can wrap it up into an image file
+   that can be embedded into a kernel. This is done with the makefs
+   command. This tool lets you take a directory and bundle it up into a
+   single file. Make sure that your size is not larger than the size you
+   specified in your kernel configuration. Once the image is created, link
+   it to the kernel with the mdsetimage command. Your kernel is now ready
+   to go!
+
+   You can compress your kernel if you like. The standard NetBSD
+   bootloader knows how to decompress gzipped kernels. Remember, your
+   spartan OS includes 4 megabytes of mostly empty space in the
+   filesystem. I compressed my kernel down to 825,544 bytes.
+# makefs -s 4m -t ffs crunch.image files
+# mdsetimage netbsd.ramdisk crunch.image
+# gzip -c netbsd.ramdisk > netbsd
+# ls -l netbsd
+-rw-r--rw-  1 brose  users  825544 Aug 24 22:28 netbsd
+
+   When you boot this kernel, you will see the normal output and then it
+   will present you with a shell prompt. At that time, you can do whatever
+   it is you need to do. My example will let you move around the file
+   structure, list the contents with ls, and reboot. Not very useful, but
+   it is a good starting point.
+
+The minimum multi user system
+
+   A multi user system is built in the same manner, but you need a few
+   extra programs and data files. I also use the standard init program.
+   Notice that I commented out the special init line, so that I use the
+   stock init for the multiuser configuration. You may want to go back to
+   your init source and make a fresh init, just in case the .o files are
+   from your single user build.
+$ cd /usr/src/sbin/init
+$ make clean; make
+
+   Here's my crunchgen configuration.
+srcdirs /usr/src/bin /usr/src/sbin /usr/src/usr.bin /usr/src/usr.sbin /usr/src/l
+ibexec
+
+progs init mount newfs mount_ffs sh ttyflags getty pwd_mkdb passwd login reboot
+ls
+
+ln sh -sh
+ln newfs mount_mfs
+
+# special init objpaths /usr/src/sbin/init/init.smallprog.o
+
+# libraries used by the programs
+# ---------------- Minimum single user files
+# init : -lutil -lcrypt
+# mount :
+# newfs : -lutil
+# mount_ffs :
+# sh : -ll -ledit -ltermcap
+# ---------------- Minimum multiuser files
+# ttyflags :
+# getty : -lutil -ltermcap
+# pwd_mkdb : -lutil
+# passwd : -lrpcsvc -lcrypt -lutil -lkrb5 -lcrypto -lasn1 -lcom_err -lroken
+# login : -lutil -lcrypt  -lskey  -lkrb5 -lasn1  -lkrb -lcrypto -lroken -lcom_er
+r
+# ---------------- Useful utilities
+# ls :
+# reboot : -lutil
+# umount :
+#
+libs -lutil -ll -ledit -ltermcap -lcrypt -lrpcsvc -lkrb5 -lkrb -lcrypto -lasn1 -
+lcom_err -lroken -lskey
+
+   And my shell commands for populating the filesystem.
+mkdir files/bin files/sbin files/usr files/etc files/var files/dev files/tmp fil
+es/root files/home
+mkdir files/usr/bin files/usr/sbin files/usr/libexec
+mkdir files/var/run files/var/db files/var/crash
+mkdir files/usr/share
+mkdir files/usr/share/misc
+
+cp /dev/MAKEDEV files/dev
+cd files/dev
+./MAKEDEV floppy ramdisk wscons
+cd ../..
+
+echo "/dev/md0a / ffs rw 1 1" > files/etc/fstab
+
+echo "echo Initializing system..." > files/etc/rc
+echo "export PATH=/sbin:/bin:/usr/sbin:/usr/bin" >> files/etc/rc
+echo "mount -ua" >> files/etc/rc
+echo "ttyflags -a" >> files/etc/rc
+
+cp work/mytiny files/sbin/init
+ln files/sbin/init files/bin/ls
+ln files/sbin/init files/sbin/mount
+ln files/sbin/init files/sbin/mount_ffs
+ln files/sbin/init files/sbin/mount_mfs
+ln files/sbin/init files/sbin/umount
+ln files/sbin/init files/bin/sh
+
+ln files/sbin/init files/usr/libexec/getty
+ln files/sbin/init files/sbin/ttyflags
+ln files/sbin/init files/sbin/pwd_mkdb
+ln files/sbin/init files/usr/bin/passwd
+ln files/sbin/init files/usr/bin/login
+ln files/sbin/init files/sbin/reboot
+ln files/sbin/init files/sbin/newfs
+
+cp /etc/ttys files/etc
+cp /etc/master.passwd files/etc
+cp /etc/pwd.db files/etc
+cp /etc/spwd.db files/etc
+cp /etc/passwd files/etc
+cp termcap.mini files/usr/share/misc/termcap
+cp /etc/gettytab files/etc
+
+
+   The termcap.mini file is simply a hand trimmed version of the termcap
+   file. This is used by the getty program when initializing the console.
+   Since it is very large (over 500k) and most of it is useless, you can
+   trim out the terminal types that you don't use. I trimmed mine down to
+   about 8k.
+
+   Once you have done this, simply place this filesystem into a kernel and
+   boot. As you can see, a multi user setup is a bit larger. But most of
+   the extra space is from incorporating the extra libraries for the login
+   and getty programs. As you add more code to the system, your code
+   growth should not be as dramatic.
+
+# makefs -s 4m -t ffs crunch.image files
+# mdsetimage netbsd.ramdisk crunch.image
+# gzip -c netbsd.ramdisk > netbsd
+# ls -l netbsd
+-rw-r--rw-  1 brose  users  1066057 Aug 24 22:28 netbsd
+
+     [9]Brian Rose is an electrical engineer who has developed embedded
+     software for the telecom and video distribution industries. He is
+     currently on involuntary hiatus (layoff) and pondering the benefits
+     of being a scuba instructor at Mexican resorts.
+
+     Copyright (C) 2003 by Brian Rose, all rights reserved.
+     Reproduced by BSD Newsletter.com with permission of the author.
+
+   RELATED INFO
+   [10]Newsfactor: Open Source Alternative: NetBSD
+
+Discussion
+
+   Discuss this article [11]below.
+
+   [12]Very Nice. - Ian Harding
+   [13]Booting - Aniju Lukose
+   [14]Cool - Geert Hendrickx
+   [15]make -D SMALLPROG - Tony
+
+   Very Nice.
+   [16]Ian Harding - September 20, 2003 23:20:17
+   This is a very good article. Thank you. I am going to try it out now!!
+   Booting
+   [17]Aniju Lukose - May 12, 2004 13:52:11
+   Very good......
+
+   Thank you for ....
+   Cool
+   [18]Geert Hendrickx - April 28, 2005 05:56:28
+   Thanks for this explanation. It helped me creating a custom
+   macppc-installer fitting on 1 floppy.
+   make -D SMALLPROG
+   [19]Tony - December 18, 2007 00:36:04
+   Hello, Good work. When one make -D SMALLPROG You will receive an no
+   such file error unless you have built the tooldir. Of course gcc -c
+   init.c will build init.o (without SMALLPROG being set). How had you
+   intended process to take place. Is it useful to build the tools? Thanks
+   in advance
+     __________________________________________________________________
+
+   Name: ____________________
+
+   Email: ____________________
+
+   Subject: ____________________
+
+   Message:
+
+   _________________________________________________________
+   _________________________________________________________
+   _________________________________________________________
+   _________________________________________________________
+   _________________________________________________________
+   _________________________________________________________
+
+   Stop Spam Abuse: What operating system's CVS history begins in March
+   1993? ____________________
+
+   Submit Comment
+
+   BSD Links
+   · [20]Advocacy
+   · [21]Drivers
+   · [22]Events
+   · [23]Flavours
+   · [24]FAQs
+   · [25]Guides
+   · [26]Programming
+   · [27]Security
+   · [28]Software
+   · [29]User Groups
+
+   September 16, 2013 11:24:32
+     __________________________________________________________________
+
+     [30]Front | [31]Information | [32]Lists | [33]Newsfeeds | [34]Study
+                                    Guide
+
+References
+
+   1. http://www.bsdnewsletter.com/
+   2. http://www.bsdnewsletter.com/info/
+   3. http://www.bsdnewsletter.com/lists/
+   4. http://www.bsdnewsletter.com/newsfeeds/
+   5. http://www.bsdnewsletter.com/bsda-book/
+   6. http://www.bsdnewsletter.com/bsd/
+   7. http://www.bsdnewsletter.com/newsfeeds/bsdnewsletter.rdf
+   8. http://www.bsdnewsletter.com/2003/09/Features102.html
+   9. http://brianrose.net/
+  10. http://www.bsdnewsletter.com/2003/04/Outside78.html
+  11. http://www.bsdnewsletter.com/2003/09/Features102b.html#discuss
+  12. http://www.bsdnewsletter.com/2003/09/Features102b.html#eforum1
+  13. http://www.bsdnewsletter.com/2003/09/Features102b.html#eforum2
+  14. http://www.bsdnewsletter.com/2003/09/Features102b.html#eforum3
+  15. http://www.bsdnewsletter.com/2003/09/Features102b.html#eforum4
+  16. mailto:iharding@Pakrat.com
+  17. mailto:anijujj@rediffmail.com
+  18. mailto:geert.hendrickx@ua.ac.be
+  19. mailto:tonys@sterrett.net
+  20. http://www.bsdnewsletter.com/Advocacy/
+  21. http://www.bsdnewsletter.com/Drivers/
+  22. http://www.bsdnewsletter.com/Events/
+  23. http://www.bsdnewsletter.com/Flavours/
+  24. http://www.bsdnewsletter.com/Frequently_Asked_Questions/
+  25. http://www.bsdnewsletter.com/Guides/
+  26. http://www.bsdnewsletter.com/Programming/
+  27. http://www.bsdnewsletter.com/Security/
+  28. http://www.bsdnewsletter.com/Software/
+  29. http://www.bsdnewsletter.com/User_Groups/
+  30. http://www.bsdnewsletter.com/
+  31. http://www.bsdnewsletter.com/info/
+  32. http://www.bsdnewsletter.com/lists/
+  33. http://www.bsdnewsletter.com/newsfeeds/
+  34. http://www.bsdnewsletter.com/bsda-book/

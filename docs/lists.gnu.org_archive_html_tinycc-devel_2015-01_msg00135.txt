@@ -1,0 +1,175 @@
+   tinycc-devel
+
+   [[1]Top][[2]All Lists]
+
+              ______________________________ Search [3]Advanced
+     __________________________________________________________________
+
+   [[4]Date Prev][[5]Date Next][[6]Thread Prev][[7]Thread Next][[8]Date
+   Index][[9]Thread Index]
+
+Re: [Tinycc-devel] The inline assembly clobber for floating point regist
+     __________________________________________________________________
+
+   From: Sergey Korshunoff
+   Subject: Re: [Tinycc-devel] The inline assembly clobber for floating
+   point register stack `%st' not implemented?
+   Date: Tue, 20 Jan 2015 20:14:38 +0300
+     __________________________________________________________________
+
+There is patch for the win32/include/math.h which removes "t", "st"
+
+2015-01-20 18:25 GMT+03:00, Sergey Korshunoff <address@hidden>:
+> Because I don't know how to handle a "t" constraint right, a math.h
+> can be rewritten
+> like:
+> long lrint (double x)
+> {
+>     long retval;
+>     __asm__ __volatile__ (
+>         "fldl   %1\n"
+>         "fistpl %0\n"  : "=m" (retval) : "m" (x) );
+>     return retval;
+> }
+> insteed of the
+> long lrint (double x)
+> {
+>      long retval;
+>      __asm__ __volatile__ ("fistpl %0"  : "=m" (retval) : "t" (x) : "st");
+>        return retval;
+> }
+>
+> 2015-01-20 17:43 GMT+03:00, Sergey Korshunoff <address@hidden>:
+>> Handling of the "t" spec needs to be improved. I take patch for it
+>> from the this mail list (2014)
+>> tcc don't load a function parameter into the float stack.
+>> There is asm of the gcc and tcc:
+>>
+>> long lrint (double x)
+>> {
+>>     long retval;
+>>     __asm__ __volatile__ ("fistpl %0"  : "=m" (retval) : "t" (x) : "st");
+>>       return retval;
+>> }
+>>
+>> gcc:
+>>   push   %ebp
+>>   mov    %esp,%ebp
+>>   sub    $0x4,%esp
+>>   fldl      0x8(%ebp)    # !!!
+>>   fistpl  -0x4(%ebp)
+>>   mov   -0x4(%ebp),%eax
+>>   leave
+>>   ret
+>>
+>> tcc:
+>>   push   %ebp
+>>   mov    %esp,%ebp
+>>   sub    $0x4,%esp
+>>   fistpl -0x4(%ebp)    # where is fldl ???
+>>   mov  -0x4(%ebp),%eax
+>>   jmp    14 <lrint+0x14>
+>>   leave
+>>   ret
+>>
+>
+
+   [10]Attachment: [11]032-math-lrint.patch
+   Description: Binary data
+     __________________________________________________________________
+
+                             reply via email to
+                              Sergey Korshunoff
+     __________________________________________________________________
+
+   [[12]Prev in Thread] Current Thread [[13]Next in Thread]
+
+     * Re: [Tinycc-devel] Is this a duplicate ASM operation?, (continued)
+          + [14]Re: [Tinycc-devel] Is this a duplicate ASM operation?,
+            Daniel Glöckner, 2015/01/18
+               o [15]Re: [Tinycc-devel] Is this a duplicate ASM
+                 operation?, Sergey Korshunoff, 2015/01/18
+                    # [16][Tinycc-devel] The inline assembly clobber for
+                      floating point register stack `%st' not
+                      implemented?, YX Hao, 2015/01/19
+                    # [17]Re: [Tinycc-devel] The inline assembly clobber
+                      for floating point register stack `%st' not
+                      implemented?, Sergey Korshunoff, 2015/01/20
+                    # [18]Re: [Tinycc-devel] The inline assembly clobber
+                      for floating point register stack `%st' not
+                      implemented?, YX Hao, 2015/01/20
+                    # [19]Re: [Tinycc-devel] The inline assembly clobber
+                      for floating point register stack `%st' not
+                      implemented?, KHMan, 2015/01/20
+                    # [20]Re: [Tinycc-devel] The inline assembly clobber
+                      for floating point register stack `%st' not
+                      implemented?, Sergey Korshunoff, 2015/01/20
+                    # [21]Re: [Tinycc-devel] The inline assembly clobber
+                      for floating point register stack `%st' not
+                      implemented?, Sergey Korshunoff, 2015/01/20
+                    # [22]Re: [Tinycc-devel] The inline assembly clobber
+                      for floating point register stack `%st' not
+                      implemented?, Sergey Korshunoff, 2015/01/20
+                    # [23]Re: [Tinycc-devel] The inline assembly clobber
+                      for floating point register stack `%st' not
+                      implemented?, Sergey Korshunoff, 2015/01/20
+                    # Re: [Tinycc-devel] The inline assembly clobber for
+                      floating point register stack `%st' not
+                      implemented?, Sergey Korshunoff <=
+                    # [24]Re: [Tinycc-devel] The inline assembly clobber
+                      for floating point register stack `%st' not
+                      implemented?, Roy Tam, 2015/01/21
+                    # [25]Re: [Tinycc-devel] The inline assembly clobber
+                      for floating point register stack `%st' not
+                      implemented?, Sergey Korshunoff, 2015/01/21
+                    # [26]Re: [Tinycc-devel] The inline assembly clobber
+                      for floating point register stack `%st' not
+                      implemented?, YX Hao, 2015/01/20
+     __________________________________________________________________
+
+     * Prev by Date: [27]Re: [Tinycc-devel] The inline assembly clobber
+       for floating point register stack `%st' not implemented?
+     * Next by Date: [28]Re: [Tinycc-devel] [PATCH] current set of patches
+       which I want to upload
+     * Previous by thread: [29]Re: [Tinycc-devel] The inline assembly
+       clobber for floating point register stack `%st' not implemented?
+     * Next by thread: [30]Re: [Tinycc-devel] The inline assembly clobber
+       for floating point register stack `%st' not implemented?
+     * Index(es):
+          + [31]Date
+          + [32]Thread
+
+References
+
+   1. https://lists.gnu.org/archive/html/tinycc-devel/
+   2. https://lists.gnu.org/archive/html
+   3. https://lists.gnu.org/archive/cgi-bin/namazu.cgi?idxname=tinycc-devel
+   4. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/msg00134.html
+   5. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/msg00136.html
+   6. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/msg00134.html
+   7. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/msg00137.html
+   8. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/index.html#00135
+   9. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/threads.html#00135
+  10. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/binMevNzyohkv.bin
+  11. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/binMevNzyohkv.bin
+  12. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/msg00134.html
+  13. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/msg00137.html
+  14. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/msg00124.html
+  15. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/msg00125.html
+  16. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/msg00126.html
+  17. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/msg00127.html
+  18. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/msg00128.html
+  19. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/msg00129.html
+  20. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/msg00130.html
+  21. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/msg00131.html
+  22. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/msg00132.html
+  23. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/msg00134.html
+  24. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/msg00137.html
+  25. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/msg00138.html
+  26. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/msg00133.html
+  27. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/msg00134.html
+  28. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/msg00136.html
+  29. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/msg00134.html
+  30. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/msg00137.html
+  31. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/index.html#00135
+  32. https://lists.gnu.org/archive/html/tinycc-devel/2015-01/threads.html#00135

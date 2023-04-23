@@ -87,11 +87,71 @@ We just enable things we absolutely need to be running Linux, each config
 option below states the main reason we think, it has to be enabled.
 The starting point of the Linux kernel configuration is 'make tinyconfig'.
 
+- CONFIG_TIMERFD
+  - for sdhcp
+
+- MODIFY_LDT_SYSCALL
+  - musl
+    (https://stackoverflow.com/questions/30377020/on-linux-is-tls-set-up-by-the-kernel-or-by-libc-or-other-language-runtime)
+    "I haven't looked at glibc yet, but I just checked musl. It initializes
+    the TLS on startup (as you said), but then also uses a set_thread_area
+    syscall to make an entry in the process' LDT which points to the space
+    allocated for TLS. Then libc sets the %gs register so that it refers to
+    the LDT entry for TLS. (This is on x86-32 -- x86-64 uses a different
+    segment register.)" – –  Alex D May 28, 2015 at 6:48
+
+- CONFIG_UNIX (networking options), unix domain sockets
+  - nscd
+  - tmux
+  - musl (in getpwnam)
+
+cd ../linux
+
+#TODO
+make tinyconfig
+compression ZSTD
+[*] Initial RAM filesystem and RAM disk (initramfs/initrd) support
+[*] XZ
+[*]   Multiple users, groups and capabilities support
+[*]   Posix Clocks & timers
+[*]   Enable support for printk 
+[*]   BUG() support
+[*] Embedded system
+    Processor family (486SX)
+["] Enable the LDT (local descriptor table)
+[*]   Legacy autoloading support
+[*] Kernel support for ELF binaries
+[*] Kernel support for scripts starting with #! 
+[*] Enable core dump support
+[*]   RAM block device support
+[*]   AT keyboard (NEW)   
+[*]   PS/2 mouse (NEW)
+[*] Enable TTY 
+[*] 8250/16550 and compatible serial support 
+[*]   Console on 8250/16550 and compatible serial port
+[*] Enable verbose x86 bootup info messages      
+[*] Early printk   
+
+controlling terminals: /dev/console on serial and tty0 has no tty!
+https://debianforum.de/forum/viewtopic.php?t=169622&start=15
+getpass in login needs legacy BSD ttys?
+https://www.linuxquestions.org/questions/linux-from-scratch-13/%5Bsolved%5D-failing-to-open-dev-tty-4175685290/
+https://unix.stackexchange.com/questions/170063/start-a-process-on-a-different-tty
+https://omaera.org/wlog/tech/runit_init
+https://pub.nethence.com/xen/guest-stali
+https://forums.gentoo.org/viewtopic-t-1000292-start-0.html
+#ENDTODO
+
 bugs
 ----
 
+- oksh started with executable stack
+  traps: sh[1] general protection fault ip:8095780 sp:bf8b9120 error:0
+  in oksh[804900+56000]
 - tcc cannot compile the linux kernel. Most likely this will remain
-  a bug forever..
+  a bug forever.. so we must use gcc toolchain for building the kernel,
+  tcc doesn't work since a long time (since tccboot) or only in non-public
+  experimental tcc/linux branches
 - Having i486tcc-linux self-hosting might not be feasable as we
   have too many funny build tools around and we don't want to get
   into the busybox/tinderbox trap, where everything has to be
@@ -150,6 +210,46 @@ bugs
   - host C library to link against first tcc
   - tons of tools which are not really binary seed 
     (they are just used to produce binaries)
+
+missing things
+--------------
+
+We miss some things currently, must see where to get them from somwhere
+or whether we add them to existing minimal packages (or temporarily
+to abase).
+
+- abase (we already started to add some small tools)
+  - more
+  - hexdump
+- sbase
+  - domainname (hostname exists)
+- ubase
+  - fdisk
+- ibase (this is a hypothetical thing, internet base tools, we will
+  put them into abase for now)
+  - ip
+  - ping
+- obase:
+  - chio (BSD I/O), stty
+  - csh and ksh (we have oksh)
+  - mt (tape management)
+  - pax (archives, we have tar)
+  - rcp/rsh (old, insecure)
+  - systrace (as truss or strace are not really nice to build)
+   => could be tricky to build, we don't want bmake too
+   The comments say:
+   "At least the ALIGN-macro is defined only meaningfully for x86_64."
+- 9base
+  - ascii
+  - awk
+  - bc and dc
+  - diff
+  - mk
+  - yacc
+  - troff
+- others
+  - byacc
+  - bison
 
 other approaches
 ----------------
@@ -269,37 +369,80 @@ links
     - https://sabotage-linux.neocities.org/blog/11/
   - others:
     - https://www.glaucuslinux.org/
+    - https://github.com/ZilchOS/bootstrap-from-tcc
+    - https://github.com/oriansj
+    - https://bellard.org/tcc/tccboot.html
+    - https://github.com/michaelforney/
+    - https://ella-0.github.io/
+    - https://github.com/landley/mkroot
+    - https://github.com/richfelker/musl-cross-make.git
+    - https://github.com/OSPreservProject/oskit
+    - https://github.com/oriansj/M2-Planet.git
+    - https://github.com/MiguelVis/mescc.git
+    - https://gitlab.com/janneke/mes.git
+    - https://www.youtube.com/watch?v=iU0Z0vBKrtQ
+      (Michael Matz, tintycc contributor, tccboot revived, tcc hacked did it on kernel 4.6, not published)
+    - https://git.mills.io/prologic/ulinux
+    - https://www.plop.at/en/ploplinux/downloads/full.html
+    - https://git.savannah.nongnu.org/git/stage0.git
+    - https://github.com/firasuke/awesome
+    - https://github.com/firasuke/mussel (Firas Khalil Khana)
+    - https://github.com/pikhq/bootstrap-linux
 - C Compilers
   - https://repo.or.cz/w/tinycc.git
 - C Libraries
   - https://www.fefe.de/dietlibc
     (https://www.monperrus.net/martin/compiling-tcc-with-dietlibc: sadly
     has issues and was never designed to use tcc in the first place)
+- tinycc and musl
+  - https://wiki.musl-libc.org/design-concepts.html
+  - https://www.mail-archive.com/tinycc-devel@nongnu.org/msg08533.html
+  - https://lists.gnu.org/archive/html/tinycc-devel/2015-01/msg00135.html
+  - https://www.mail-archive.com/tinycc-devel@nongnu.org/msg10201.html
+  - https://www.mail-archive.com/tinycc-devel@nongnu.org/msg10196.html
 - Terminal stuff
   - https://github.com/sabotage-linux/netbsd-curses/
   - https://www.leonerd.org.uk/code/libtermkey/
+  - http://git.musl-libc.org/cgit/uuterm/tree/README
 - Editors
   - https://github.com/martanne/vis
   - https://joe-editor.sourceforge.io/
   - https://ex-vi.sourceforge.net/
+- Kernel
+  - Tinification
+    - https://weeraman.com/building-a-tiny-linux-kernel-8c07579ae79d
+    - https://tiny.wiki.kernel.org/
+    - http://events17.linuxfoundation.org/sites/events/files/slides/tiny.pdf
 - Boot process
+  - ramdisks
+    - https://people.freedesktop.org/~narmstrong/meson_drm_doc/admin-guide/initrd.html
+    - https://firasuke.github.io/DOTSLASHLINUX/post/booting-the-linux-kernel-without-an-initrd-initramfs/
   - device management
     - https://git.suckless.org/smdev
   - init systems
     - git://git.suckless.org/sinit
     - https://github.com/bbenne10/rc
     - https://github.com/hut/minirc
+    - https://omaera.org/wlog/tech/runit_init
 - minimal userland
   - https://github.com/ibara/oksh
   - git://git.suckless.org/sbase
   - git://git.suckless.org/ubase
   - https://git.andreasbaumann.cc/cgit/abase/
-  - https://beastiebox.sourceforge.net/
+  - other minimal user lands (we don't use for now)
+    - https://busybox.net/
+    - https://landley.net/toybox/
+    - https://tools.suckless.org/9base/
+    - https://github.com/leahneukirchen/obase
+    - https://beastiebox.sourceforge.net/
 - Link collections of interesting software
   - https://suckless.org/rocks/
   - https://suckless.org/other_projects/
   - https://github.com/firasuke/awesome
   - https://wiki.musl-libc.org/alternatives.html
   - http://bashismal.blogspot.com/2011/10/unbloated-resources-in-c.html
+- cruching binaries
+  - https://github.com/ryao/crunch
+  - http://www.bsdnewsletter.com/2003/09/Features102.html
 - historical stuff
   - https://www.elinux.org/Busybox_replacement_project

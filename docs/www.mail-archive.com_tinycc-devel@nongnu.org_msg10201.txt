@@ -1,0 +1,140 @@
+   #[1]contents [2]index [3]prev [4]next
+
+   [5]Skip to site navigation (Press enter)
+
+[6]Re: [Tinycc-devel] "error: invalid displacement" i386 1f 'L..1' does not
+get resolved
+
+   [7]Michael Matz [8]Wed, 20 Apr 2022 08:18:47 -0700
+Hello,
+
+On Sun, 17 Apr 2022, Volodymyr Boyko wrote:
+
+
+Hi
+I'm trying to assemble the following snippet of code:
+
+.global sigsetjmp
+.global __sigsetjmp
+.type sigsetjmp,@function
+.type __sigsetjmp,@function
+sigsetjmp:
+__sigsetjmp:
+        mov 8(%esp),%ecx
+        jecxz 1f
+
+        mov 4(%esp),%eax
+        popl 24(%eax)
+        mov %ebx,28+8(%eax)
+        mov %eax,%ebx
+
+.hidden ___setjmp
+        call ___setjmp
+
+        pushl 24(%ebx)
+        mov %ebx,4(%esp)
+        mov %eax,8(%esp)
+        mov 28+8(%ebx),%ebx
+
+.hidden __sigsetjmp_tail
+        jmp __sigsetjmp_tail
+
+1:      jmp ___setjmp
+but getting this error:
+src/signal/i386/sigsetjmp.s:8: error: invalid displacement
+After renaming/moving the label around I assume the issue is that local
+labels cannot be forward;1b and my_label moved to the top do work fine.
+
+
+
+   Yeah, it's related to that, but specific to the 'jexcz' opcode: the
+   special thing about it is that it only comes in an 8-bit displacement
+   form _and_ doesn't have an inverse form. TCC, being single-pass, has to
+   assume that forward labels could be anywhere, and hence potentially
+   need a 32bit form (no matter that _in this case_ it would turn out to
+   not be necessary), so jumps are rewritten into their disp32 forms for
+   such labels. For jecxz that can't be done. And as the inverse form
+   doesn't exist we can't even work around this by emitting something like
+   a hypothetical:
+
+  jecxnz +5   ; doesn't exist!
+  jmp 1f
+
+
+   The GNU assembler uses multiple passes to figure out that the
+   displacement in the testcase turns out to fit into a disp8 field and
+   hence all is well. Add a couple more opcodes between the jecxz and the
+   1: label to make the distance larger than 128 and see it erroring out
+   as well.
+
+
+   Supporting this requires some surgery (e.g. to support the _PC8
+   relocation and emitting them for this case only), so is of low
+   priority.
+
+
+Ciao,
+Michael.
+_______________________________________________
+Tinycc-devel mailing list
+Tinycc-devel@nongnu.org
+[9]https://lists.nongnu.org/mailman/listinfo/tinycc-devel
+
+     * [10]Previous message
+     * [11]View by thread
+     * [12]View by date
+     * [13]Next message
+
+     * [14][Tinycc-devel] "error: invalid displacement" i38... Volodymyr
+       Boyko
+     *
+          + Re: [Tinycc-devel] "error: invalid displacement&... Michael
+            Matz
+
+Reply via email to
+
+   Michael Matz
+   [15]The Mail Archive
+   Search the site ____________________ Submit
+     * [16]The Mail Archive home
+     * [17]tinycc-devel - all messages
+     * [18]tinycc-devel - about the list
+     * [19]Expand
+     * [20]Previous message
+     * [21]Next message
+
+     * [22]The Mail Archive home
+     * [23]Add your mailing list
+     * [24]FAQ
+     * [25]Support
+     * [26]Privacy
+     * alpine.LSU.2.21.2204201629570.4781@hell6.fritz.box
+
+References
+
+   1. https://www.mail-archive.com/tinycc-devel@nongnu.org/index.html#10201
+   2. https://www.mail-archive.com/tinycc-devel@nongnu.org/maillist.html#10201
+   3. https://www.mail-archive.com/tinycc-devel@nongnu.org/msg10196.html
+   4. https://www.mail-archive.com/tinycc-devel@nongnu.org/msg10199.html
+   5. https://www.mail-archive.com/tinycc-devel@nongnu.org/msg10201.html#nav
+   6. https://www.mail-archive.com/search?l=tinycc-devel@nongnu.org&q=subject:%22Re%5C%3A+%5C%5BTinycc%5C-devel%5C%5D+%5C%22error%5C%3A+invalid+displacement%5C%22+i386+1f+%27L..1%27+does+not+get+resolved%22&o=newest
+   7. https://www.mail-archive.com/search?l=tinycc-devel@nongnu.org&q=from:%22Michael+Matz%22
+   8. https://www.mail-archive.com/search?l=tinycc-devel@nongnu.org&q=date:20220420
+   9. https://lists.nongnu.org/mailman/listinfo/tinycc-devel
+  10. https://www.mail-archive.com/tinycc-devel@nongnu.org/msg10196.html
+  11. https://www.mail-archive.com/tinycc-devel@nongnu.org/index.html#10201
+  12. https://www.mail-archive.com/tinycc-devel@nongnu.org/maillist.html#10201
+  13. https://www.mail-archive.com/tinycc-devel@nongnu.org/msg10199.html
+  14. https://www.mail-archive.com/tinycc-devel@nongnu.org/msg10196.html
+  15. https://www.mail-archive.com/
+  16. https://www.mail-archive.com/
+  17. https://www.mail-archive.com/tinycc-devel@nongnu.org/
+  18. https://www.mail-archive.com/tinycc-devel@nongnu.org/info.html
+  19. https://www.mail-archive.com/search?l=tinycc-devel@nongnu.org&q=subject:%22Re%5C%3A+%5C%5BTinycc%5C-devel%5C%5D+%5C%22error%5C%3A+invalid+displacement%5C%22+i386+1f+%27L..1%27+does+not+get+resolved%22&o=newest&f=1
+  20. https://www.mail-archive.com/tinycc-devel@nongnu.org/msg10196.html
+  21. https://www.mail-archive.com/tinycc-devel@nongnu.org/msg10199.html
+  22. https://www.mail-archive.com/
+  23. https://www.mail-archive.com/faq.html#newlist
+  24. https://www.mail-archive.com/faq.html
+  25. https://www.mail-archive.com/faq.html#support
+  26. https://www.mail-archive.com/faq.html#privacy

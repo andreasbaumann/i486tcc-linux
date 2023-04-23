@@ -1,0 +1,95 @@
+   #[1]contents [2]index [3]prev [4]next
+
+   [5]Skip to site navigation (Press enter)
+
+[6][Tinycc-devel] Inline asm error while compiling i386 musl
+
+   [7]John Arnold [8]Wed, 18 Sep 2019 02:08:49 -0700
+I am aware that tcc officially does not support compiling musl, but I want
+to throw caution to the wind and see if some changes can fix that. I'm
+trying to build i386 musl, and I've already hacked around a few errors, but
+this one has me totally stumped. For the syscall header
+[9]https://git.musl-libc.org/cgit/musl/tree/arch/i386/syscall_arch.h the
+definition of __syscall3
+
+static inline long __syscall3(long n, long a1, long a2, long a3)
+{
+unsigned long __ret;
+#if !defined(__PIC__) || !defined(BROKEN_EBX_ASM)
+__asm__ __volatile__ (SYSCALL_INSNS : "=a"(__ret) : "a"(n), "b"(a1),
+"c"(a2), "d"(a3) : "memory");
+#else
+__asm__ __volatile__ (SYSCALL_INSNS_34 : "=a"(__ret) : "a"(n), "D"(a1),
+"c"(a2), "d"(a3) : "memory");
+#endif
+return __ret;
+}
+
+results in "error: incorrect prefix"
+
+But oddly, this only happen with syscall3. The definitions of syscall1 and
+syscall2 work fine, and if I comment syscall3 out, so do the definitions of
+syscall4, 5, 6. I have no idea what would be causing the error here, but if
+any of the more experienced developers have an idea of the problem, I'd
+really appreciate any advice.
+
+Thanks,
+John
+
+_______________________________________________
+Tinycc-devel mailing list
+Tinycc-devel@nongnu.org
+[10]https://lists.nongnu.org/mailman/listinfo/tinycc-devel
+
+     * [11]Previous message
+     * [12]View by thread
+     * [13]View by date
+     * [14]Next message
+
+Reply via email to
+
+   John Arnold
+   [15]The Mail Archive
+   Search the site ____________________ Submit
+     * [16]The Mail Archive home
+     * [17]tinycc-devel - all messages
+     * [18]tinycc-devel - about the list
+     * [19]Expand
+     * [20]Previous message
+     * [21]Next message
+
+     * [22]The Mail Archive home
+     * [23]Add your mailing list
+     * [24]FAQ
+     * [25]Support
+     * [26]Privacy
+     * CACq8dh0UX+4NrG-9bPheM4hct23pbtOqtXhc7PMT525wGHrRyA@mail.gmail.com
+
+References
+
+   1. https://www.mail-archive.com/tinycc-devel@nongnu.org/index.html#08533
+   2. https://www.mail-archive.com/tinycc-devel@nongnu.org/maillist.html#08533
+   3. https://www.mail-archive.com/tinycc-devel@nongnu.org/msg08532.html
+   4. https://www.mail-archive.com/tinycc-devel@nongnu.org/msg08534.html
+   5. https://www.mail-archive.com/tinycc-devel@nongnu.org/msg08533.html#nav
+   6. https://www.mail-archive.com/search?l=tinycc-devel@nongnu.org&q=subject:%22%5C%5BTinycc%5C-devel%5C%5D+Inline+asm+error+while+compiling+i386+musl%22&o=newest
+   7. https://www.mail-archive.com/search?l=tinycc-devel@nongnu.org&q=from:%22John+Arnold%22
+   8. https://www.mail-archive.com/search?l=tinycc-devel@nongnu.org&q=date:20190918
+   9. https://git.musl-libc.org/cgit/musl/tree/arch/i386/syscall_arch.h
+  10. https://lists.nongnu.org/mailman/listinfo/tinycc-devel
+  11. https://www.mail-archive.com/tinycc-devel@nongnu.org/msg08532.html
+  12. https://www.mail-archive.com/tinycc-devel@nongnu.org/index.html#08533
+  13. https://www.mail-archive.com/tinycc-devel@nongnu.org/maillist.html#08533
+  14. https://www.mail-archive.com/tinycc-devel@nongnu.org/msg08534.html
+  15. https://www.mail-archive.com/
+  16. https://www.mail-archive.com/
+  17. https://www.mail-archive.com/tinycc-devel@nongnu.org/
+  18. https://www.mail-archive.com/tinycc-devel@nongnu.org/info.html
+  19. https://www.mail-archive.com/search?l=tinycc-devel@nongnu.org&q=subject:%22%5C%5BTinycc%5C-devel%5C%5D+Inline+asm+error+while+compiling+i386+musl%22&o=newest&f=1
+  20. https://www.mail-archive.com/tinycc-devel@nongnu.org/msg08532.html
+  21. https://www.mail-archive.com/tinycc-devel@nongnu.org/msg08534.html
+  22. https://www.mail-archive.com/
+  23. https://www.mail-archive.com/faq.html#newlist
+  24. https://www.mail-archive.com/faq.html
+  25. https://www.mail-archive.com/faq.html#support
+  26. https://www.mail-archive.com/faq.html#privacy

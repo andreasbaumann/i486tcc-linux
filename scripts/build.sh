@@ -481,6 +481,81 @@ else
 	echo "stage1 abase exists"
 fi
 
+# TODO FROM HERE
+
+# TODO: have some way to deal with dependencies and with the user
+# choosing what he wants to have in the final system or/and on
+# the ramdisk
+# TODO: we also have to think about whether build artifacts are
+# the same per stage (for instance ramdisk binaries are static
+# and crunched, final binaries on the hard disk maybe dynamic
+# and "normal"..?
+
+#~ cd ../joe
+#~ CC=/data/work/i486/root/stage1/bin/i386-tcc \
+	#~ ./configure --prefix=/data/work/i486/root/stage1
+#~ make LDFLAGS=-static
+#~ make install
+
+#~ cd ../less
+#~ CC=/data/work/i486/root/stage1/bin/i386-tcc ./configure --prefix=/data/work/i486/root/stage1
+#~ make LDFLAGS=-static
+#~ make install PREFIX=/data/work/i486/root/stage1
+
+#~ cd ../screen
+#~ ./autogen.sh
+#~ CC=/data/work/i486/root/stage1/bin/i386-tcc CFLAGS='-march=i486 -mcpu=i486' ./configure --prefix=/data/work/i486/root/stage1
+#~ make LDFLAGS=-static
+
+#~ cd ../lynx
+#~ CC=/data/work/i486/root/stage1/bin/i386-tcc CFLAGS='-march=i486 -mcpu=i486' ./configure --prefix=/data/work/i486/root/stage1
+
+#~ cd ../zlib
+#~ CC=/data/work/i486/root/stage1/bin/i386-tcc ./configure --prefix=/data/work/i486/root/stage1 --static
+#~ make
+#~ cd contrib/minizip
+#~ make CC=/data/work/i486/root/stage1/bin/i386-tcc CFLAGS=-static
+#~ cp minizip /data/work/i486/root/stage1/bin/zip
+#~ cp miniunz /data/work/i486/root/stage1/bin/unzip
+
+#~ cd ../perp
+#~ cd lasagna
+#~ make CC=/data/work/i486/root/stage1/bin/i386-tcc 
+#~ cd ..
+#~ make CC=/data/work/i486/root/stage1/bin/i386-tcc LDFLAGS="-static ../lasagna/libasagna.a"
+#~ make install
+
+
+
+#~ cd ../strace
+#~ CC=/data/work/i486/root/stage1/bin/i386-tcc ./configure --prefix=/data/work/i486/root/stage1 --enable-mpers=no --disable-dependency-tracking
+#~ make
+#~ # TODO: rtnl_link.c:968: error: Unexpected size of ivg.ivg_64(16 expected)
+
+#~ cd ../samurai
+#~ make CC=/data/work/i486/root/stage1/bin/i386-tcc LDFLAGS=-static
+#~ make install PREFIX=/data/work/i486/root/stage1
+
+#~ cd ../editline
+#~ ./autogen.sh
+#~ CC=/data/work/i486/root/stage1/bin/i386-tcc ./configure --prefix=/data/work/i486/root/stage1 --enable-static
+#~ make LDFLAGS=-static
+#~ make install
+
+#~ cd ../lua
+#~ make linux CC=/data/work/i486/root/stage1/bin/i386-tcc \
+	#~ MYLDFLAGS=-static AR='/data/work/i486/root/stage0/bin/i386-tcc -ar' RANLIB=echo
+#~ make install INSTALL_TOP=/data/work/i486/root/stage1
+
+
+#~ cd ../iproute2
+#~ PKG_CONFIG=false CC=/data/work/i486/root/stage1/bin/i386-tcc \
+	#~ ./configure --prefix=/data/work/i486/root/stage1
+#~ make LDFLAGS=-static CC=/data/work/i486/root/stage1/bin/i386-tcc
+#~ make install DESTDIR=/data/work/i486/root/stage1 PREFIX=/
+
+# END TODO
+
 if [ ! -f "${BASE}/root/stage1/boot/bzImage" ]; then
 	echo "Building the Linux kernel.."
 	rm -rf "linux-${LINUX_KERNEL_VERSION}"

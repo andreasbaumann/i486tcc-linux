@@ -64,7 +64,10 @@ test -d "${RAMDISK}/root" || mkdir "${RAMDISK}/root"
 cp "${LOCAL}"/root/.profile "${RAMDISK}/root"
 test -d "${RAMDISK}/etc" || mkdir "${RAMDISK}/etc"
 cp -dR "${LOCAL}"/etc/* "${RAMDISK}/etc"
-HASH=$(openssl passwd -1  -salt '5RPVAd' 'xx')
+
+# default passwd is SHA-256 or SHA-512 which can take a minute to verify
+# on old machines! We are using unsafe MD5 crypt1, beware of hacks!
+HASH=$(openssl passwd -1 -salt '5RPVAd' 'xx')
 echo "root:${HASH}:17718::::::" >"${RAMDISK}/etc/shadow"
 
 # package ramdisk directory with cpio and compress it with xz
