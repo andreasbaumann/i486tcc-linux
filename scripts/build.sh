@@ -567,9 +567,10 @@ if [ ! -f "${BASE}/root/stage1/boot/bzImage" ]; then
 	make -j$CPUS bzImage
 	test -d "${BASE}/root/stage1/boot" || mkdir "${BASE}/root/stage1/boot"
 	cp arch/i386/boot/bzImage "${BASE}/root/stage1/boot"
-	#make -j$CPUS modules
-	#mkdir "${BASE}/root/stage1/lib/modules"
-	#find . -name '*.ko' | xargs tar -cf - | tar -C "${BASE}/root/stage1/lib/modules" -xf -
+	make -j$CPUS modules
+	rm -rf "${BASE}/root/stage1/lib/modules"
+	mkdir "${BASE}/root/stage1/lib/modules"
+	find . -name '*.ko' | xargs tar -cf - | tar -C "${BASE}/root/stage1/lib/modules" -xf -
 	cd ..
 else
 	echo "stage1 kernel exists"

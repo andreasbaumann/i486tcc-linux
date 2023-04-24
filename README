@@ -166,7 +166,10 @@ The starting point of the Linux kernel configuration is 'make tinyconfig'.
 
 - CONFIG_MULTIUSER=y
   CONFIG_NET=y
-  "login: initgroups: Function not implemented"
+  - "login: initgroups: Function not implemented"
+  - musl (in getpwnam)
+    - nscd query code which calls 'socket' and then only falls back
+      to using files, this is a problem in musl.
 
 - CONFIG_PROC_SYSCTL=y
   (CONFIG_PROC_PAGE_MONITOR=y ?)
@@ -177,14 +180,33 @@ The starting point of the Linux kernel configuration is 'make tinyconfig'.
 - CONFIG_UNIX98_PTYS
   "mount: mount: devpts: No such device"
 
-TODO FROM HERE:
-
 - CONFIG_COMPAT_32BIT_TIME
   - for 32-bit time parameter as in pselect (this of course maked the
     whole thing non-2038-safe)
     "vis: mainloop function not implemented", needs 'pselect'
 
-TODO: preemtion better for 1 CPU systems, Desktop?
+- CONFIG_MSDOS_PARTITION
+  - for fdisk
+
+- CONFIG_MODULES
+  - modules support, for everything which doesn't has to be in the
+    kernel, we can have a module and load it in rc.init.
+
+- CONFIG_UNIX (networking options, as module), unix domain sockets
+  - tmux
+
+- CONFIG_PCI_QUIRKS=y
+  "8139cp: 8139cp: 10/100 PCI Ethernet driver v1.3 (Mar 22, 2004)
+   8139cp 0000:00:03.0: found PCI INT A -> IRQ 11
+   8139cp: probe of 0000:00:03.0 failed with error -22"
+  22 is EINVAL, this is a nasty one to find
+  
+- CONFIG_VGA_ARB
+  => might be needed for PCI not to choke on VGA cards
+  
+TODO FROM HERE:
+
+TODO: preemption better for 1 CPU systems, Desktop?
 
 BLOCK_LEGACY_AUTOLOAD?? needed for /dev/ram0?
 are we doing pivot_root ?
@@ -195,14 +217,7 @@ are we doing pivot_root ?
 - CONFIG_TIMERFD
   - for sdhcp
 
-- CONFIG_UNIX (networking options), unix domain sockets
-  - nscd
-  - tmux
-  - musl (in getpwnam)
-
 cd ../linux
-
-
 
 #TODO
 [*]   Multiple users, groups and capabilities support
