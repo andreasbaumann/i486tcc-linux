@@ -1,0 +1,149 @@
+Linux version 6.3.0 (abaumann@eurox) (gcc (GCC) 12.2.1 20230201, GNU ld (GNU Binutils) 2.40) #1 Fri Apr 28 07:43:13 CEST 2023
+x86/fpu: x87 FPU will use FSAVE
+signal: max sigframe size: 928
+BIOS-provided physical RAM map:
+BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff] usable
+BIOS-e820: [mem 0x000000000009fc00-0x000000000009ffff] reserved
+BIOS-e820: [mem 0x00000000000f0000-0x00000000000fffff] reserved
+BIOS-e820: [mem 0x0000000000100000-0x0000000003ffffff] usable
+BIOS-e820: [mem 0x00000000ffff0000-0x00000000ffffffff] reserved
+earlycon: uart8250 at I/O port 0x3f8 (options '9600n8')
+printk: bootconsole [uart8250] enabled
+Notice: NX (Execute Disable) protection missing in CPU!
+last_pfn = 0x4000 max_arch_pfn = 0x100000
+x86/PAT: PAT support disabled because CONFIG_X86_PAT is disabled in the kernel.
+x86/PAT: Configuration [0-7]: WB  WT  UC- UC  WB  WT  UC- UC  
+RAMDISK: [mem 0x00800000-0x00b7efff]
+64MB LOWMEM available.
+  mapped low ram: 0 - 04000000
+  low ram: 0 - 04000000
+Zone ranges:
+  Normal   [mem 0x0000000000001000-0x0000000003ffffff]
+Movable zone start for each node
+Early memory node ranges
+  node   0: [mem 0x0000000000001000-0x000000000009efff]
+  node   0: [mem 0x0000000000100000-0x0000000003ffffff]
+Initmem setup node 0 [mem 0x0000000000001000-0x0000000003ffffff]
+On node 0, zone Normal: 1 pages in unavailable ranges
+On node 0, zone Normal: 97 pages in unavailable ranges
+[mem 0x04000000-0xfffeffff] available for PCI devices
+clocksource: refined-jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645519600211568 ns
+Built 1 zonelists, mobility grouping on.  Total pages: 16158
+Kernel command line: debug loglevel=7 earlycon=uart8250,io,0x3f8,9600n8 console=tty0 console=ttyS0,9600n8 rdinit=/bin/sinit root=/dev/ram0 rootfstype=ramfs iommu=off
+Dentry cache hash table entries: 8192 (order: 3, 32768 bytes, linear)
+Inode-cache hash table entries: 4096 (order: 2, 16384 bytes, linear)
+mem auto-init: stack:all(zero), heap alloc:off, heap free:off
+Checking if this processor honours the WP bit even in supervisor mode...Ok.
+Memory: 56892K/65144K available (1989K kernel code, 441K rwdata, 528K rodata, 216K init, 148K bss, 8252K reserved, 0K cma-reserved)
+SLUB: HWalign=32, Order=0-1, MinObjects=0, CPUs=1, Nodes=1
+NR_IRQS: 16, nr_irqs: 16, preallocated irqs: 16
+Console: colour VGA+ 80x25
+printk: console [tty0] enabled
+printk: console [ttyS0] enabled
+printk: console [ttyS0] enabled
+printk: bootconsole [uart8250] disabled
+printk: bootconsole [uart8250] disabled
+Calibrating delay loop... 30.08 BogoMIPS (lpj=60160)
+pid_max: default: 4096 minimum: 301
+Mount-cache hash table entries: 1024 (order: 0, 4096 bytes, linear)
+Mountpoint-cache hash table entries: 1024 (order: 0, 4096 bytes, linear)
+Last level iTLB entries: 4KB 0, 2MB 0, 4MB 0
+Last level dTLB entries: 4KB 0, 2MB 0, 4MB 0, 1GB 0
+CPU: Intel 486 DX/2 (family: 0x4, model: 0x3, stepping: 0x5)
+Performance Events: no PMU driver, software events only.
+devtmpfs: initialized
+clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+NET: Registered PF_NETLINK/PF_ROUTE protocol family
+clocksource: pit: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1601818034827 ns
+PCI: Fatal: No config space access function found
+PCI: System does not support PCI
+vgaarb: loaded
+clocksource: Switched to clocksource pit
+NET: Registered PF_INET protocol family
+IP idents hash table entries: 2048 (order: 2, 16384 bytes, linear)
+tcp_listen_portaddr_hash hash table entries: 1024 (order: 0, 4096 bytes, linear)
+Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+TCP established hash table entries: 1024 (order: 0, 4096 bytes, linear)
+TCP bind hash table entries: 1024 (order: 1, 8192 bytes, linear)
+TCP: Hash tables configured (established 1024 bind 1024)
+UDP hash table entries: 256 (order: 0, 4096 bytes, linear)
+UDP-Lite hash table entries: 256 (order: 0, 4096 bytes, linear)
+PCI: CLS 0 bytes, default 16
+platform rtc_cmos: registered platform RTC device (no PNP device found)
+Unpacking initramfs...
+workingset: timestamp_bits=30 max_order=14 bucket_order=0
+Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
+serial8250: ttyS0 at I/O 0x3f8 (irq = 4, base_baud = 115200) is a 16550A
+serial8250: ttyS1 at I/O 0x2f8 (irq = 3, base_baud = 115200) is a 16550A
+serio: i8042 KBD port at 0x60,0x64 irq 1
+serio: i8042 AUX port at 0x60,0x64 irq 12
+input: AT Translated Set 2 keyboard as /devices/platform/i8042/serio0/input/input0
+sched_clock: Marking stable (2344871250, 0)->(2348000000, -3128750)
+input: ImExPS/2 Generic Explorer Mouse as /devices/platform/i8042/serio1/input/input2
+random: crng init done
+Freeing initrd memory: 3580K
+Freeing unused kernel image (initmem) memory: 216K
+Write protecting kernel text and read-only data: 2520k
+Run /bin/sinit as init process
+process '/bin/sinit' started with executable stack
+Starting..
+Mounting pseudo-filesystems..
+Mounting registerd filesystems..
+Starting login sessions..
+Done.
+ne: Unknown symbol eip_interrupt (err -2)
+ne: Unknown symbol eip_netdev_ops (err -2)
+ne: Unknown symbol __alloc_eip_netdev (err -2)
+ne: Unknown symbol NS8390p_init (err -2)
+ne: `0x0x60' invalid for parameter `io'
+ne ne.0 (unnamed net_device) (uninitialized): ne.c: No NE*000 card found at i/o = 0x320
+ne ne.0 (unnamed net_device) (uninitialized): ne.c: No NE*000 card found at i/o = 0x320
+ne: `0x0x80' invalid for parameter `io'
+ne: unknown parameter 'h' ignored
+ne.c: You must supply "io=0xNNN" value(s) for ISA cards.
+ne ne.0 (unnamed net_device) (uninitialized): ne.c: No NE*000 card found at i/o = 0x310
+ne ne.0 (unnamed net_device) (uninitialized): NE*000 ethercard probe at 0x300:
+00:00:e8:cd:05:88
+ne ne.0 eth0: NE2000 found at 0x300, using IRQ 10.
+------------[ cut here ]------------
+NETDEV WATCHDOG: eth0 (ne): transmit queue 0 timed out
+WARNING: CPU: 0 PID: 0 at net/sched/sch_generic.c:525 0xc1183fc0
+Modules linked in: ne 8390p
+CPU: 0 PID: 0 Comm: swapper Not tainted 6.3.0 #1
+EIP: 0xc1183fc0
+Code: 3d 09 07 2e c1 00 75 2c c6 05 09 07 2e c1 01 8b 45 ec e8 4c ed fd ff 56 50 8d 83 cc fd ff ff 50 68 f8 6c 24 c1 e8 e7 79 ea ff <0f> 0b 83 c4 10 eb 03 46 eb 95 8b 45 ec e8 3d f8 ff ff 8b 8b 44 fe
+EAX: 00000036 EBX: c0e25234 ECX: 00000070 EDX: 00000000
+ESI: 00000000 EDI: ffff7c27 EBP: c0111f60 ESP: c0111f34
+DS: 007b ES: 007b FS: 0000 GS: 0000 SS: 0068 EFLAGS: 00210282
+CR0: 80050033 CR2: b7f55080 CR3: 00443000 CR4: 00000000
+Call Trace:
+ <SOFTIRQ>
+ ? 0xc1183efa
+ 0xc1053e41
+ 0xc1054095
+ 0xc11f04b0
+ ? 0xc11f0420
+ 0xc1017232
+ </SOFTIRQ>
+ 0xc102ddb2
+ 0xc102df16
+ 0xc11eccb1
+ 0xc11f0fb1
+EIP: 0xc11eda66
+Code: 0a 55 89 e5 e8 d2 ff ff ff 5d c3 c3 a1 4c 04 34 c1 8b 15 50 04 34 c1 c3 a1 a0 c9 32 c1 85 c0 7e 07 0f 00 2d e4 65 1f c1 fb f4 <fa> c3 a1 40 04 2e c1 80 48 02 20 8b 10 80 e2 08 75 44 8b 15 58 27
+EAX: 00000000 EBX: c12823c0 ECX: 00000000 EDX: 00000000
+ESI: c13100e0 EDI: ffffffff EBP: c1277f58 ESP: c1277f54
+DS: 007b ES: 007b FS: 0000 GS: 0000 SS: 0068 EFLAGS: 00200246
+ ? 0xc11e0000
+ ? 0xc11e0000
+ ? 0xc11eda66
+ ? 0xc11edace
+ 0xc11edb04
+ 0xc10442da
+ 0xc1044405
+ 0xc11edb79
+ 0xc12ed3be
+ 0xc12ed881
+ 0xc12f320b
+ 0xc10001c1
+---[ end trace 0000000000000000 ]---

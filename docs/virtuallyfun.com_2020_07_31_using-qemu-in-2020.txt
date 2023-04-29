@@ -1,0 +1,323 @@
+   #[1]Virtually Fun » Feed [2]Virtually Fun » Comments Feed [3]Virtually
+   Fun » Using Qemu in 2020 Comments Feed [4]alternate [5]alternate
+   [6]alternate
+
+   [7]Skip to primary content
+
+[8]Virtually Fun
+
+   [9]Virtually Fun Search ____________________ Search
+
+Main menu
+
+     * [10]Home
+     * [11]Emulators
+          + [12]jDOSBox
+          + [13]Qemu
+          + [14]SIMH
+          + [15]Virtual PC
+     * [16]Operating Systems
+          + [17]CP/M
+          + [18]MS-DOS
+          + [19]OS/2
+          + [20]Windows NT
+
+Post navigation
+
+   [21]<- Previous [22]Next ->
+
+Using Qemu in 2020
+
+   Posted on [23]July 31, 2020 by [24]neozeed
+
+   So I wanted to dive back into old BSD, and I wanted to use the new
+   native Qemu on OS X. That means having to "learn" the new crazy syntax
+   that has drifted a LOT over the last 10+ years.
+
+   I want to run [25]NetBSD 1.0 and tear into the GCC 2.x patches required
+   back in the day
+
+   In the old days, I was using Qemu 0.13 and had it working using the
+   following:
+qemu.exe -L pc-bios -hda netbsd-1.0.vmdk -net nic,model=ne2k_isa -net user -redi
+r tcp:42323::23 -m 64 -no-rebootÂ  -rtc base=localtime -k en-us
+
+   Thankfully I was using VMDK containers, probably as I'm sure I
+   installed it under VMware, with it's better floppy support, but pulled
+   it back to Qemu to have NE2000 support. Now let's look at the dmesg to
+   where the source of the problem is, the network card:
+NetBSD 1.0 (QEMU) #0: Thu Sep 22 06:45:37 PDT 2016
+Â  Â  [26][email protected]:/usr/src/sys/arch/i386/compile/QEMU
+CPU: Pentium (GenuineIntel 586-class CPU)
+real memÂ  = 67764224
+avail mem = 62312448
+using 852 buffers containing 3489792 bytes of memory
+pc0 at isa0 port 0x60-0x6f irq 1: color
+com0 at isa0 port 0x3f8-0x3ff irq 4: ns16550a, working fifo
+lpt0 at isa0 port 0x378-0x37f irq 7
+wdc0 at isa0 port 0x1f0-0x1f7 irq 14
+wd0 at wdc0 drive 0: 1023MB 2080 cyl, 16 head, 63 sec <QEMU HARDDISK>
+fdc0 at isa0 port 0x3f0-0x3f7 irq 6 drq 2
+fd0 at fdc0 drive 1: density unknown
+pci0 at isa0 port 0x0-0x665: configuration mode 1
+pci0 bus 0 device 0: identifier 12378086 class 06000002 not configured
+pci0 bus 0 device 1: identifier 70008086 class 06010000 not configured
+pci0 bus 0 device 2: identifier 11111234 class 03000002 not configured
+ed0 at isa0 port 0x320-0x33f irq 10: address 52:54:00:12:34:56, type NE2000 (16-
+bit)
+npx0 at isa0 port 0xf0-0xff: using exception 16
+biomask 4040 netmask 412 ttymask 12
+changing root device to wd0a
+
+   So the important thing here is that the NE2000 is the ed0 device using
+   an IO of 0x320 and IRQ 10. I'm pretty sure back then I cheated, and
+   just recompiled Qemu to remove the default definition that doesn't work
+   properly with trying to share IRQ 9.
+
+   Keeping this in mind, let's build this for the new Qemu:
+qemu-system-i386 -net none -device ne2k_isa,iobase=0x320,irq=10,netdev=ne -netde
+v user,id=ne,hostfwd=tcp::42323-:23 -drive file=netbsd-1.0.vmdk,if=ide,index=0,m
+edia=disk,cache=writeback,format=vmdk -rtc base=localtime -k en-us
+
+   So the first important thing is to disable any/all defualt NIC's with
+   the `net none' flag. Next to add in the NE2K_ISA type device manually
+   so I can specify the iobase & irq manually. Note the netdev as this is
+   used to tie in the emulated device, to the backend that will process
+   the packets. The next part is the redirect to have the host listen on
+   port 42323 and redirect them into port 23 of the VM. Again the syntax
+   to redirect ports has drifted significantly. The hostfwd now is bound
+   directly to the netdev user, in this new syntax it allows for multiple
+   NIC's to be bound to multiple user NAT's if needed.
+-device ne2k_isa,iobase=0x320,irq=10,netdev=ne -netdev user,id=ne,hostfwd=tcp::4
+2323-:23
+
+   The next ting is the hard disk, before `hda' worked fine, although like
+   everything else that is subject to change in the future, so dealing
+   with it now, use the drive flag:
+-drive file=netbsd-1.0.vmdk,if=ide,index=0,media=disk,cache=writeback,format=vmd
+k
+
+   It could be my personal opinion but the drive syntax, although much
+   longer is easier to work with. The key parts being what interface to
+   use (IDE), and what port/index to plug the device in (0), along with
+   the media type, the cache strategy, along with the encoded format,
+   which is more so important when dealign with RAW devices, as
+   unidentified media will be tagged as raw, however it'll be mounted
+   read-only unless it is directly specified as above.
+
+   For additional fun, the serial port can be set to a MS Mouse port,
+   although I haven't tested it as of yet.
+-serial msmouse
+
+   Have fun QEMU'ing!
+
+   This entry was posted in [27]QEMU by [28]neozeed. Bookmark the
+   [29]permalink.
+
+9 thoughts on "Using Qemu in 2020"
+
+    1.
+   Bruno Castelló on [30]August 1, 2020 at 5:47 am said:
+       Sounds fun. I have two vintage VMs, DOS622/Win3.11 and Win98 for
+       gaming on both VMware and UTMapp (QEMU gui on iOS) and I have been
+       trying hard to understand that syntax for a bit more modern VMs
+       such as Win XP and 7, using homebrews QEMU 5 on my Mac. Not having
+       very good luck so far in terms of speed.
+       I also plan to try and build old macOS Snow Leopard and System 7 or
+       macOS 9.x with QEMU just for fun. I've never used the last two as a
+       kid. What about OS/2 Warp? I remember my dad using it one day. All
+       I want is to ditch VMware for good and understand better the QEMU
+       things. The only reason I am still on VMware is because of Grand
+       Prix 4 game, supposed to run on XP with ease (as a kid, I do
+       remember playing it with XP!!) but it could only run in W10 VMware
+       VM. Oh dear.
+       Anyway I'm able to play GP2 and GP3 which is awesome for now. And
+       trying to find time, peace and concentration to remember how I used
+       to code things in VB3 with Win3.11.
+       [31]Reply |v
+    2.
+   DOS on [32]August 2, 2020 at 3:57 am said:
+       I'm not much of a fan of the new Qemu syntax. The old syntax for
+       specifying drives was much more terse, whereas now I have to
+       remember the extra words to tell it it's a raw disk image instead
+       of it just guessing that. Also the default NIC has meant that I
+       accidentally exposed something to the Internet that I didn't want
+       to, and it's not as simple as putting a wrapper script around it
+       because I have a lot of different versions floating around.
+       [33]Reply |v
+          +
+        [34]neozeed on [35]August 2, 2020 at 6:18 am said:
+            Yes it is... kind of showing off why you have gigabytes of
+            stuff to orchestrate command line flags now.. This isn't even
+            touching things like differential disks, and things like
+            shared memory busses and all the other fancy stuff.
+            I'm getting into the "-net none" type habit as of late, along
+            with turning off serial & parallel as it just wastes
+            resources.
+            Qemu doesn't care about legacy stuff, so we are always at
+            their trendy whims.
+            [36]Reply |v
+    3.
+   Astromike on [37]August 13, 2020 at 2:02 am said:
+       Sorry, I am coming late to this post, but I also wanted to chime in
+       here. I've actually had good luck with the newer versions of QEMU,
+       though stability and speed really seems to depend on what you are
+       doing. For example, for reasons I can't quite understand FreeDOS
+       seems very sluggish (which seems counterintuitive to me, but
+       whatever.)
+       I just wanted to add that I recently adapted Michael Engel's NeXT
+       busmouse patch to the newest release candidate (5.1.0-rc3). With
+       the OpenStep 4.2 update and its VESA driver you get a visually
+       pretty setup. It still seems a little wobbly at times, but it is
+       workable. I haven't had time to fight with the network card, but I
+       hope it can be figured out.
+       I'm not sure if someone else has done this, but if not I'd be happy
+       to share the patch. Alas, I don't have a place to stick it on the
+       web. Neozeed, maybe you could help there if you think it could have
+       some value.
+       Cheers!
+       [38]Reply |v
+          +
+        [39]neozeed on [40]August 13, 2020 at 8:26 am said:
+            Id be MORE than happy to host the patch, and go over it.
+            I like sourceforge as it's been around for eons, so it's not
+            trendy and will probably be around a bunch more (they got new
+            owners and fired the guy that did the trojan shit, and removed
+            it everywhere, although I know in the PR space the damage is
+            done)...
+            you can email me with my user @gmail.com
+            [41]Reply |v
+               o
+             AdamS on [42]September 14, 2020 at 9:26 pm said:
+                 Hi neozeed, Did you get any response from Astromike for
+                 adapted Michael Engel's NeXT busmouse patch to the newest
+                 qemu? It would be great to have this available somewhere.
+                 I just tried to run Rhapsody with latest qemu. I managed
+                 to get though dreaded PIIX "Interrupt timeout" patching
+                 hw/intc/i8259.c, but I got stuck at PS/2 mouse that is
+                 jumping randomly in qemu.
+                 So the most straightforward workaround would be busmouse
+                 support updated for latest 5.x qemu. But I lack time and
+                 skills to do it
+                 Cheers, Adam.
+                 [43]Reply |v
+                    #
+                  [44]neozeed on [45]September 16, 2020 at 12:35 am said:
+                      I don't recall seeing anything, and I don't have any
+                      twitter to try to communicate.
+                      You would have to try there, if you are permitted
+                      [46]Reply |v
+          +
+        Sean on [47]February 15, 2021 at 6:39 am said:
+            Hey Astromike, I'd love to take a look at that patch!
+            [48]Reply |v
+    4.
+   Lorenzo on [49]August 17, 2020 at 8:36 am said:
+       > For additional fun, the serial port can be set to a MS Mouse
+       port, although I haven't tested it as of yet.
+       I have, and I don't think it works, but I can't tell why. I'm
+       trying to not dig into qemu+CuteMouse's source code myself... not
+       again/more.
+       I opened a bug in the bug tracker (
+       [50]https://bugs.launchpad.net/qemu/+bug/1888663 ), but I assume
+       it's really low on the priority list. If anyone can get it working,
+       I'd be happy to hear it!
+       [51]Reply |v
+
+Leave a Reply [52]Cancel reply
+
+   Your email address will not be published. Required fields are marked *
+
+   Comment *
+   _____________________________________________
+   _____________________________________________
+   _____________________________________________
+   _____________________________________________
+   _____________________________________________
+   _____________________________________________
+   _____________________________________________
+   _____________________________________________
+
+   Name * ______________________________
+
+   Email * ______________________________
+
+   Website ______________________________
+
+   [ ] Save my name, email, and website in this browser for the next time
+   I comment.
+
+   Post Comment
+
+   D
+   _____________________________________________
+   _____________________________________________
+   _____________________________________________
+   _____________________________________________
+   _____________________________________________
+   _____________________________________________
+   _____________________________________________
+   _____________________________________________
+
+   This site uses Akismet to reduce spam. [53]Learn how your comment data
+   is processed.
+
+   [54]Looks like more outages ahead.. [55]Proudly powered by WordPress
+
+References
+
+   1. https://virtuallyfun.com/feed/
+   2. https://virtuallyfun.com/comments/feed/
+   3. https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/feed/
+   4. https://virtuallyfun.com/wp-json/wp/v2/posts/10398
+   5. https://virtuallyfun.com/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fvirtuallyfun.com%2F2020%2F07%2F31%2Fusing-qemu-in-2020%2F
+   6. https://virtuallyfun.com/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fvirtuallyfun.com%2F2020%2F07%2F31%2Fusing-qemu-in-2020%2F&format=xml
+   7. https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/#content
+   8. https://virtuallyfun.com/
+   9. https://virtuallyfun.com/
+  10. https://virtuallyfun.com/
+  11. https://virtuallyfun.com/emulators/
+  12. https://virtuallyfun.com/emulators/jdosbox/
+  13. https://virtuallyfun.com/emulators/qemu-2/
+  14. https://virtuallyfun.com/emulators/simh/
+  15. https://virtuallyfun.com/emulators/virtual-pc/
+  16. https://virtuallyfun.com/operating-systems/
+  17. https://virtuallyfun.com/operating-systems/cpm/
+  18. https://virtuallyfun.com/operating-systems/ms-dos/
+  19. https://virtuallyfun.com/operating-systems/os2/
+  20. https://virtuallyfun.com/operating-systems/windows-nt/
+  21. https://virtuallyfun.com/2020/07/31/so-yes-there-was-an-outage/
+  22. https://virtuallyfun.com/2020/08/02/the-lost-history-of-prep-windows-nt-3-5x-and-the-rs-6000-40p/
+  23. https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/
+  24. https://virtuallyfun.com/author/neozeed/
+  25. https://sourceforge.net/projects/bsd42/files/4BSD%20under%20Windows/v0.4/NetBSD%201.0.zip/download
+  26. https://virtuallyfun.com/cdn-cgi/l/email-protection
+  27. https://virtuallyfun.com/category/qemu/
+  28. https://virtuallyfun.com/author/neozeed/
+  29. https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/
+  30. https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/#comment-256780
+  31. https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/?replytocom=256780#respond
+  32. https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/#comment-256784
+  33. https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/?replytocom=256784#respond
+  34. https://virtuallyfun.com/
+  35. https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/#comment-256786
+  36. https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/?replytocom=256786#respond
+  37. https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/#comment-257303
+  38. https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/?replytocom=257303#respond
+  39. https://virtuallyfun.com/
+  40. https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/#comment-257306
+  41. https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/?replytocom=257306#respond
+  42. https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/#comment-258542
+  43. https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/?replytocom=258542#respond
+  44. https://virtuallyfun.com/
+  45. https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/#comment-258547
+  46. https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/?replytocom=258547#respond
+  47. https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/#comment-263886
+  48. https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/?replytocom=263886#respond
+  49. https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/#comment-257889
+  50. https://bugs.launchpad.net/qemu/+bug/1888663
+  51. https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/?replytocom=257889#respond
+  52. https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/#respond
+  53. https://akismet.com/privacy/
+  54. https://virtuallyfun.com/2011/05/14/looks-like-more-outages-ahead/
+  55. https://wordpress.org/

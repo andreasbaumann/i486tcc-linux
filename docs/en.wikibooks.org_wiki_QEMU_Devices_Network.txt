@@ -1,0 +1,232 @@
+   #[1]alternate [2]Edit [3]Wikibooks (en) [4]Wikibooks Atom feed
+
+QEMU/Devices/Network
+
+   From Wikibooks, open books for an open world
+   < [5]QEMU | [6]Devices
+   [7]Jump to navigation [8]Jump to search
+
+   Network devices are somewhat special, since besides being able to add
+   them the standard way, there's a much easier one to configure them
+   through the -net nic parameter.
+
+   Also, please note that -device doesn't suppress the default
+   configuration, so it might not do what you intend.
+
+Adding a card[[9]edit | [10]edit source]
+
+   Simply specifying -net nic on the command line adds an interface. You
+   can select the hardware being emulated using the model modifier.
+
+   Example:
+qemu -net nic,model=ne2k_pci ...
+
+Network card models[[11]edit | [12]edit source]
+
+   For PC emulation
+   Model Bus Speed Description
+   e1000 PCI 1Gb/s Intel Gigabit Ethernet
+   i82551 PCI 10/100Mb/s Intel 10/100 Mbps Fast Ethernet
+   i82557b PCI 10/100Mb/s Intel 10/100 Mbps Fast Ethernet
+   i82559er PCI 10/100Mb/s Intel 10/100 Mbps Fast Ethernet
+   ne2k_pci PCI 10Mb/s NE2000
+   ne2k_isa ISA 10Mb/s NE2000
+   pcnet PCI 10/100Mb/s AMD PCnet FAST III Ethernet
+   rtl8139 PCI 10/100Mb/s Realtek Fast Ethernet
+   virtio PCI 1Gb/s Virtual High Performance Ethernet card (see
+   [13]Virtio)
+
+   Others emulated architectures
+
+   You have to launch this command to list emulated network card
+qemu-system-<arch> -net nic,model=?
+
+   Retrieved from
+   "[14]https://en.wikibooks.org/w/index.php?title=QEMU/Devices/Network&ol
+   did=3949941"
+   [15]Category:
+     * [16]Book:QEMU
+
+Navigation menu
+
+Personal tools
+
+     * Not logged in
+     * [17]Discussion for this IP address
+     * [18]Contributions
+     * [19]Create account
+     * [20]Log in
+
+Namespaces
+
+     * [21]Book
+     * [22]Discussion
+
+   [ ] English
+
+Views
+
+     * [23]Read
+     * [24]Edit
+     * [25]Edit source
+     * [26]View history
+
+   [ ] More
+
+   ____________________ Search Go
+
+Navigation
+
+     * [27]Main Page
+     * [28]Help
+     * [29]Browse
+     * [30]Cookbook
+     * [31]Wikijunior
+     * [32]Featured books
+     * [33]Recent changes
+     * [34]Donations
+     * [35]Random book
+     * [36]Using Wikibooks
+
+community
+
+     * [37]Reading room forum
+     * [38]Community portal
+     * [39]Bulletin Board
+     * [40]Help out!
+     * [41]Policies and guidelines
+     * [42]Contact us
+
+Tools
+
+     * [43]What links here
+     * [44]Related changes
+     * [45]Upload file
+     * [46]Special pages
+     * [47]Permanent link
+     * [48]Page information
+     * [49]Cite this page
+
+sister projects
+
+     * [50]Wikipedia
+     * [51]Wikiversity
+     * [52]Wiktionary
+     * [53]Wikiquote
+     * [54]Wikisource
+     * [55]Wikinews
+     * [56]Wikivoyage
+     * [57]Commons
+     * [58]Wikidata
+     * [59]MediaWiki
+     * [60]Meta-Wiki
+
+Print/export
+
+     * [61]Create a collection
+     * [62]Download as PDF
+     * [63]Printable version
+
+In other languages
+
+   [64]Add links
+
+     * This page was last edited on 30 July 2021, at 05:03.
+     * Text is available under the [65]Creative Commons
+       Attribution-ShareAlike License; additional terms may apply. By
+       using this site, you agree to the [66]Terms of Use and [67]Privacy
+       Policy.
+
+     * [68]Privacy policy
+     * [69]About Wikibooks
+     * [70]Disclaimers
+     * [71]Mobile view
+     * [72]Developers
+     * [73]Statistics
+     * [74]Cookie statement
+
+     * [75]Wikimedia Foundation
+     * [76]Powered by MediaWiki
+
+References
+
+   Visible links:
+   1. https://en.m.wikibooks.org/wiki/QEMU/Devices/Network
+   2. https://en.wikibooks.org/w/index.php?title=QEMU/Devices/Network&action=edit
+   3. https://en.wikibooks.org/w/opensearch_desc.php
+   4. https://en.wikibooks.org/w/index.php?title=Special:RecentChanges&feed=atom
+   5. https://en.wikibooks.org/wiki/QEMU
+   6. https://en.wikibooks.org/wiki/QEMU/Devices
+   7. https://en.wikibooks.org/wiki/QEMU/Devices/Network#mw-head
+   8. https://en.wikibooks.org/wiki/QEMU/Devices/Network#searchInput
+   9. https://en.wikibooks.org/w/index.php?title=QEMU/Devices/Network&veaction=edit&section=1
+  10. https://en.wikibooks.org/w/index.php?title=QEMU/Devices/Network&action=edit&section=1
+  11. https://en.wikibooks.org/w/index.php?title=QEMU/Devices/Network&veaction=edit&section=2
+  12. https://en.wikibooks.org/w/index.php?title=QEMU/Devices/Network&action=edit&section=2
+  13. https://en.wikibooks.org/wiki/QEMU/Devices/Virtio
+  14. https://en.wikibooks.org/w/index.php?title=QEMU/Devices/Network&oldid=3949941
+  15. https://en.wikibooks.org/wiki/Special:Categories
+  16. https://en.wikibooks.org/wiki/Category:Book:QEMU
+  17. https://en.wikibooks.org/wiki/Special:MyTalk
+  18. https://en.wikibooks.org/wiki/Special:MyContributions
+  19. https://en.wikibooks.org/w/index.php?title=Special:CreateAccount&returnto=QEMU%2FDevices%2FNetwork
+  20. https://en.wikibooks.org/w/index.php?title=Special:UserLogin&returnto=QEMU%2FDevices%2FNetwork
+  21. https://en.wikibooks.org/wiki/QEMU/Devices/Network
+  22. https://en.wikibooks.org/w/index.php?title=Talk:QEMU/Devices/Network&action=edit&redlink=1
+  23. https://en.wikibooks.org/wiki/QEMU/Devices/Network
+  24. https://en.wikibooks.org/w/index.php?title=QEMU/Devices/Network&veaction=edit
+  25. https://en.wikibooks.org/w/index.php?title=QEMU/Devices/Network&action=edit
+  26. https://en.wikibooks.org/w/index.php?title=QEMU/Devices/Network&action=history
+  27. https://en.wikibooks.org/wiki/Main_Page
+  28. https://en.wikibooks.org/wiki/Help:Contents
+  29. https://en.wikibooks.org/wiki/Wikibooks:Card_Catalog_Office
+  30. https://en.wikibooks.org/wiki/Cookbook:Table_of_Contents
+  31. https://en.wikibooks.org/wiki/Wikijunior
+  32. https://en.wikibooks.org/wiki/Wikibooks:Featured_books
+  33. https://en.wikibooks.org/wiki/Special:RecentChanges
+  34. https://donate.wikimedia.org/wiki/Special:FundraiserRedirector?utm_source=donate&utm_medium=sidebar&utm_campaign=C13_en.wikibooks.org&uselang=en
+  35. https://en.wikibooks.org/wiki/Special:RandomInCategory/Book:Wikibooks_Stacks/Books
+  36. https://en.wikibooks.org/wiki/Using_Wikibooks
+  37. https://en.wikibooks.org/wiki/Wikibooks:Reading_room
+  38. https://en.wikibooks.org/wiki/Wikibooks:Community_Portal
+  39. https://en.wikibooks.org/wiki/Wikibooks:Reading_room/Bulletin_Board
+  40. https://en.wikibooks.org/wiki/Wikibooks:Maintenance
+  41. https://en.wikibooks.org/wiki/Wikibooks:Policies_and_guidelines
+  42. https://en.wikibooks.org/wiki/Wikibooks:Contact_us
+  43. https://en.wikibooks.org/wiki/Special:WhatLinksHere/QEMU/Devices/Network
+  44. https://en.wikibooks.org/wiki/Special:RecentChangesLinked/QEMU/Devices/Network
+  45. https://commons.wikimedia.org/wiki/Special:UploadWizard?uselang=en
+  46. https://en.wikibooks.org/wiki/Special:SpecialPages
+  47. https://en.wikibooks.org/w/index.php?title=QEMU/Devices/Network&oldid=3949941
+  48. https://en.wikibooks.org/w/index.php?title=QEMU/Devices/Network&action=info
+  49. https://en.wikibooks.org/w/index.php?title=Special:CiteThisPage&page=QEMU%2FDevices%2FNetwork&id=3949941&wpFormIdentifier=titleform
+  50. https://en.wikipedia.org/wiki/Main_Page
+  51. https://en.wikiversity.org/wiki/Wikiversity:Main_Page
+  52. https://en.wiktionary.org/wiki/Wiktionary:Main_Page
+  53. https://en.wikiquote.org/wiki/Main_Page
+  54. https://en.wikisource.org/wiki/Main_Page
+  55. https://en.wikinews.org/wiki/Main_Page
+  56. https://en.wikivoyage.org/wiki/Main_Page
+  57. https://commons.wikimedia.org/wiki/Main_Page
+  58. https://www.wikidata.org/wiki/Wikidata:Main_Page
+  59. https://www.mediawiki.org/wiki/Main_Page
+  60. https://meta.wikimedia.org/wiki/Main_Page
+  61. https://en.wikibooks.org/w/index.php?title=Special:Book&bookcmd=book_creator&referer=QEMU%2FDevices%2FNetwork
+  62. https://en.wikibooks.org/w/index.php?title=Special:DownloadAsPdf&page=QEMU%2FDevices%2FNetwork&action=show-download-screen
+  63. https://en.wikibooks.org/w/index.php?title=QEMU/Devices/Network&printable=yes
+  64. https://www.wikidata.org/wiki/Special:NewItem?site=enwikibooks&page=QEMU%2FDevices%2FNetwork
+  65. https://creativecommons.org/licenses/by-sa/3.0/
+  66. https://foundation.wikimedia.org/wiki/Terms_of_Use
+  67. https://foundation.wikimedia.org/wiki/Privacy_policy
+  68. https://foundation.wikimedia.org/wiki/Privacy_policy
+  69. https://en.wikibooks.org/wiki/Wikibooks:Welcome
+  70. https://en.wikibooks.org/wiki/Wikibooks:General_disclaimer
+  71. https://en.m.wikibooks.org/w/index.php?title=QEMU/Devices/Network&mobileaction=toggle_view_mobile
+  72. https://developer.wikimedia.org/
+  73. https://stats.wikimedia.org/#/en.wikibooks.org
+  74. https://foundation.wikimedia.org/wiki/Cookie_statement
+  75. https://wikimediafoundation.org/
+  76. https://www.mediawiki.org/
+
+   Hidden links:
+  78. https://en.wikibooks.org/wiki/Main_Page
