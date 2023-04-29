@@ -557,3 +557,8 @@ Real hardware
 Unisys CDW-4002
 ---------------
 
+cd lib/modules/drivers/net/ethernet/8390
+insmod 8390p.ko
+insmod ne.ko io=0x300 irq=10
+ifconfig eth0 up
+sdhcp
