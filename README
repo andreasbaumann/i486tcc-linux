@@ -552,6 +552,8 @@ links
   - https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/
 - nbd
   - https://patchwork.kernel.org/project/linux-block/patch_20190612163144.18486-2/roman.stratiienko@globallogic.com/
+- ping
+  - https://www.geeksforgeeks.org/ping-in-c.txt
 
 Real hardware
 -------------
