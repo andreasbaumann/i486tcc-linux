@@ -62,6 +62,8 @@ test -d "${RAMDISK}"/var/run || mkdir "${RAMDISK}"/var/run
 # copy locally adapted scripts
 test -d "${RAMDISK}/root" || mkdir "${RAMDISK}/root"
 cp "${LOCAL}"/root/.profile "${RAMDISK}/root"
+test -d "${RAMDISK}/bin" || mkdir "${RAMDISK}/bin"
+cp -dR "${LOCAL}"/bin/* "${RAMDISK}/bin"
 test -d "${RAMDISK}/etc" || mkdir "${RAMDISK}/etc"
 cp -dR "${LOCAL}"/etc/* "${RAMDISK}/etc"
 

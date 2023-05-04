@@ -7,5 +7,16 @@ echo "Synching and unmounting filesystems.."
 sync
 umount -a
 
-echo "Shut down."
+case "$1" in
+	reboot)
+		echo "Rebooting.."
+		halt -r
+		;;
+	
+	poweroff)
+		echo "Shutting down.."
+		halt -p
+		;;
+esac
+
 wait

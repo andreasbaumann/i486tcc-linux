@@ -1,0 +1,3 @@
+#!/bin/oksh
+
+kill -SIGUSR1 1
