@@ -482,6 +482,15 @@ else
 	echo "ramdisk image exists"
 fi
 
+# root file system
+
+if [ ! -f "${BASE}/root.img" ]; then
+	echo "Creating root image.."
+	${BASE}/scripts/create_root.sh
+else
+	echo "root image exists"
+fi
+
 # create boot floppies
 
 if [ ! -f "${BASE}/floppy.img" ]; then
