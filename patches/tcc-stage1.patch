@@ -30,15 +30,15 @@ index f932edc..2e5114b 100644
  # convert "include/tccdefs.h" to "tccdefs_.h"
  %_.h : include/%.h conftest.c
 -	$S$(CC) -DC2STR $(filter %.c,$^) -o c2str.exe && ./c2str.exe $< $@
-+	$S$(CC) -I@@BASE@@/root/stage0/include -nostdlib -DC2STR $(filter %.c,$^) -o c2str.exe \
-+	@@BASE@@/root/stage0/lib/crt1.o @@BASE@@/root/stage0/lib/libc.a @@BASE@@/root/stage0/lib/tcc/i386-libtcc1.a \
++	$S$(CC) -I@@BASE@@/build/stage0/include -nostdlib -DC2STR $(filter %.c,$^) -o c2str.exe \
++	@@BASE@@/build/stage0/lib/crt1.o @@BASE@@/build/stage0/lib/libc.a @@BASE@@/build/stage0/lib/tcc/i386-libtcc1.a \
 +	&& ./c2str.exe $< $@
  
  # target specific object rule
  $(X)%.o : %.c $(LIBTCC_INC)
 -	$S$(CC) -o $@ -c $< $(DEFINES) $(CFLAGS)
 +	$S$(CC) -o $@ -c $< $(DEFINES) $(CFLAGS) \
-+	-I@@BASE@@/root/stage0/include -nostdlib
++	-I@@BASE@@/build/stage0/include -nostdlib
  
  # additional dependencies
  $(X)tcc.o : tcctools.c
@@ -48,8 +48,8 @@ index f932edc..2e5114b 100644
  tcc$(EXESUF): tcc.o $(LIBTCC)
 -	$S$(CC) -o $@ $^ $(LIBS) $(LDFLAGS) $(LINK_LIBTCC)
 +	$S$(CC) -static -o $@ $^ $(LIBS) $(LDFLAGS) $(LINK_LIBTCC) \
-+	-nostdlib @@BASE@@/root/stage0/lib/crt1.o @@BASE@@/root/stage0/lib/libc.a \
-+	@@BASE@@/root/stage0/lib/tcc/i386-libtcc1.a
++	-nostdlib @@BASE@@/build/stage0/lib/crt1.o @@BASE@@/build/stage0/lib/libc.a \
++	@@BASE@@/build/stage0/lib/tcc/i386-libtcc1.a
  
  # Cross Tiny C Compilers
  # (the TCCDEFS_H dependency is only necessary for parallel makes,
@@ -59,8 +59,8 @@ index f932edc..2e5114b 100644
  $(CROSS_TARGET)-tcc$(EXESUF): $(TCC_FILES)
 -	$S$(CC) -o $@ $^ $(LIBS) $(LDFLAGS)
 +	$S$(CC) -static -o $@ $^ $(LIBS) $(LDFLAGS) \
-+	-nostdlib @@BASE@@/root/stage0/lib/crt1.o @@BASE@@/root/stage0/lib/libc.a \
-+	@@BASE@@/root/stage0/lib/tcc/i386-libtcc1.a
++	-nostdlib @@BASE@@/build/stage0/lib/crt1.o @@BASE@@/build/stage0/lib/libc.a \
++	@@BASE@@/build/stage0/lib/tcc/i386-libtcc1.a
  
  # profiling version
  tcc_p$(EXESUF): $($T_FILES)
@@ -73,7 +73,7 @@ index bc0d3e5..3d9c90b 100755
  if test -z "$cross_prefix" ; then
    CONFTEST=./conftest$EXESUF
 -  if ! $cc -o $CONFTEST $source_path/conftest.c ; then
-+  if ! $cc -nostdlib -I@@BASE@@/root/stage0/include -o ./conftest @@BASE@@/root/stage0/lib/crt1.o @@BASE@@/src/stage1/tinycc-@@TINYCC_VERSION@@/conftest.c @@BASE@@/root/stage0/lib/libc.a @@BASE@@/root/stage0/lib/tcc/i386-libtcc1.a; then
++  if ! $cc -nostdlib -I@@BASE@@/build/stage0/include -o ./conftest @@BASE@@/build/stage0/lib/crt1.o @@BASE@@/src/stage1/tinycc-@@TINYCC_VERSION@@/conftest.c @@BASE@@/build/stage0/lib/libc.a @@BASE@@/build/stage0/lib/tcc/i386-libtcc1.a; then
      echo "configure: error: '$cc' failed to compile conftest.c."
    else
      cc_name="$($CONFTEST compiler)"
@@ -84,8 +84,8 @@ index 0000000..b74be45
 +++ b/config-extra.mak
 @@ -0,0 +1,6 @@
 +NATIVE_DEFINES += -march=i486 -mcpu=i486
-+ROOT-i386 = @@BASE@@/root/stage1
-+CRT-i386  = @@BASE@@/root/stage1/lib
-+LIB-i386  = @@BASE@@/root/stage1/lib
-+INC-i386  = @@BASE@@/root/stage1/include
++ROOT-i386 = @@BASE@@/build/stage1
++CRT-i386  = @@BASE@@/build/stage1/lib
++LIB-i386  = @@BASE@@/build/stage1/lib
++INC-i386  = @@BASE@@/build/stage1/include
 +DEF-i386  += -D__linux__

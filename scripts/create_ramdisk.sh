@@ -22,7 +22,7 @@ RAMDISK="${BASE}"/ramdisk
 LOCAL="${BASE}"/local
 
 rm -rf "${BASE}/ramdisk"
-cp -R "${BASE}/root/stage1" "${BASE}/ramdisk"
+cp -R "${BASE}/build/stage1" "${BASE}/ramdisk"
 
 # remove cross-compilers
 # TODO: they should not be built in the first place

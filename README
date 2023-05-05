@@ -24,11 +24,12 @@ src/       contains all unpacked sources for building
 ../stage0  host toolchain building
 ../stage1  ramdisk first native build
 configs/   configurations used during building, e.g. suckless config.h files
-root/      the binary artifacts of each stage
+build/     the binary artifacts of each stage
 ../stage0
 ../stage1
 local/     local adaptions and configurations which go into the ramdisk
 ramdisk/   the ramdisk being later compressed to ramdisk.img
+root/      the root filesystem later being used via NBD or directly as image
 tests/     test programs to test sanity of stages
 
 patches

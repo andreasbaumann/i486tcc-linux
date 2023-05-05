@@ -1,6 +1,7 @@
-/root/
-/src/
-/ramdisk/
 /downloads/
+/src/
+/build/
+/root/
+/ramdisk/
 *~
 .*~

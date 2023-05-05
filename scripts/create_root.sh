@@ -18,6 +18,6 @@ set -e
 SCRIPT=$(readlink -f "$0")
 BASE=$(dirname ${SCRIPT})/..
 
-RAMDISK="${BASE}"/ramdisk
+ROOT="${BASE}"/root
 LOCAL="${BASE}"/local
 
