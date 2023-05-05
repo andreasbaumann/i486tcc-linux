@@ -21,152 +21,11 @@ BASE=$(dirname ${SCRIPT})/..
 CPUS=$(nproc)
 #CPUS=1
 
-LINUX_KERNEL_VERSION="6.3.1"
-TINYCC_VERSION="85b27"
-MUSL_VERSION="1.2.3"
-_OKSH_VERSION="7.2"
-SBASE_VERSION="191f7"
-UBASE_VERSION="3c887"
-SMDEV_VERSION="8d075"
-SINIT_VERSION="28c44"
-SDHCP_VERSION="8455f"
-UFLBBL_VERSION="d8680"
-LIBEVENT_VERSION="2.1.12-stable"
-VIS_VERSION="c9737"
-LIBTERMKEY_VERSION="0.22"
-NETBSD_NCURSES_VERSION="0.3.2"
-TMUX_VERSION="3.3a"
-ZLIB_VERSION="1.2.13"
-MANDOC_VERSION="1.14.6"
-ABASE_VERSION="8233c"
+. "${BASE}/configs/versions"
+
+${BASE}/scripts/download.sh
 
 echo "Building in base directory '$BASE'"
-
-# download sources
-
-if [ ! -f "${BASE}/downloads/tinycc-${TINYCC_VERSION}.tar.gz" ]; then
-	cd "${BASE}/downloads/"
-	git clone https://repo.or.cz/tinycc.git "tinycc-${TINYCC_VERSION}"
-	git -C "tinycc-${TINYCC_VERSION}" checkout "${TINYCC_VERSION}"
-	tar zcf "${BASE}/downloads/tinycc-${TINYCC_VERSION}.tar.gz" "tinycc-${TINYCC_VERSION}"
-	rm -rf "tinycc-${TINYCC_VERSION}"
-	cd ..
-fi
-
-if [ ! -f "${BASE}/downloads/musl-${MUSL_VERSION}.tar.gz" ]; then
-	wget -O "${BASE}/downloads/musl-${MUSL_VERSION}.tar.gz" "https://musl.libc.org/releases/musl-1.2.3.tar.gz"
-fi
-
-if [ ! -f "${BASE}/downloads/oksh-${_OKSH_VERSION}.tar.gz" ]; then
-	wget -O "${BASE}/downloads/oksh-${_OKSH_VERSION}.tar.gz" "https://github.com/ibara/oksh/releases/download/oksh-${_OKSH_VERSION}/oksh-${_OKSH_VERSION}.tar.gz"
-fi
-
-if [ ! -f "${BASE}/downloads/sbase-${SBASE_VERSION}.tar.gz" ]; then
-	cd "${BASE}/downloads/"
-	git clone git://git.suckless.org/sbase "sbase-${SBASE_VERSION}"
-	git -C "sbase-${SBASE_VERSION}" checkout "${SBASE_VERSION}"
-	tar zcf "${BASE}/downloads/sbase-${SBASE_VERSION}.tar.gz" "sbase-${SBASE_VERSION}"
-	rm -rf "sbase-${SBASE_VERSION}"
-	cd ..
-fi
-
-if [ ! -f "${BASE}/downloads/ubase-${UBASE_VERSION}.tar.gz" ]; then
-	cd "${BASE}/downloads/"
-	git clone git://git.suckless.org/ubase "ubase-${UBASE_VERSION}"
-	git -C "ubase-${UBASE_VERSION}" checkout "${UBASE_VERSION}"
-	tar zcf "${BASE}/downloads/ubase-${UBASE_VERSION}.tar.gz" "ubase-${UBASE_VERSION}"
-	rm -rf "ubase-${UBASE_VERSION}"
-	cd ..
-fi
-
-if [ ! -f "${BASE}/downloads/smdev-${SMDEV_VERSION}.tar.gz" ]; then
-	cd "${BASE}/downloads/"
-	git clone git://git.suckless.org/smdev "smdev-${SMDEV_VERSION}"
-	git -C "smdev-${SMDEV_VERSION}" checkout "${SMDEV_VERSION}"
-	tar zcf "${BASE}/downloads/smdev-${SMDEV_VERSION}.tar.gz" "smdev-${SMDEV_VERSION}"
-	rm -rf "smdev-${SMDEV_VERSION}"
-	cd ..
-fi
-
-if [ ! -f "${BASE}/downloads/sinit-${SINIT_VERSION}.tar.gz" ]; then
-	cd "${BASE}/downloads/"
-	git clone git://git.suckless.org/sinit "sinit-${SINIT_VERSION}"
-	git -C "sinit-${SINIT_VERSION}" checkout "${SINIT_VERSION}"
-	tar zcf "${BASE}/downloads/sinit-${SINIT_VERSION}.tar.gz" "sinit-${SINIT_VERSION}"
-	rm -rf "sinit-${SINIT_VERSION}"
-	cd ..
-fi
-
-if [ ! -f "${BASE}/downloads/sdhcp-${SDHCP_VERSION}.tar.gz" ]; then
-	cd "${BASE}/downloads/"
-	git clone git://git.2f30.org/sdhcp "sdhcp-${SDHCP_VERSION}"
-	git -C "sdhcp-${SDHCP_VERSION}" checkout "${SDHCP_VERSION}"
-	tar zcf "${BASE}/downloads/sdhcp-${SDHCP_VERSION}.tar.gz" "sdhcp-${SDHCP_VERSION}"
-	rm -rf "sdhcp-${SDHCP_VERSION}"
-	cd ..
-fi
-
-if [ ! -f "${BASE}/downloads/netbsd-curses-${NETBSD_NCURSES_VERSION}.tar.gz" ]; then
-	wget -O "${BASE}/downloads/netbsd-curses-${NETBSD_NCURSES_VERSION}.tar.gz" "https://github.com/sabotage-linux/netbsd-curses/archive/refs/tags/v${NETBSD_NCURSES_VERSION}.tar.gz"
-fi
-
-if [ ! -f "${BASE}/downloads/libtermkey-${LIBTERMKEY_VERSION}.tar.gz" ]; then
-	wget -O "${BASE}/downloads/libtermkey-${LIBTERMKEY_VERSION}.tar.gz" "https://www.leonerd.org.uk/code/libtermkey/libtermkey-${LIBTERMKEY_VERSION}.tar.gz"
-fi
-
-if [ ! -f "${BASE}/downloads/libevent-${LIBEVENT_VERSION}.tar.gz" ]; then
-	cd "${BASE}/downloads/"
-	wget "https://github.com/libevent/libevent/releases/download/release-${LIBEVENT_VERSION}/libevent-${LIBEVENT_VERSION}.tar.gz"
-	cd ..
-fi
-
-if [ ! -f "${BASE}/downloads/vis-${VIS_VERSION}.tar.gz" ]; then
-	cd "${BASE}/downloads/"
-	git clone https://github.com/martanne/vis.git "vis-${VIS_VERSION}"
-	git -C "vis-${VIS_VERSION}" checkout "${VIS_VERSION}"
-	tar zcf "${BASE}/downloads/vis-${VIS_VERSION}.tar.gz" "vis-${VIS_VERSION}"
-	rm -rf "vis-${VIS_VERSION}"
-	cd ..
-fi
-
-if [ ! -f "${BASE}/downloads/tmux-${TMUX_VERSION}.tar.gz" ]; then
-	wget -O "${BASE}/downloads/tmux-${TMUX_VERSION}.tar.gz" "https://github.com/tmux/tmux/releases/download/${TMUX_VERSION}/tmux-${TMUX_VERSION}.tar.gz"
-fi
-
-if [ ! -f "${BASE}/downloads/zlib-${ZLIB_VERSION}.tar.gz" ]; then
-	wget -O "${BASE}/downloads/zlib-${ZLIB_VERSION}.tar.gz" "https://zlib.net/zlib-${ZLIB_VERSION}.tar.gz"
-
-fi
-
-if [ ! -f "${BASE}/downloads/mandoc-${MANDOC_VERSION}.tar.gz" ]; then
-	wget -O "${BASE}/downloads/mandoc-${MANDOC_VERSION}.tar.gz" "https://mdocml.bsd.lv/snapshots/mandoc-${MANDOC_VERSION}.tar.gz"
-fi
-
-if [ ! -f "${BASE}/downloads/abase-${ABASE_VERSION}.tar.gz" ]; then
-	cd "${BASE}/downloads/"
-	git clone git://git.andreasbaumann.cc/abase.git "abase-${ABASE_VERSION}"
-	git -C "abase-${ABASE_VERSION}" checkout "${ABASE_VERSION}"
-	tar zcf "${BASE}/downloads/abase-${ABASE_VERSION}.tar.gz" "abase-${ABASE_VERSION}"
-	rm -rf "abase-${ABASE_VERSION}"
-	cd ..
-fi
-
-if [ ! -f "${BASE}/downloads/uflbbl-${UFLBBL_VERSION}.tar.gz" ]; then
-	cd "${BASE}/downloads/"
-	git clone git://git.andreasbaumann.cc/uflbbl.git "uflbbl-${UFLBBL_VERSION}"
-	git -C "uflbbl-${UFLBBL_VERSION}" checkout "${UFLBBL_VERSION}"
-	tar zcf "${BASE}/downloads/uflbbl-${UFLBBL_VERSION}.tar.gz" "uflbbl-${UFLBBL_VERSION}"
-	rm -rf "uflbbl-${UFLBBL_VERSION}"
-	cd ..
-fi
-
-# we cannot build the kernel with tcc (tccboot times are long gone), so
-# we build it with gcc. Luckily we don't need a cross-compiler for that,
-# we can just use the hosts gcc.
-
-if [ ! -f "${BASE}/downloads/linux-${LINUX_KERNEL_VERSION}.tar.gz" ]; then
-	wget -O "${BASE}/downloads/linux-${LINUX_KERNEL_VERSION}.tar.gz" "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-${LINUX_KERNEL_VERSION}.tar.gz"
-fi
 
 # stage 0
 #########
@@ -481,6 +340,25 @@ else
 	echo "stage1 abase exists"
 fi
 
+if [ ! -f "${BASE}/root/stage1/bin/nbd-client" ]; then
+	rm -rf "nbd-${NBD_VERSION}"
+	tar xf "${BASE}/downloads/nbd-${NBD_VERSION}.tar.gz"
+	cd "nbd-${NBD_VERSION}"
+	CC="${BASE}/root/stage1/bin/i386-tcc" \
+	./configure --prefix="${BASE}/root/stage1" \
+		--enable-static --disable-shared \
+		--without-gnutls --without-libnl
+	make -j$CPUS V=1 nbd-client
+	# libtool links wrongly dynamically with static archives?
+	${BASE}/root/stage1/bin/i386-tcc -static -g \
+		-DNOTLS -DPROG_NAME=\"nbd-client\" \
+		-o nbd-client nbd_client-nbd-client.o ./.libs/libcliserv.a ./.libs/libnbdclt.a
+	cp nbd-client "${BASE}/root/stage1/bin/."
+	cd ..
+else
+	echo "stage1 nbd-client exists"
+fi
+
 # TODO FROM HERE
 
 # TODO: have some way to deal with dependencies and with the user
@@ -555,6 +433,10 @@ fi
 #~ make install DESTDIR=/data/work/i486/root/stage1 PREFIX=/
 
 # END TODO
+
+# we cannot build the kernel with tcc (tccboot times are long gone), so
+# we build it with gcc. Luckily we don't need a cross-compiler for that
+# on x86_64, we can just use the hosts gcc.
 
 if [ ! -f "${BASE}/root/stage1/boot/bzImage" ]; then
 	echo "Building the Linux kernel.."

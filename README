@@ -18,6 +18,7 @@ directory layout
 ----------------
 
 scripts/   build scripts
+lib/       libraries for build scripts
 dowloads/  downloaded software (tarballs or git/svn/cvs checkouts)
 src/       contains all unpacked sources for building
 ../stage0  host toolchain building
