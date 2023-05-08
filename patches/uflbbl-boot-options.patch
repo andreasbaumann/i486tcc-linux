@@ -1,15 +1,6 @@
 diff -rauN uflbbl/src/boot.asm uflbbl-kernel-params-patch/src/boot.asm
 --- uflbbl/src/boot.asm	2023-05-05 18:48:22.000000000 +0200
 +++ uflbbl-kernel-params-patch/src/boot.asm	2023-05-07 19:51:21.735659678 +0200
-@@ -11,7 +11,7 @@
- 
- stage1:
- 
--; no interrupts, initializing segment registers and a real mode stack
-+; no interrupts,  segment registers and a real mode stack
- ; growing downwards from 0x7c00 where the stage 1 code and data lives
- 	cli
- 	cld
 @@ -1385,7 +1385,7 @@
  	dw 0
  

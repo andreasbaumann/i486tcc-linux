@@ -77,8 +77,10 @@ cp -dR "${LOCAL}"/bin/* "${ROOT}/bin"
 test -d "${ROOT}/etc" || mkdir "${ROOT}/etc"
 cp -dR "${LOCAL}"/etc/* "${ROOT}/etc"
 
-# copy ramdisk to /boot
+# copy ramdisk, boot loader and kernel to /boot
 cp ramdisk.img "${ROOT}/boot"
+cp "${BASE}/build/stage1/boot/bzImage" "${ROOT}/boot"
+cp "${BASE}/build/stage1/boot/boot.img" "${ROOT}/boot"
 
 # default passwd is SHA-256 or SHA-512 which can take a minute to verify
 # on old machines! We are using unsafe MD5 crypt1, beware of hacks!

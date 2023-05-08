@@ -21,57 +21,43 @@ BASE=$(dirname ${SCRIPT})/..
 RAMDISK="${BASE}"/ramdisk
 LOCAL="${BASE}"/local
 
-rm -rf "${BASE}/ramdisk"
-cp -R "${BASE}/build/stage1" "${BASE}/ramdisk"
+rm -rf "${RAMDISK}"
+mkdir "${RAMDISK}"
 
-# remove cross-compilers
-# TODO: they should not be built in the first place
-rm -f "${RAMDISK}"/bin/x86_64*tcc
-rm -f "${RAMDISK}"/bin/tcc
-rm -f "${RAMDISK}"/bin/arm*tcc
-rm -f "${RAMDISK}"/bin/c67*tcc
-rm -f "${RAMDISK}"/bin/riscv64*tcc
-rm -f "${RAMDISK}"/bin/*win32*tcc
-rm -rf "${RAMDISK}"/lib/tcc/x86_64*
-rm -rf "${RAMDISK}"/lib/tcc/arm*
-rm -rf "${RAMDISK}"/lib/tcc/riscv64*
-rm -rf "${RAMDISK}"/lib/tcc/win32
-rm -rf "${RAMDISK}"/lib/tcc/libtcc1.a
-rm -rf "${RAMDISK}"/lib/tcc/bt-*.o
-rm -rf "${RAMDISK}"/lib/tcc/bcheck.o
+# the ramdisk init script
+cp "${BASE}"/local/init "${RAMDISK}"
 
-# remove the kernel and the /boot directory
-rm -rf "${RAMDISK}"/boot
-
-# remove some unneeded development stuff
-rm -rf "${RAMDISK}"/lib/pkgconfig
-
-# no HTML or info documentation
-rm -rf "${RAMDISK}"/share/info
-rm -rf "${RAMDISK}"/share/doc
+# the kernel modules
+mkdir "${RAMDISK}/lib"
+cp -R "${BASE}/build/stage1/lib/modules" "${RAMDISK}/lib"
 
 # make sure mount points exist
 test -d "${RAMDISK}"/dev || mkdir "${RAMDISK}"/dev
 test -d "${RAMDISK}"/dev/pts || mkdir "${RAMDISK}"/dev/pts
 test -d "${RAMDISK}"/proc || mkdir "${RAMDISK}"/proc
 test -d "${RAMDISK}"/sys || mkdir "${RAMDISK}"/sys
-test -d "${RAMDISK}"/tmp || mkdir "${RAMDISK}"/tmp
-test -d "${RAMDISK}"/var || mkdir "${RAMDISK}"/var
-test -d "${RAMDISK}"/var/run || mkdir "${RAMDISK}"/var/run
+#~ test -d "${RAMDISK}"/tmp || mkdir "${RAMDISK}"/tmp
+#~ test -d "${RAMDISK}"/var || mkdir "${RAMDISK}"/var
+#~ test -d "${RAMDISK}"/var/run || mkdir "${RAMDISK}"/var/run
 
-# copy locally adapted scripts
-test -d "${RAMDISK}/root" || mkdir "${RAMDISK}/root"
-cp "${LOCAL}"/root/.profile "${RAMDISK}/root"
+# just copy the stuff needed by '/init'
 test -d "${RAMDISK}/bin" || mkdir "${RAMDISK}/bin"
-cp -dR "${LOCAL}"/bin/* "${RAMDISK}/bin"
-test -d "${RAMDISK}/etc" || mkdir "${RAMDISK}/etc"
-cp -dR "${LOCAL}"/etc/* "${RAMDISK}/etc"
-cp -dR "${LOCAL}"/init "${RAMDISK}/."
+cp -dR "${BASE}/build/stage1"/bin/oksh "${RAMDISK}/bin"
+cp -dR "${BASE}/build/stage1"/bin/sh "${RAMDISK}/bin"
+cp -dR "${BASE}/build/stage1"/bin/ubase-box "${RAMDISK}/bin"
+cp -dR "${BASE}/build/stage1"/bin/mount "${RAMDISK}/bin"
+cp -dR "${BASE}/build/stage1"/bin/insmod "${RAMDISK}/bin"
+cp -dR "${BASE}/build/stage1"/bin/switch_root "${RAMDISK}/bin"
+cp -dR "${BASE}/build/stage1"/bin/sbase-box "${RAMDISK}/bin"
+cp -dR "${BASE}/build/stage1"/bin/mkdir "${RAMDISK}/bin"
+cp -dR "${BASE}/build/stage1"/bin/sdhcp "${RAMDISK}/bin"
+cp -dR "${BASE}/build/stage1"/bin/abase-box "${RAMDISK}/bin"
+cp -dR "${BASE}/build/stage1"/bin/ifconfig "${RAMDISK}/bin"
+cp -dR "${BASE}/build/stage1"/bin/nbd-client "${RAMDISK}/bin"
 
-# default passwd is SHA-256 or SHA-512 which can take a minute to verify
-# on old machines! We are using unsafe MD5 crypt1, beware of hacks!
-HASH=$(openssl passwd -1 -salt '5RPVAd' 'xx')
-echo "root:${HASH}:17718::::::" >"${RAMDISK}/etc/shadow"
+# mount calls setmntent which want to write to '/etc/fstab'?
+test -d "${RAMDISK}/etc" || mkdir "${RAMDISK}/etc"
+cp "${BASE}/local"/etc/fstab "${RAMDISK}/etc"
 
 # package ramdisk directory with cpio and compress it with xz
 cd "${RAMDISK}"

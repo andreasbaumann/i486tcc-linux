@@ -306,6 +306,12 @@ bugs
   - tons of tools which are not really binary seed 
     (they are just used to produce binaries)
 - can we use ccache and distcc with tcc?
+- nbd-client gets killed before calling killall5, we cannot mark it
+  to be started by 'init' presumably (as systemd does), we can also not
+  umount it otherwise we don't have killall5. There is the option of
+  having a shutdown ramdisk (as others do)..
+- qemu: Slirp: Failed to send packet, ret: -1
+  => seems to be a qemu network thingy..
 
 missing things
 --------------
