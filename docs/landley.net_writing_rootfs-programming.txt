@@ -1,0 +1,169 @@
+Programming for Initramfs.
+
+  By: Rob Landley
+
+   In the previous two articles, we covered the advantages of initramfs
+   and the various ways to package a root filesystem into initramfs. This
+   article gives some tips on creating root filesystems that take
+   advantage of initramfs.
+
+   Creating a root filesystem for Linux is a bigger topic than one article
+   can hope to cover, and this is obviously not the only way to do it. (If
+   you've never created a root filesystem for Linux before, there are
+   several [1]existing documents to help you get started.) An initramfs is
+   just a small self-contained root filesystem for Linux, often just a
+   temporary one that hands off control after performing a few specific
+   tasks.
+
+   The two main ways to create small filesystems are to start from scratch
+   and add just what you need, or to start with a large working system and
+   trim it down. This article picks a bit from both camps.
+
+Put some executables to your new root filesystem.
+
+   Last time we packaged a statically linked hello world program. Most
+   real programs are dynamically linked, and won't run without their
+   shared libraries. The ldd command can list a program's shared
+   libraries, but since shared libraries can require other shared
+   libraries, identifying all needed libraries can be time consuming.
+
+   If you can get a large system working, you can use the following shell
+   script to copy all the executables listed on the command line, and all
+   the shared libraries they link to, into a new directory. Then you can
+   chroot into that directory to make sure they run.[2][1]
+#!/bin/sh
+
+function mkchroot
+{
+  [ $# -lt 2 ] && return
+
+  dest=$1
+  shift
+  for i in "$@"
+  do
+    # Get an absolute path for the file
+    [ "${i:0:1}" == "/" ] || i=$(which $i)
+    # Skip files that already exist at target.
+    [ -f "$dest/$i" ] && continue
+    if [ -e "$i" ]
+    then
+      # Create destination path
+      d=`echo "$i" | grep -o '.*/'` &&
+      mkdir -p "$dest/$d" &&
+      # Copy file
+      cat "$i" > "$dest/$i" &&
+      chmod +x "$dest/$i"
+    else
+      echo "Not found: $i"
+    fi
+    # Recursively copy shared libraries' shared libraries.
+    mkchroot "$dest" $(ldd "$i" | egrep -o '/.* ')
+  done
+}
+
+mkchroot "$@"
+
+   Its first argument is the new directory, and the rest of its arguments
+   are executables to copy. You can try it out like so:
+  mkchroot subdir /bin/sh /bin/ls
+  sudo chroot subdir /bin/sh
+  ls -l
+  exit
+
+Populate /dev with mdev.
+
+   In addition to executables to run, even a minimal root filesystem needs
+   device nodes. The /dev directory contains special files that allow
+   programs to talk to the hardware.[3][2]
+
+   The mdev program in busybox 1.1.2 uses the sysfs filesystem in the 2.6
+   kernel to autodetect the available hardware, and create the appropriate
+   device nodes. Like a very small and simple version of "udev", it reads
+   from /sys and writes to /dev, and you can use it from your init scripts
+   like this:
+  mkdir /sys /dev
+  mount -t sysfs /sys /sys
+  mount -t tmpfs /dev /dev  # optional step
+  mdev -s
+
+   If you'd like hotplug support, you can tell the kernel to run mdev to
+   create or delete a device node very time it receives a hotplug event:
+  echo /sbin/mdev > /proc/sys/kernel/hotplug
+
+   By default, mdev creates each device node owned by root, with
+   permissions 660. If you'd like to specify different permissions, you
+   can create an optional /etc/mdev.conf file containing lines like this:
+  console   0:0  777
+  tty.*     0:0  660
+  hda[0-3]  0:3  644
+
+   Each line of mdev.conf starts with a regular expression specifying
+   which device nodes to match, followed by the numeric uid:gid the
+   device(s) should belong to, and then octal file permissions.
+
+Switching from rootfs to another root filesystem
+
+   A common use of initramfs is to find and mount another root filesystem.
+   Since rootfs can't be unmounted, the way to switch to a different root
+   filesystem is with switch_root command. This command is available in
+   current versions of busybox, in several distributions' boot utility
+   packages, and as the "run-init" command the klibc package on
+   kernel.org.
+
+   What switch_root does is delete all the files out of rootfs (to free up
+   the memory) and then chroot into a new filesystem and exec a new init
+   process out of the new filesystem.
+
+   The following shell script fragment demonstrates how to use
+   switch_root:
+  # First, find and mount the new filesystem.
+
+  mkdir /newroot
+  mount /dev/whatever /newroot
+
+  # Unmount everything else you've attached to rootfs.  (Moving the filesystems
+  # into newroot is something useful to do with them.)
+
+  mount --move /sys /newroot/sys
+  mount --move /proc /newroot/proc
+  mount --move /dev /newroot/dev
+
+  # Now switch to the new filesystem, and run /sbin/init out of it.  Don't
+  # forget the "exec" here, because you want the new init program to inherit
+  # PID 1.
+
+  exec switch_root /newroot /sbin/init
+
+If all else fails, rdinit=/bin/sh
+
+   The kernel command line option "rdinit" tells the kernel to run a
+   program other than /init out of initramfs. For example,
+   "rdinit=/bin/sh" runs a command shell if you have one in there. If your
+   initramfs isn't doing what you expect, try running a command shell to
+   see what's up.
+     __________________________________________________________________
+
+   Footnote 1: This technique is just a start. It won't find required
+   configuration files, paths and environment variables, device nodes,
+   required empty directories like /tmp, and it won't find libraries
+   accessed via dlopen() (such as glibc's libnss files). But BusyBox and
+   uClibc don't have many external dependencies, and you can debug by
+   comparing the larger working system to see what else is missing. If all
+   else fails, the "strace" utility can give you an idea what's wrong. But
+   in general, Busybox and uClibc have a minimum of external dependencies,
+   and shouldn't give you too many surprises.
+
+   A truly minimal system can often do without seemingly vital files like
+   /etc/passwd. If you never need any users other than root, and never
+   have look up a user's name or password, it just doesn't come up. That
+   sort of thing can go in the final filesystem.
+
+   Footnote 2: The 2.6.16 kernel will automatically open a default console
+   for init, using the "console=" kernel command line option, even if the
+   /dev directory in initramfs hasn't got the requested device node.
+
+References
+
+   1. http://www.busybox.net/FAQ.html#build_system
+   2. https://landley.net/writing/rootfs-programming.html#footnote1
+   3. https://landley.net/writing/rootfs-programming.html#footnote2

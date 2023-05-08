@@ -205,7 +205,16 @@ The starting point of the Linux kernel configuration is 'make tinyconfig'.
   
 - CONFIG_VGA_ARB
   => might be needed for PCI not to choke on VGA cards
+
+- CONFIG_BLK_DEV_FD=m
+  => we might want to use floppies for confugration or files
   
+- CONFIG_BLK_DEV_NBD=m
+  => NBD support for root filesystem on network block device
+
+- CONFIG_EXT4_FS=m, CONFIG_EXT4_USE_FOR_EXT2=y
+  => mount ext4 filesystems (for instance the root.img)
+
 TODO FROM HERE:
 
 TODO: preemption better for 1 CPU systems, Desktop?
@@ -514,6 +523,8 @@ links
   - ramdisks
     - https://people.freedesktop.org/~narmstrong/meson_drm_doc/admin-guide/initrd.html
     - https://firasuke.github.io/DOTSLASHLINUX/post/booting-the-linux-kernel-without-an-initrd-initramfs/
+    - https://docs.kernel.org/admin-guide/initrd.html
+    - https://landley.net/writing/rootfs-programming.html
   - device management
     - https://git.suckless.org/smdev
   - init systems

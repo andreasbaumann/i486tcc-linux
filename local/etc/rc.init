@@ -10,7 +10,7 @@ mount -n -t devtmpfs -o mode=0755,nosuid udev /dev
 mkdir -p /dev/pts
 mount -n -t devpts -o mode=0620,gid=5,nosuid,noexec devpts /dev/pts
 
-echo "Mounting registerd filesystems.."
+echo "Mounting registered filesystems.."
 mount -a
 
 echo "Starting login sessions.."
@@ -19,4 +19,4 @@ respawn getty /dev/tty2 &
 respawn getty /dev/tty3 &
 respawn getty /dev/tty4 &
 
-echo "Done."
+echo "Ready."

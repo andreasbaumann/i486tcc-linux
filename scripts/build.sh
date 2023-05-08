@@ -41,7 +41,7 @@ if [ ! -x "${BASE}/build/stage0/bin/i386-tcc" ]; then
 	rm -rf "tinycc-${TINYCC_VERSION}"
 	tar xf "${BASE}/downloads/tinycc-${TINYCC_VERSION}.tar.gz"
 	cd "tinycc-${TINYCC_VERSION}"
-	patch -Np1 < "../../../patches/tcc-asm.patch"
+	patch -Np1 < "${BASE}/patches/tcc-asm.patch"
 	./configure --enable-static --prefix="${BASE}/build/stage0" \
 		--config-musl --enable-cross
 	make -j$CPUS
@@ -58,7 +58,7 @@ if [ ! -f "${BASE}/build/stage0/lib/libc.a" ]; then
 	rm -rf "musl-${MUSL_VERSION}"
 	tar xf "${BASE}/downloads/musl-${MUSL_VERSION}.tar.gz"
 	cd "musl-${MUSL_VERSION}"
-	patch -Np1 < "../../../patches/musl-1.2.3-tcc.patch"
+	patch -Np1 < "${BASE}/patches/musl-1.2.3-tcc.patch"
 	CC="${BASE}/build/stage0/bin/i386-tcc" ./configure \
 		--prefix="${BASE}/build/stage0" \
 		--target=i386-linux-musl --disable-shared
@@ -78,8 +78,8 @@ if [ ! -x "${BASE}/build/stage1/bin/i386-tcc" ]; then
 	rm -rf "tinycc-${TINYCC_VERSION}"
 	tar xf "${BASE}/downloads/tinycc-${TINYCC_VERSION}.tar.gz"
 	cd "tinycc-${TINYCC_VERSION}"
-	patch -Np1 < "../../../patches/tcc-asm.patch"
-	patch -Np1 < "../../../patches/tcc-stage1.patch"
+	patch -Np1 < "${BASE}/patches/tcc-asm.patch"
+	patch -Np1 < "${BASE}/patches/tcc-stage1.patch"
 	sed -i "s|@@BASE@@|${BASE}|g" Makefile configure config-extra.mak
 	sed -i "s|@@TINYCC_VERSION@@|${TINYCC_VERSION}|g" Makefile configure config-extra.mak
 	./configure --enable-static --prefix="${BASE}/build/stage1" \
@@ -102,7 +102,7 @@ if [ ! -f "${BASE}/build/stage1/lib/libc.a" ]; then
 	rm -rf "musl-${MUSL_VERSION}"
 	tar xf "${BASE}/downloads/musl-${MUSL_VERSION}.tar.gz"
 	cd "musl-${MUSL_VERSION}"
-	patch -Np1 < "../../../patches/musl-1.2.3-tcc.patch"
+	patch -Np1 < "${BASE}/patches/musl-1.2.3-tcc.patch"
 	CC="${BASE}/build/stage1/bin/i386-tcc" ARCH=i386 \
 	./configure \
 		--prefix="${BASE}/build/stage1" \
@@ -171,7 +171,7 @@ if [ ! -x "${BASE}/build/stage1/bin/ubase-box" ]; then
 	rm -rf "ubase-${UBASE_VERSION}"
 	tar xf "${BASE}/downloads/ubase-${UBASE_VERSION}.tar.gz"
 	cd "ubase-${UBASE_VERSION}"
-	patch -Np1 < "../../../patches/ubase-sysmacros.patch"
+	patch -Np1 < "${BASE}/patches/ubase-sysmacros.patch"
 	make -j$CPUS ubase-box CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS=-static
 	make -j$CPUS ubase-box-install PREFIX="${BASE}/build/stage1"
 	cd ..
@@ -183,7 +183,7 @@ if [ ! -x "${BASE}/build/stage1/bin/smdev" ]; then
 	rm -rf "smdev-${SMDEV_VERSION}"
 	tar xf "${BASE}/downloads/smdev-${SMDEV_VERSION}.tar.gz"
 	cd "smdev-${SMDEV_VERSION}"
-	patch -Np1 < "../../../patches/smdev-sysmacros.patch"
+	patch -Np1 < "${BASE}/patches/smdev-sysmacros.patch"
 	make -j$CPUS CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS=-static
 	make -j$CPUS install PREFIX="${BASE}/build/stage1"
 	cd ..
@@ -221,7 +221,7 @@ if [ ! -f "${BASE}/build/stage1/lib/libncurses.a" ]; then
 	rm -rf "netbsd-curses-${NETBSD_NCURSES_VERSION}"
 	tar xf "${BASE}/downloads/netbsd-curses-${NETBSD_NCURSES_VERSION}.tar.gz"
 	cd "netbsd-curses-${NETBSD_NCURSES_VERSION}"
-	patch -Np1 < "../../../patches/netbsd-curses-attributes.patch"
+	patch -Np1 < "${BASE}/patches/netbsd-curses-attributes.patch"
 	CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS='-static' make -j$CPUS all-static
 	CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS='-static' make -j$CPUS install-static \
 		PREFIX="${BASE}/build/stage1"
@@ -265,7 +265,7 @@ if [ ! -x "${BASE}/build/stage1/bin/vi" ]; then
 	rm -rf "vis-${VIS_VERSION}"
 	tar xf "${BASE}/downloads/vis-${VIS_VERSION}.tar.gz"
 	cd "vis-${VIS_VERSION}"
-	patch -Np1 < "../../../patches/vis-no-pkgconfig-for-ncurses.patch"
+	patch -Np1 < "${BASE}/patches/vis-no-pkgconfig-for-ncurses.patch"
 	LDFLAGS=-L"${BASE}/build/stage1/lib" \
 	CFLAGS=-I"${BASE}/build/stage1/include" \
 	CC="${BASE}/build/stage1/bin/i386-tcc"  \
@@ -463,7 +463,9 @@ fi
 if [ ! -f "${BASE}/build/stage1/boot/boot.img" ]; then
 	rm -rf "uflbbl-${UFLBBL_VERSION}"
 	tar xf "${BASE}/downloads/uflbbl-${UFLBBL_VERSION}.tar.gz"
-	cd "uflbbl-${UFLBBL_VERSION}/src"
+	cd "uflbbl-${UFLBBL_VERSION}"
+	patch -Np1 < "${BASE}/patches/uflbbl-boot-options.patch"
+	cd src
 	nasm -o boot.img boot.asm
 	cp boot.img "${BASE}/build/stage1/boot/boot.img"
 	cd ../..

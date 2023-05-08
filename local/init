@@ -1,0 +1,36 @@
+#!/bin/oksh
+
+echo "Starting in ramdisk.."
+
+echo "Mounting pseudo-filesystems.."
+mkdir -p /proc /sys
+mount -n -t proc -o nosuid,noexec,nodev proc /proc
+mount -n -t sysfs -o nosuid,noexec,nodev,ro sys /sys
+mount -n -t devtmpfs -o mode=0755,nosuid udev /dev
+mkdir -p /dev/pts
+mount -n -t devpts -o mode=0620,gid=5,nosuid,noexec devpts /dev/pts
+
+echo "Starting network via DHCP.."
+# TODO: replace modprobe with samurai script
+#modprobe ne io=0x300
+insmod /lib/modules/drivers/net/ethernet/8390/8390p.ko
+insmod /lib/modules/drivers/net/ethernet/8390/ne.ko io=0x300
+ifconfig eth0 up
+sdhcp
+
+echo "Loading root filesystem.."
+insmod /lib/modules/crypto/crypto.ko
+insmod /lib/modules/crypto/crypto_algapi.ko
+insmod /lib/modules/crypto/crypto_hash.ko
+insmod lib/modules/fs/jbd2/jbd2.ko
+insmod /lib/modules/fs/mbcache.ko
+insmod /lib/modules/lib/crc16.ko
+insmod /lib/modules/crypto/crc32c_generic.ko
+insmod /lib/modules/fs/ext4/ext4.ko
+insmod /lib/modules/drivers/block/nbd.ko
+nbd-client -N ROOT 10.0.0.2 /dev/nbd0
+mkdir /newroot
+mount -t ext4 /dev/nbd0 /newroot
+
+echo "Mounting new root.."
+exec switch_root /newroot /bin/sinit

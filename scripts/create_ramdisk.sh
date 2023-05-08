@@ -66,6 +66,7 @@ test -d "${RAMDISK}/bin" || mkdir "${RAMDISK}/bin"
 cp -dR "${LOCAL}"/bin/* "${RAMDISK}/bin"
 test -d "${RAMDISK}/etc" || mkdir "${RAMDISK}/etc"
 cp -dR "${LOCAL}"/etc/* "${RAMDISK}/etc"
+cp -dR "${LOCAL}"/init "${RAMDISK}/."
 
 # default passwd is SHA-256 or SHA-512 which can take a minute to verify
 # on old machines! We are using unsafe MD5 crypt1, beware of hacks!
