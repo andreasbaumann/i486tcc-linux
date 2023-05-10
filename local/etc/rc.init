@@ -2,10 +2,9 @@
 
 echo "Starting.."
 
+# TODO: unmount old root, free ramdisk
+
 echo "Mounting pseudo-filesystems.."
-mount -n -t proc -o nosuid,noexec,nodev proc /proc
-mount -n -t sysfs -o nosuid,noexec,nodev,ro sys /sys
-mount -n -t devtmpfs -o mode=0755,nosuid udev /dev
 mkdir /dev/pts
 mount -n -t devpts -o mode=0620,gid=5,nosuid,noexec devpts /dev/pts
 

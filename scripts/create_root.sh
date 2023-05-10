@@ -68,6 +68,7 @@ test -d "${ROOT}"/sys || mkdir "${ROOT}"/sys
 test -d "${ROOT}"/tmp || mkdir "${ROOT}"/tmp
 test -d "${ROOT}"/var || mkdir "${ROOT}"/var
 test -d "${ROOT}"/var/run || mkdir "${ROOT}"/var/run
+test -d "${ROOT}"/mnt || mkdir "${ROOT}"/mnt
 
 # copy locally adapted scripts
 test -d "${ROOT}/root" || mkdir "${ROOT}/root"

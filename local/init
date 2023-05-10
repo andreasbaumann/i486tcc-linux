@@ -1,4 +1,4 @@
-#!/bin/oksh -x
+#!/bin/oksh
 
 echo "Starting in ramdisk.."
 
@@ -26,14 +26,17 @@ insmod /lib/modules/crypto/crc32c_generic.ko
 insmod /lib/modules/fs/ext4/ext4.ko
 insmod /lib/modules/drivers/block/nbd.ko
 nbd-client -N ROOT 10.0.0.2 /dev/nbd0
-mkdir /newroot
-mount -t ext4 /dev/nbd0 /newroot
+mkdir /mnt
+mount -t ext4 /dev/nbd0 /mnt
 
 echo "Loading additional modules.."
 insmod /lib/modules/net/unix/unix.ko
 
 echo "Mounting new root.."
-exec switch_root /newroot /bin/sinit
+mount -M /proc /mnt/proc
+mount -M /sys /mnt/sys
+mount -M /dev /mnt/dev
+exec switch_root -c /dev/console /mnt /bin/sinit
 
 echo "Failed to mount NBD root..falling back to shell.."
 exec /bin/sh

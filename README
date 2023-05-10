@@ -312,7 +312,9 @@ bugs
   having a shutdown ramdisk (as others do)..
 - qemu: Slirp: Failed to send packet, ret: -1
   => seems to be a qemu network thingy..
-
+- vis sometimes looses first line of text or shows strange artefacts
+  when exiting it
+  
 missing things
 --------------
 
