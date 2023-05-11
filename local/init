@@ -19,7 +19,7 @@ echo "Loading root filesystem.."
 insmod /lib/modules/crypto/crypto.ko
 insmod /lib/modules/crypto/crypto_algapi.ko
 insmod /lib/modules/crypto/crypto_hash.ko
-insmod lib/modules/fs/jbd2/jbd2.ko
+insmod /lib/modules/fs/jbd2/jbd2.ko
 insmod /lib/modules/fs/mbcache.ko
 insmod /lib/modules/lib/crc16.ko
 insmod /lib/modules/crypto/crc32c_generic.ko

@@ -215,6 +215,15 @@ The starting point of the Linux kernel configuration is 'make tinyconfig'.
 - CONFIG_EXT4_FS=m, CONFIG_EXT4_USE_FOR_EXT2=y
   => mount ext4 filesystems (for instance the root.img)
 
+Debugging:
+
+- CONFIG_KALLSYMS=y
+  CONFIG_KGDB=y
+  CONFIG_UNWINDER_FRAME_POINTER=y
+  CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
+  CONFIG_FRAME_POINTER=y
+  CONFIG_UNWINDER_FRAME_POINTER=y
+
 TODO FROM HERE:
 
 TODO: preemption better for 1 CPU systems, Desktop?
@@ -314,7 +323,9 @@ bugs
   => seems to be a qemu network thingy..
 - vis sometimes looses first line of text or shows strange artefacts
   when exiting it
-  
+- If building on x86_64, you need lib32 glibc and gcc-libs for tcc
+  to link a standalone version between stage0 and stage1
+    
 missing things
 --------------
 
@@ -573,8 +584,8 @@ links
   - https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/
 - nbd
   - https://patchwork.kernel.org/project/linux-block/patch_20190612163144.18486-2/roman.stratiienko@globallogic.com/
-- ping
-  - https://www.geeksforgeeks.org/ping-in-c.txt
+- debugging
+  - https://www.kernel.org/doc/html/v4.15/dev-tools/kgdb.html
 
 Real hardware
 -------------
