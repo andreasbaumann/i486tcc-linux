@@ -359,6 +359,18 @@ else
 	echo "stage1 nbd-client exists"
 fi
 
+if [ ! -f "${BASE}/build/stage1/bin/samu" ]; then
+	rm -rf "samurai-${SAMURAI_VERSION}"
+	tar xf "${BASE}/downloads/samurai-${SAMURAI_VERSION}.tar.gz"
+	cd "samurai-${SAMURAI_VERSION}"
+	CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS=-static \
+	make -j$CPUS samu
+	make -j$CPUS install DESTDIR="${BASE}/build/stage1" PREFIX=/
+	cd ..
+else
+	echo "stage1 samurai exists"
+fi
+
 # TODO FROM HERE
 
 # TODO: have some way to deal with dependencies and with the user
@@ -403,16 +415,10 @@ fi
 #~ make CC=/data/work/i486/build/stage1/bin/i386-tcc LDFLAGS="-static ../lasagna/libasagna.a"
 #~ make install
 
-
-
 #~ cd ../strace
 #~ CC=/data/work/i486/build/stage1/bin/i386-tcc ./configure --prefix=/data/work/i486/build/stage1 --enable-mpers=no --disable-dependency-tracking
 #~ make
 #~ # TODO: rtnl_link.c:968: error: Unexpected size of ivg.ivg_64(16 expected)
-
-#~ cd ../samurai
-#~ make CC=/data/work/i486/build/stage1/bin/i386-tcc LDFLAGS=-static
-#~ make install PREFIX=/data/work/i486/build/stage1
 
 #~ cd ../editline
 #~ ./autogen.sh
@@ -424,7 +430,6 @@ fi
 #~ make linux CC=/data/work/i486/build/stage1/bin/i386-tcc \
 	#~ MYLDFLAGS=-static AR='/data/work/i486/build/stage0/bin/i386-tcc -ar' RANLIB=echo
 #~ make install INSTALL_TOP=/data/work/i486/build/stage1
-
 
 #~ cd ../iproute2
 #~ PKG_CONFIG=false CC=/data/work/i486/build/stage1/bin/i386-tcc \

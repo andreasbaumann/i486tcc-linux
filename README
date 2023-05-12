@@ -423,7 +423,13 @@ oasis
 -----
 
 statically linked, the Lua build thing is weird.
-he also rewrote ninja as samurai in C (which is nice).
+He also rewrote ninja as samurai in C (which is nice).
+Also with QBE and cproc the user land can be built with a small C
+compiler. QBE is currently lacking IA-32 support, so we can not just
+rebuild oasis for our purpose (though we could write a IA-32 QBE
+code generator).
+The idea of using git for installation feels strange to me.
+Also lua scripting for all this software introduces high maintaince costs.
 
 the package list was more or less an inspiration for our list of packages:
 
@@ -435,6 +441,7 @@ sdhcp instead of dhclient or dhcpcd
 vis instead of vim or emacs
 netbsd-curses instead of ncurses
 mandoc instead of man-db
+samurai instead of ninja
 
 those packages we are still considering:
 
@@ -443,7 +450,6 @@ bearssl instead of openssl
 byacc instead of bison
 perp and sinit instead of sysvinit or systemd
 netsurf instead of chromium or firefox
-samurai instead of ninja
 velox instead of Xorg
 
 morpheus
