@@ -36,9 +36,10 @@ test -d "${RAMDISK}"/dev || mkdir "${RAMDISK}"/dev
 test -d "${RAMDISK}"/dev/pts || mkdir "${RAMDISK}"/dev/pts
 test -d "${RAMDISK}"/proc || mkdir "${RAMDISK}"/proc
 test -d "${RAMDISK}"/sys || mkdir "${RAMDISK}"/sys
-#~ test -d "${RAMDISK}"/tmp || mkdir "${RAMDISK}"/tmp
-#~ test -d "${RAMDISK}"/var || mkdir "${RAMDISK}"/var
-#~ test -d "${RAMDISK}"/var/run || mkdir "${RAMDISK}"/var/run
+test -d "${RAMDISK}"/tmp || mkdir "${RAMDISK}"/tmp
+test -d "${RAMDISK}"/var || mkdir "${RAMDISK}"/var
+test -d "${RAMDISK}"/var/run || mkdir "${RAMDISK}"/var/run
+test -d "${RAMDISK}"/mnt || mkdir "${RAMDISK}"/mnt
 
 # just copy the stuff needed by '/init'
 test -d "${RAMDISK}/bin" || mkdir "${RAMDISK}/bin"

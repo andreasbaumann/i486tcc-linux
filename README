@@ -183,7 +183,7 @@ The starting point of the Linux kernel configuration is 'make tinyconfig'.
   "mount: mount: devpts: No such device"
 
 - CONFIG_COMPAT_32BIT_TIME
-  - for 32-bit time parameter as in pselect (this of course maked the
+  - for 32-bit time parameter as in pselect (this of course made the
     whole thing non-2038-safe)
     "vis: mainloop function not implemented", needs 'pselect'
 
@@ -224,6 +224,13 @@ Debugging:
   CONFIG_FRAME_POINTER=y
   CONFIG_UNWINDER_FRAME_POINTER=y
 
+Memory optimization:
+
+- CONFIG_PHYSICAL_START=0x1000000 16M
+  CONFIG_PHYSICAL_ALIGN=0x2000 8K
+  CONFIG_RELOCATABLE=n
+  boot.asm: set ramdisk and linux addresses correctly
+  
 TODO FROM HERE:
 
 TODO: preemption better for 1 CPU systems, Desktop?
@@ -283,8 +290,6 @@ bugs
   again and a stage2 probably, as it has to run inside the chroot and eventually
   even inside a qemu emulation).
 - currently we bundle too many things in the initial ramdisk:
-  - man pages
-  - a full tcc compiler with musl/system header files and libraries
   - all kernel modules (instead of just the essential or/and the ones
     fitting to the hardware)
 - kernel modules should remain uncompressed when added to the ramdisk and
@@ -325,7 +330,23 @@ bugs
   when exiting it
 - If building on x86_64, you need lib32 glibc and gcc-libs for tcc
   to link a standalone version between stage0 and stage1
-    
+- does the ramdisk get correctly unmounted? I see a /mnt busy message
+  when doing the switch_root
+- man pages are not compressed on the root partition, mandoc can deal
+  with compressed pages (as it requires zlib)
+- low memory support
+  low ram: 0 - 011e0000
+  -> 011E0000 = 18MB
+  RAMDISK: [mem 0x00580000-0x0062bfff]
+  62BFFF-580000 704511
+  -> ramdisk.img is 704152 compressed, where does it get unpacked to
+  Memory: 12984K/17912K available (1990K kernel code, 446K rwdata, 532K rodata, 204K init, 148K bss, 4928K reserved, 0K cma-reserved)
+  -> roughly 6 MB of kernel space
+  Unpacking initramfs...
+  -> right, where to, or does it live in the cache only?
+  Freeing initrd memory: 688K
+  -> is this our ramdisk? we didn't to switch_root yet
+  
 missing things
 --------------
 
@@ -546,6 +567,7 @@ links
     - https://z49x2vmq.github.io/2020/12/24/linux-tiny-qemu/
 - Boot process
   - ramdisks
+    - https://linuxlink.timesys.com/docs/startup_overview
     - https://people.freedesktop.org/~narmstrong/meson_drm_doc/admin-guide/initrd.html
     - https://firasuke.github.io/DOTSLASHLINUX/post/booting-the-linux-kernel-without-an-initrd-initramfs/
     - https://docs.kernel.org/admin-guide/initrd.html

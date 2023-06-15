@@ -1,12 +1,26 @@
-diff -rauN uflbbl/src/boot.asm uflbbl-kernel-params-patch/src/boot.asm
---- uflbbl/src/boot.asm	2023-05-05 18:48:22.000000000 +0200
-+++ uflbbl-kernel-params-patch/src/boot.asm	2023-05-07 19:51:21.735659678 +0200
+diff -rauN a/src/boot.asm b/src/boot.asm
+--- a/src/boot.asm	2023-05-05 18:48:22.000000000 +0200
++++ b/src/boot.asm	2023-05-19 15:44:17.984926907 +0200
+@@ -468,10 +468,10 @@
+ 	mov [READ_STATE], byte STATE_READ_INITRD
+ ; qemu initrd start location 7fab000, 133869568 (this is 128MB) too high for us,
+ ; kernel gives us alignment hints and hints where to load initrd to?
+-; let's use 8MB, TODO: does the kernel release the initial ramdisk? I think so. is
++; let's use 6MB, TODO: does the kernel release the initial ramdisk? I think so. is
+ ; it relocating it's structures? or do we get fragmented heap and stuff?
+-	a32 mov [READ_DESTINATION_PTR], dword 0x00800000
+-	a32 mov [INITRD_ADDRESS], dword 0x00800000
++	a32 mov [READ_DESTINATION_PTR], dword 0x00580000
++	a32 mov [INITRD_ADDRESS], dword 0x00580000
+ 	a32 mov eax, [READ_DATA_SIZE]
+ 	a32 mov [INITRD_SIZE], eax
+ 	mov al, '!'
 @@ -1385,7 +1385,7 @@
  	dw 0
  
  KERNEL_CMD_LINE:
 -	db "debug loglevel=7 earlycon=uart8250,io,0x3f8,9600n8 console=tty0 console=ttyS0,9600n8 rdinit=/bin/sinit root=/dev/ram0 rootfstype=ramfs iommu=off", 0
-+	db "debug loglevel=7 earlycon=uart8250,io,0x3f8,9600n8 console=tty0 console=ttyS0,9600n8 init=/init iommu=off nomodeset nokaslr", 0
++	db "debug loglevel=7 earlyprintk=vga earlycon=uart8250,io,0x3f8,9600n8 console=tty0 console=ttyS0,9600n8 init=/init iommu=off nomodeset", 0
  
  KERNEL_CMD_SIZE equ $-KERNEL_CMD_LINE
  

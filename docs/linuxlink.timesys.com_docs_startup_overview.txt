@@ -1,0 +1,193 @@
+   [1][squares1.svg] (BUTTON) Toggle navigation
+     * [2][ll-oneline-inverse.png]
+
+     *
+          + ____________________
+     * [3]Docs
+     * [4]Vulnerability Notifications
+     * [5]Create a BSP
+     * [6]Register
+     * [7]Log in
+
+   [8]Skip to main content
+
+   [9]Timesys LinuxLink
+
+The Linux Startup Process
+
+   The core of the Linux operating system is known as the kernel, which is
+   loaded into memory when an embedded Linux system boots. The kernel
+   automatically probes, identifies, and initializes as much of your
+   system's hardware as possible, and then looks for an initial filesystem
+   that it can access in order to continue the boot process.
+
+   The first filesystem mounted by Linux systems during the boot process
+   is known as a root filesystem, and is automatically mounted at the
+   Linux root directory /. Once mounted, the root filesystem provides the
+   Linux system with a basic directory structure that it can use to map
+   devices to Linux device nodes, access those devices, and locate, load,
+   and execute subsequent code such as system code or your custom
+   applications.
+
+   All Linux systems start in essentially the same way. After loading the
+   kernel into memory and executing it, Linux systems execute a system
+   application known as init, which is typically found in /sbin/init on
+   Linux systems. The init process is process ID (PID) 1 on the system. It
+   reads the file /etc/inittab to identify the way in which the system
+   should boot and lists all other processes and programs that it should
+   start.
+
+Initial RAM Disks
+
+   An initial RAM disk is a compressed filesystem image that is bundled
+   with a kernel. (For more information, refer to [10]Initial RAM Disks.)
+   If your system uses an initial RAM disk (initrd or initramfs), the boot
+   sequence includes one extra step. Instead of initially executing the
+   init process, the system uncompresses and mounts the initial RAM disk,
+   and then executes the file /linuxrc. This file can be a shell script
+   that lists other commands to execute, can be a multi-call binary such
+   as BusyBox, or can be a symbolic link to a multi-call binary or to
+   /sbin/init.
+
+   Because init is a user program, located in a filesystem, the Linux
+   kernel must find and mount the first (or root) filesystem in order to
+   boot successfully. Ordinarily, available filesystems are listed in the
+   file /etc/fstab so the mount program can find them. But /etc/fstab is
+   itself a file, stored in a filesystem. Finding the very first
+   filesystem is a chicken-and-egg problem, and to solve it the kernel
+   developers created the kernel command-line option root=, which
+   specifies on which device the root filesystem exists.
+
+initrd
+
+   When root= was first implemented, it would be either a floppy drive or
+   a partition on a hard drive. Today, the root filesystem can be on
+   dozens of different types of hardware, or spread across several
+   locations in a RAID. Its location can move around between reboots, as
+   with hot-pluggable USB devices on a system with multiple USB ports. The
+   root filesystem might be compressed, encrypted, or loopback-mounted. It
+   could even be located on a network server, requiring the kernel to
+   acquire a DHCP address, perform a DNS lookup, and log in to a remote
+   server (with username and password), all before the kernel can find and
+   run the first userspace program.
+
+   Note:
+
+   On desktop Linux systems that use the GRUB (Grand Unified Boot Loader)
+   boot loader, the system's initial RAM disk is usually stored as a
+   separate file external to the kernel. This file is typically located in
+   the /boot directory and is identified in the GRUB configuration file
+   (/etc/grub.conf). On most embedded systems, the initial RAM disk is
+   created as a file external to the kernel, but is bundled with the
+   kernel as a final step in the kernel build process. If you are using
+   GRUB, this device is identified via one of your boot arguments, the
+   root= parameter.
+
+   As a result, root= does not provide enough information to the kernel.
+   Even including a great deal of special-case behavior in the kernel does
+   not help with device enumeration, encryption keys, or network logins
+   that vary from system to system. RAM disks such as initrd help to solve
+   this problem.
+
+   For 2.4 and earlier kernels, initrd is still the only way to provide a
+   RAM-based root filesystem. Initrd is a RAM-based block device -- a
+   fixed-size chunk of memory that can be formatted and mounted like a
+   disk. Therefore, the contents of the RAM disk have to be formatted and
+   prepared with special tools, such as mke2fs and losetup. Additionally,
+   like all block devices, the RAM disk requires a filesystem driver to
+   interpret the data at run time, which imposes an artificial size limit
+   that either wastes space or limits capacity.
+
+   RAM disks waste even more memory due to caching. Linux is designed to
+   cache all files and directory entries read from or written to block
+   devices, so Linux copies data to and from the RAM disk into the "page
+   cache" (for file data), and the "dentry cache" (for directory entries).
+
+   Initrd was designed as front end to the root= device detection code,
+   not a replacement for it. When you boot a Linux system that uses an
+   initial RAM disk, the system uncompresses and mounts the initial RAM
+   disk, and then executes the file /linuxrc (which must therefore be
+   executable) before running init. The linuxrc file performs functions
+   such as logging onto the network, telling the kernel which block device
+   contains the root filesystem (using root= and pivot_root), and then
+   returns control to the kernel. Finally, the kernel mounts the root
+   filesystem and executes init. This process assumes that the root
+   filesystem was on a block device rather than a network share, and also
+   assumes that initrd isn't itself going to be the root filesystem.
+
+   Because of these limitations with initrd, the 2.6 kernel developers
+   chose to implement a new mechanism for finding the initial filesystem -
+   initramfs.
+
+initramfs
+
+   Initramfs is a mechanism in which the files in the Linux cache are
+   mounted like a filesystem, and retained until they're deleted or the
+   system reboots. Linux 2.6 kernels bundle a small RAM-based initial root
+   filesystem into the kernel, containing a program called init that the
+   kernel runs as its first program. Finding another filesystem containing
+   the root filesystem is now the job of this new init program.
+
+   These RAM-based filesystems automatically grow or shrink to fit the
+   size of the data they contain. Adding files to a ramfs (or extending
+   existing files) automatically allocates more memory, and deleting or
+   truncating files frees that memory. Because there is no block device,
+   there is no duplication between the block device and the cache - the
+   copy in the cache is the only copy of the data. In addition, a system
+   using initramfs as its root filesystem doesn't need a filesystem driver
+   built into the kernel, because there are no block devices to interpret
+   as filesystems; there are simply files located in memory. Best of all,
+   this isn't new code, but a new application for the existing Linux
+   caching code, which means it adds almost no size, is very simple, and
+   is based on extremely well-tested infrastructure.
+
+   The contents of an initramfs do not have to be general-purpose. For
+   example, if a given system's root filesystem is located on an encrypted
+   network block device, and the network address, login, and decryption
+   key are all to be found on a given USB device that requires a password
+   to access, the system's initramfs can have a special-purpose program
+   that knows all about this process, and makes it happen. Even better,
+   systems that don't need a large root filesystem do not need to switch
+   to another root filesystem.
+
+   With initramfs, the kernel can return to following orders after it
+   launches init. Because the init program is run with PID 1, the real
+   root filesystem is initramfs until further notice, and the exec()
+   system call can be used to pass that process ID to another program, if
+   needed.
+
+   Copyright © 2023 [11]Timesys Corporation. All Rights Reserved.
+   [12]Privacy Policy | [13]Cookie Policy | [14]Eula | [15]Terms of
+   Service | [16]Terms of Sale
+   Yocto Project and all related marks and logos are registered trademarks
+   of The Linux Foundation. This website is not, in any way, endorsed by
+   the Yocto Project or The Linux Foundation.
+   [17][timesys-github.png] [18][timesys-twitter.png]
+   [19][timesys-youtube.png] [20][squares1.svg]
+
+References
+
+   Visible links:
+   1. https://linuxlink.timesys.com/
+   2. https://linuxlink.timesys.com/
+   3. https://linuxlink.timesys.com/docs/
+   4. https://linuxlink.timesys.com/cves/demo
+   5. https://linuxlink.timesys.com/guest/
+   6. https://linuxlink.timesys.com/register/
+   7. https://linuxlink.timesys.com/login/
+   8. https://linuxlink.timesys.com/docs/startup_overview#main-content
+   9. https://linuxlink.timesys.com/
+  10. https://linuxlink.timesys.com/docs/initrd
+  11. http://www.timesys.com/
+  12. https://linuxlink.timesys.com/about/privacy
+  13. https://linuxlink.timesys.com/about/cookies
+  14. https://linuxlink.timesys.com/about/eula
+  15. https://linuxlink.timesys.com/about/tos
+  16. https://linuxlink.timesys.com/about/termsofsale
+  17. https://github.com/TimesysGit
+  18. http://twitter.com/Timesys
+  19. http://www.youtube.com/timesys
+  20. http://www.timesys.com/
+
+   Hidden links:
+  22. https://linuxlink.timesys.com/docs/startup_overview

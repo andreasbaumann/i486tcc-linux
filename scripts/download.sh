@@ -137,6 +137,14 @@ if [ ! -f "${BASE}/downloads/samurai-${SAMURAI_VERSION}.tar.gz" ]; then
 	wget -O "${BASE}/downloads/samurai-${SAMURAI_VERSION}.tar.gz" "https://github.com/michaelforney/samurai/releases/download/${SAMURAI_VERSION}/samurai-${SAMURAI_VERSION}.tar.gz"
 fi
 
+if [ ! -f "${BASE}/downloads/samurai-${SAMURAI_VERSION}.tar.gz" ]; then
+	wget -O "${BASE}/downloads/samurai-${SAMURAI_VERSION}.tar.gz" "https://github.com/michaelforney/samurai/releases/download/${SAMURAI_VERSION}/samurai-${SAMURAI_VERSION}.tar.gz"
+fi
+
+if [ ! -f "${BASE}/downloads/joe-${JOE_VERSION}.tar.gz" ]; then
+	wget -O "${BASE}/downloads/joe-${JOE_VERSION}.tar.gz" "https://netcologne.dl.sourceforge.net/project/joe-editor/JOE%20sources/joe-${JOE_VERSION}/joe-${JOE_VERSION}.tar.gz"
+fi
+
 if [ ! -f "${BASE}/downloads/uflbbl-${UFLBBL_VERSION}.tar.gz" ]; then
 	cd "${BASE}/downloads/"
 	git clone git://git.andreasbaumann.cc/uflbbl.git "uflbbl-${UFLBBL_VERSION}"

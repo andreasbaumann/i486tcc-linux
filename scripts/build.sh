@@ -35,7 +35,7 @@ cd "${BASE}/src/stage0"
 # stage 0 host, build a 64-bit cross-compiler for i386, the host might
 # not have a packaged tcc at all or one not built for cross-compilation
 # TODO: we get a little bit too many cross compilers, but currently
-# we cannot easily just the ones we want.
+# we cannot easily build just the ones we want.
 
 if [ ! -x "${BASE}/build/stage0/bin/i386-tcc" ]; then
 	rm -rf "tinycc-${TINYCC_VERSION}"
@@ -70,7 +70,7 @@ else
 fi
 
 # build tcc with tcc from stage1 against musl from stage0, it should
-# have no dependencies from the host anymore
+# have no dependencies on the host anymore
 
 cd "${BASE}/src/stage1"
 
@@ -302,6 +302,11 @@ if [ ! -f "${BASE}/build/stage1/lib/libz.a" ]; then
 		--static
 	make -j$CPUS
 	make -j$CPUS install PREFIX="${BASE}/build/stage1"
+	# TOOD: do we need command line tools for ZIP?
+	#~ cd contrib/minizip
+	#~ make CC=/data/work/i486/build/stage1/bin/i386-tcc CFLAGS=-static
+	#~ cp minizip /data/work/i486/build/stage1/bin/zip
+	#~ cp miniunz /data/work/i486/build/stage1/bin/unzip
 	cd ..
 else
 	echo "stage1 zlib exists"
@@ -321,7 +326,8 @@ if [ ! -x "${BASE}/build/stage1/bin/man" ]; then
 		LDFLAGS="-static -L${BASE}/build/stage1/lib"
 		BINM_PAGER=more
 EOF
-	./configure 
+	# TODO: can we patch out zlib support? Or patch in xz support?
+	./configure
 	make -j$CPUS
 	make -j$CPUS install DESTDIR="${BASE}/build/stage1"
 	cd ..
@@ -371,6 +377,20 @@ else
 	echo "stage1 samurai exists"
 fi
 
+if [ ! -f "${BASE}/build/stage1/bin/joe" ]; then
+	rm -rf "joe-${JOE_VERSION}"
+	tar xf "${BASE}/downloads/joe-${JOE_VERSION}.tar.gz"
+	cd "joe-${JOE_VERSION}"
+	CC="${BASE}/build/stage1/bin/i386-tcc" \
+	./configure --prefix="${BASE}/build/stage1" \
+		--enable-static --disable-shared
+	make -j$CPUS LDFLAGS=-static
+	make -j$CPUS install
+	cd ..
+else
+	echo "stage1 joe exists"
+fi
+
 # TODO FROM HERE
 
 # TODO: have some way to deal with dependencies and with the user
@@ -380,12 +400,6 @@ fi
 # the same per stage (for instance ramdisk binaries are static
 # and crunched, final binaries on the hard disk maybe dynamic
 # and "normal"..?
-
-#~ cd ../joe
-#~ CC=/data/work/i486/build/stage1/bin/i386-tcc \
-	#~ ./configure --prefix=/data/work/i486/build/stage1
-#~ make LDFLAGS=-static
-#~ make install
 
 #~ cd ../less
 #~ CC=/data/work/i486/build/stage1/bin/i386-tcc ./configure --prefix=/data/work/i486/build/stage1
@@ -399,14 +413,6 @@ fi
 
 #~ cd ../lynx
 #~ CC=/data/work/i486/build/stage1/bin/i386-tcc CFLAGS='-march=i486 -mcpu=i486' ./configure --prefix=/data/work/i486/build/stage1
-
-#~ cd ../zlib
-#~ CC=/data/work/i486/build/stage1/bin/i386-tcc ./configure --prefix=/data/work/i486/build/stage1 --static
-#~ make
-#~ cd contrib/minizip
-#~ make CC=/data/work/i486/build/stage1/bin/i386-tcc CFLAGS=-static
-#~ cp minizip /data/work/i486/build/stage1/bin/zip
-#~ cp miniunz /data/work/i486/build/stage1/bin/unzip
 
 #~ cd ../perp
 #~ cd lasagna
