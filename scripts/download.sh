@@ -158,6 +158,10 @@ if [ ! -f "${BASE}/downloads/linux-${LINUX_KERNEL_VERSION}.tar.gz" ]; then
 	wget -O "${BASE}/downloads/linux-${LINUX_KERNEL_VERSION}.tar.gz" "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-${LINUX_KERNEL_VERSION}.tar.gz"
 fi
 
+if [ ! -f "${BASE}/downloads/dropbear-${DROPBEAR_VERSION}.tar.bz2" ]; then
+	wget -O "${BASE}/downloads/dropbear-${DROPBEAR_VERSION}.tar.bz2" "https://matt.ucc.asn.au/dropbear/releases/dropbear-${DROPBEAR_VERSION}.tar.bz2"
+fi
+
 trap - 0
 
 exit 0

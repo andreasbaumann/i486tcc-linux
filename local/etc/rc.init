@@ -18,4 +18,15 @@ respawn getty /dev/tty3 &
 respawn getty /dev/tty4 &
 respawn getty /dev/ttyS0 &
 
+if test ! -d /etc/dropbear; then
+	echo "Generating host keys.."
+	mkdir /etc/dropbear
+	dropbearkey -t rsa -f /etc/dropbear/dropbear_rsa_host_key
+	dropbearkey -t dss -f /etc/dropbear/dropbear_dss_host_key
+	dropbearkey -t ecdsa -f /etc/dropbear/dropbear_ecdsa_host_key
+	dropbearkey -t ed25519 -f /etc/dropbear/dropbear_ed25519_host_key
+fi
+echo "Starting SSH daemon.."
+dropbear
+
 echo "Ready."

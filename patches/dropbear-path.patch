@@ -1,0 +1,31 @@
+diff -rauN dropbear-2022.83/default_options.h dropbear-2022.83-path-patch/default_options.h
+--- dropbear-2022.83/default_options.h	2022-11-14 15:30:00.000000000 +0100
++++ dropbear-2022.83-path-patch/default_options.h	2023-06-15 14:42:19.428893698 +0200
+@@ -302,7 +302,7 @@
+ 
+ /* The command to invoke for xauth when using X11 forwarding.
+  * "-q" for quiet */
+-#define XAUTH_COMMAND "/usr/bin/xauth -q"
++#define XAUTH_COMMAND "/bin/xauth -q"
+ 
+ 
+ /* If you want to enable running an sftp server (such as the one included with
+@@ -315,7 +315,7 @@
+ 
+ /* This is used by the scp binary when used as a client binary. If you're
+  * not using the Dropbear client, you'll need to change it */
+-#define DROPBEAR_PATH_SSH_PROGRAM "/usr/bin/dbclient"
++#define DROPBEAR_PATH_SSH_PROGRAM "/bin/dbclient"
+ 
+ /* Whether to log commands executed by a client. This only logs the 
+  * (single) command sent to the server, not what a user did in a 
+@@ -351,7 +351,7 @@
+ #define DEFAULT_IDLE_TIMEOUT 0
+ 
+ /* The default path. This will often get replaced by the shell */
+-#define DEFAULT_PATH "/usr/bin:/bin"
+-#define DEFAULT_ROOT_PATH "/usr/sbin:/usr/bin:/sbin:/bin"
++#define DEFAULT_PATH "/bin"
++#define DEFAULT_ROOT_PATH "/bin"
+ 
+ #endif /* DROPBEAR_DEFAULT_OPTIONS_H_ */

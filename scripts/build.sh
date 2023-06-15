@@ -18,8 +18,8 @@ set -e
 SCRIPT=$(readlink -f "$0")
 BASE=$(dirname ${SCRIPT})/..
 
-CPUS=$(nproc)
-#CPUS=1
+#CPUS=$(nproc)
+CPUS=1
 
 . "${BASE}/configs/versions"
 
@@ -58,7 +58,7 @@ if [ ! -f "${BASE}/build/stage0/lib/libc.a" ]; then
 	rm -rf "musl-${MUSL_VERSION}"
 	tar xf "${BASE}/downloads/musl-${MUSL_VERSION}.tar.gz"
 	cd "musl-${MUSL_VERSION}"
-	patch -Np1 < "${BASE}/patches/musl-1.2.3-tcc.patch"
+	patch -Np1 < "${BASE}/patches/musl-tcc.patch"
 	CC="${BASE}/build/stage0/bin/i386-tcc" ./configure \
 		--prefix="${BASE}/build/stage0" \
 		--target=i386-linux-musl --disable-shared
@@ -389,6 +389,26 @@ if [ ! -f "${BASE}/build/stage1/bin/joe" ]; then
 	cd ..
 else
 	echo "stage1 joe exists"
+fi
+
+if [ ! -f "${BASE}/build/stage1/bin/dropbearmulti" ]; then
+	rm -rf "dropbear-${DROPBEAR_VERSION}"
+	tar xf "${BASE}/downloads/dropbear-${DROPBEAR_VERSION}.tar.bz2"
+	cd "dropbear-${DROPBEAR_VERSION}"
+	patch -Np1 < "${BASE}/patches/dropbear-path.patch"
+	CC="${BASE}/build/stage1/bin/i386-tcc" \
+	./configure --prefix="${BASE}/build/stage1" \
+		--enable-static --disable-shared
+	make -j$CPUS STATIC=1 MULTI=1 SCPPROGRESS=1 PROGRAMS="dropbear dbclient dropbearkey scp ssh"
+	cp dropbearmulti "${BASE}/build/stage1/bin/."
+	make -j$CPUS inst_dropbearmulti
+	rm -f "${BASE}/build/stage1/sbin/dropbear"
+	for i in dbclient dropbearkey dropbear scp ssh; do
+		ln -sf dropbearmulti "${BASE}/build/stage1/bin/${i}"
+	done
+	cd ..
+else
+	echo "stage1 dropbear exists"
 fi
 
 # TODO FROM HERE

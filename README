@@ -66,6 +66,8 @@ patches
 - vis
   * disabled probing of 'curses/termcap' with 'pkconfig', added them
     directly to 'configure'
+- dropbear
+  * patched binary locations and pathes in default_options.h
 
 dependencies
 ------------
