@@ -406,6 +406,17 @@ if [ ! -f "${BASE}/build/stage1/bin/dropbearmulti" ]; then
 	for i in dbclient dropbearkey dropbear scp ssh; do
 		ln -sf dropbearmulti "${BASE}/build/stage1/bin/${i}"
 	done
+	# generate keys on the host (as this one has more power than
+	# the 486, this works on this set of ISAs if the host is AMD64/x86
+	# (otherwise we have to build either a host version of dropbear and
+	# hope the key formats are platform independent or we use qemu-img
+	# to generate the keys). Generating them here is also a security issue
+	# as host keys are supposed to be built on each unique host!
+	mkdir "${BASE}/build/stage1/etc/dropbear"
+	"${BASE}/build/stage1/bin/dropbearkey" -t rsa -f "${BASE}/build/stage1/etc/dropbear/dropbear_rsa_host_key"
+	"${BASE}/build/stage1/bin/dropbearkey" -t dss -f "${BASE}/build/stage1//etc/dropbear/dropbear_dss_host_key"
+	"${BASE}/build/stage1/bin/dropbearkey" -t ecdsa -f "${BASE}/build/stage1//etc/dropbear/dropbear_ecdsa_host_key"
+	"${BASE}/build/stage1/bin/dropbearkey" -t ed25519 -f "${BASE}/build/stage1//etc/dropbear/dropbear_ed25519_host_key"
 	cd ..
 else
 	echo "stage1 dropbear exists"
