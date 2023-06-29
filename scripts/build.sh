@@ -102,7 +102,7 @@ if [ ! -f "${BASE}/build/stage1/lib/libc.a" ]; then
 	rm -rf "musl-${MUSL_VERSION}"
 	tar xf "${BASE}/downloads/musl-${MUSL_VERSION}.tar.gz"
 	cd "musl-${MUSL_VERSION}"
-	patch -Np1 < "${BASE}/patches/musl-1.2.3-tcc.patch"
+	patch -Np1 < "${BASE}/patches/musl-tcc.patch"
 	CC="${BASE}/build/stage1/bin/i386-tcc" ARCH=i386 \
 	./configure \
 		--prefix="${BASE}/build/stage1" \
