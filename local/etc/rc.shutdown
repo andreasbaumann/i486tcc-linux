@@ -1,11 +1,20 @@
 #!/bin/oksh
 
 echo "Shutting down all processes.."
-killall5 -s KILL
+PID_NBD_CLIENT=`pidof nbd-client`
+PID_SDHCP=`pidof sdhcp`
+killall5 -o $PID_NBD_CLIENT,$PID_SDHCP -s TERM
 
-echo "Synching and unmounting filesystems.."
+sleep 5
+
+echo "Synching filesystems.."
 sync
-umount -a
+
+echo "Mounting root file system read-only.."
+mount -o remount,ro /
+
+echo "Killing all processes.."
+killall5 -o $PID_NBD_CLIENT,$PID_SDHCP -s KILL
 
 case "$1" in
 	reboot)
