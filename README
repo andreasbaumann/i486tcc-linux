@@ -119,6 +119,9 @@ The starting point of the Linux kernel configuration is 'make tinyconfig'.
   - enable bug reporting of the kernel
   - frame pointers allow stack strace in case of errors
 
+- CONFIG_MAGIC_SYSRQ=y
+  - for debugging
+  
 - CONFIG_LOG_BUF_SHIFT=16
   CONFIG_PRINTK_SAFE_LOG_BUF_SHIFT=12
   - trying to make some buffers smaller, the effect might not be that
@@ -326,6 +329,13 @@ bugs
   to be started by 'init' presumably (as systemd does), we can also not
   umount it otherwise we don't have killall5. There is the option of
   having a shutdown ramdisk (as others do)..
+- maybe we need a shutdown ramdisk (generated on the fly or using
+  pivot_root and not switch_root and reuse the init ramdisk - but
+  loosing the memory while running and pivot_root is a deprecated
+  syscall. And we have a new ramarchive initrd and not a traditional
+  ramdisk. The shutdown ramdisk is not so much a ramdisk but a tmpfs
+  you are not unmounting with the rest of the file systems. And you
+  populate it with killall5 and unmount, etc.
 - qemu: Slirp: Failed to send packet, ret: -1
   => seems to be a qemu network thingy..
 - vis sometimes looses first line of text or shows strange artefacts
@@ -479,6 +489,13 @@ morpheus
 --------
 
 statically linked
+Plan 9 mk build system
+x86_64 and i486 builds
+quite old (kernel 3.10.32)
+git://git.2f30.org/hbase (Heirloom as alernative base for some Unix tools)
+textbased tools like abduco and dvtm for easy text console multiplexing
+and window manager, no X
+tinyalsa sounds interesting too
 
 stali
 -----
@@ -584,8 +601,9 @@ links
     - https://forums.gentoo.org/viewtopic-t-1000292-start-0.html
 - minimal userland
   - https://github.com/ibara/oksh
-  - git://git.suckless.org/sbase
-  - git://git.suckless.org/ubase
+  - suckless
+    - git://git.suckless.org/sbase
+    - git://git.suckless.org/ubase
   - https://git.andreasbaumann.cc/cgit/abase/
   - other minimal user lands (we don't use for now)
     - https://busybox.net/
@@ -593,6 +611,10 @@ links
     - https://tools.suckless.org/9base/
     - https://github.com/leahneukirchen/obase
     - https://beastiebox.sourceforge.net/
+  - gopher://bitreich.org
+  - https://git.2f30.org/hbase/log.html
+- minimalism
+  - https://wiki.installgentoo.com/wiki/Software_minimalism
 - Link collections of interesting software
   - https://suckless.org/rocks/
   - https://suckless.org/other_projects/

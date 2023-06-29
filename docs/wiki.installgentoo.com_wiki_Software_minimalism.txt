@@ -1,0 +1,541 @@
+   #[1]InstallGentoo Wiki (en) [2]InstallGentoo Wiki Atom feed
+
+   We are still actively working on the spam issue.
+
+Software minimalism
+
+   From InstallGentoo Wiki
+   Jump to: [3]navigation, [4]search
+
+   Software Minimalism is a philosophy inherent to many [5]GNU/Linux
+   distributions and other Unix like operating systems. The purpose of
+   this page is to help newbies and advanced users alike by defining
+   software minimalism and giving some ideas on where to start.
+
+Contents
+
+     * [6]1 What does /g/ use?
+     * [7]2 Unix Philosophy
+          + [8]2.1 Justification for Minimalism
+     * [9]3 Minimalism Rules of thumb
+     * [10]4 Minimal Operating Systems
+     * [11]5 Minimal metadistros
+     * [12]6 File Systems
+     * [13]7 Window Managers
+     * [14]8 Display Managers
+     * [15]9 Screensavers
+     * [16]10 External Resources
+
+What does /g/ use?
+
+   A common minimal configuration which can be seen among /g/ users in
+   minimalism threads usually features some of the software below. For the
+   most part everything is TUI
+
+   NOTE: Examples here are based on the least bloated option available if
+   no other alternatives exist.
+     * Distro: [17]Gentoo, [18]OpenBSD, [19]Void Linux, [20]CRUX
+       GNU/Linux, [21]9front, or [22]Alpine Linux);
+     * Userland: busybox statically linked, [23]hbase, [24]suckless core
+       (ubase, sbase, 9base) statically linked;
+     * Window Manager: [25]DWM, rio, or TTY;
+     * Login/Display manager: sx [26]edited version to use with sbase
+       tty(1);
+     * File Manager: Sometimes [27]noice, [28]nnn, or [29]LF, standard
+       Unix utils like ls, cp, mv, etc.;
+     * Terminal Emulator: [30]st;
+     * Web Browser(note: web is bloat): [31]surf, [32]lynx, [33]netsurf,
+       w3m, cURL;
+     * gopher: [34]lynx, [35]sacc, or hURL;
+     * Shell: [36]mksh or [37]dash;
+     * OS information: they all rely on bash as a dependancy so just write
+       you own or use ufetch if you run void;
+     * Screen lock/saver: [38]slock;
+     * Music player: [39]mpd + [40]mpc, or [41]cmus;
+     * Video player: [42]mpv or ffplay (part of ffmpeg);
+     * IRC client: [43]weechat, [44]irssi, [45]iii, [46]ii,erc;
+     * Screen capture (screenshot): [47]scrot or [48]import (part of
+       imagemagick);
+     * Image viewer/desktop wallpaper display: [49]lel, [50]feh, or
+       [51]sxiv and [52]hsetroot;
+     * PDF Viewer: [53]zathura using the mupdf backend, or better yet to
+       view PostScript or DjVu files, [54]mupdf;
+     * Video conversion: [55]FFmpeg (including WebM or GIF creation);
+     * Text editor: [56]acme (boarderline bloat), [57]Vim (boarderline
+       bloat), [58]neovim (better), [59]Vis (best), or [60]sam, [61]Nano
+       (if you don't need/want a modal editor), Emacs
+     * Document creation: {g,t}roff, markdown;
+     * Other: [62]doas (opendoas package on void) in place of sudo, 9front
+       or plan9 and [63]factotum in place of Linux and PAM.
+
+Unix Philosophy
+
+   The Unix philosophy, originated by Ken Thompson, is a set of cultural
+   norms and philosophical approaches to minimalist, modular software
+   development. The UNIX philosophy is documented by Doug McIlroy in the
+   Bell System Technical Journal from 1978:
+    1. Make each program do one thing well. To do a new job, build afresh
+       rather than complicate old programs by adding new "features".
+    2. Expect the output of every program to become the input to another,
+       as yet unknown, program. Don't clutter output with extraneous
+       information. Avoid stringently columnar or binary input formats.
+       Don't insist on interactive input.
+    3. Design and build software, even operating systems, to be tried
+       early, ideally within weeks. Don't hesitate to throw away the
+       clumsy parts and rebuild them.
+    4. Use tools in preference to unskilled help to lighten a programming
+       task, even if you have to detour to build the tools and expect to
+       throw some of them out after you've finished using them.
+
+   This is often summarized as:
+     * Write programs that do one thing and do it well.
+     * Write programs to work together.
+     * Write programs to handle text streams, because that is a universal
+       interface.
+
+Justification for Minimalism
+
+   By Following the Unix Philosophy we can:
+     * Make code that is easier to write and maintain
+     * Facilitate easy scripting and automation
+     * Decrease bugs in a code base
+     * decrease vulnerabilities and remove attack vectors in our software
+     * Become overall more efficient
+
+   The power of unix is the power of the pipe and console redirection:
+$ gunzip -dc file.tgz | tar xf -
+$ cat /foo/bar.txt | grep "string"
+$ bunzip2 < image.ff.bz2 | lel
+$ bunzip2 < image.ff.bz2 | ff2png > sxiv
+$ audio/mp3dec <foo.ogg >/dev/audio #(pulled from 9front audio(1) man page)
+$ cat foo bar baz > foobarbaz
+$ echo "append this text" >> foo
+$ echo "overwrite with this text" > foo
+$ cat foo.ps > /dev/lpt #to print on an lpt printer
+
+   For a more indepth explaination read [64]Program Design in the UNIX
+   Environment
+
+Minimalism Rules of thumb
+
+   A system cannot be minimal if it uses:
+     * poetteringware or any freedesktop maintained software, this
+       includes:
+          + pulse audio
+          + systemd
+          + dbus
+          + wayland
+     * Gnome and GTK
+     * KDE
+     * GUI based tools
+     * programs written to use XML
+     * Any of the GNU tools
+     * it is listed at [65]https://suckless.org/sucks/ or as harmful under
+       [66]https://harmful.cat-v.org/software/
+
+   And always remember, just because it runs in a terminal doesn't make it
+   minimal!
+
+Minimal Operating Systems
+
+   Although strictly speaking every BSD and GNU/Linux distro isn't nearly
+   as minimal as described in [67]Program Design in the UNIX Environment
+   here are some Operating Systems that get close.
+     * [68]9front - This is the closest thing to [69]Program Design in the
+       UNIX Environment tier minimalism
+     * [70]OpenBSD
+     * [71]Void Linux - especially if using the musl version
+     * [72]CRUX
+     * [73]KISS Linux
+     * [74]/g/entoo - can be made as minimal as you want it to be
+     * [75]Alpine Linux - busybox/Linux
+
+   Every modern Operating system has succumbed to extreme feature creep.
+   Research UNIX was the first and last time that simple single use tools
+   were in wide spread use. The GNU/Linux and BSD core utils include tons
+   of added flags that go beyond what each tool is designed to do (such as
+   the now popular example of cat -v) but beyond that some tools have
+   defaults that are already multi-functional in nature such as ls having
+   columnar output by default. 9front remedies this by having lc (list
+   columns) but even then the days of a totally complete operating system
+   that is designed according to the Unix Philosophy are long gone (if
+   those days even existed is a matter of debate). As such, don't think
+   too long and hard on which operating system to use. Almost any Linux or
+   BSD system that doesn't use the GNU core utils and SystemD is already
+   more minimal than 99% of what is being used by the vast majority of
+   people.
+
+   A lot of anons suggest Arch Linux or Debian netinst, but since both of
+   these use a GNU userland and systemd they're not minimal.
+
+Minimal metadistros
+
+     * [76]LARBS
+     * [77]InstantOS
+
+File Systems
+
+   A quick note on file systems. It is hard to find any way to judge how
+   minimal a filesystem is, but here are some pointers using some common
+   and/or popular examples.
+     * EXT4: has encryption built in which is bloat since dm-crypt does a
+       better job. Alternatives: F2FS, xfs (if you need extents)
+     * ZFS: breaks file system layer seperation. Combines a LVM, database
+       and filesystem into one program. Alternatives: HAMMER2, soft/hard
+       raid with a seperate LVM and a
+     * NTFS, EXFAT, HFS+, etc.: bloatware botnets. If you need
+       compatability an alternative is UDF which has an open
+       implementation is highly portable and an industry standard, any
+       system capable of reading a DVD can read and write to a drive
+       formatted to UDF.
+
+   Some other considerations:
+
+   If you're going to have separate partitions for different directories
+   under root you might as well optimize while you're at it:
+     * /usr is where most of your binaries and libraries are stored, so
+       low latency is more important than throughput, suggest NILFS,
+       REISERFS, or REISER4. 20GB
+     * /etc rarely takes up much disk space. Most files stored here are
+       small (in the order of no larger than a few hundred kilobytes).
+       Usually CA's for ssl auth are located somewhere in /etc as well.
+       Suggest, REISERFS, REISER4, NILFS. 1-2GB
+     * /var contains small files, is where the database for your package
+       manager usually is and spools are usually located. A filesystem
+       with high throughput on smaller files would be preferred. Suggest
+       REISERFS, REISER4. 15GB
+     * /boot doesn't need anything fancy and journaling on disk can just
+       get in the way, suggest Fat32. 512MB
+     * / most nix systems have a hard time booting if the root directory
+       is using a less popular filesystem, suggest EXT3 or xfs. 30GB is a
+       safe bet
+     * /home if you have an SSD you'll want a general use filesystem that
+       is optimized for flash storage in which case F2FS is your best bet.
+       If not, xfs or EXT3. Usually this takes up the rest of the file
+       system.
+
+   For the most bullet proof filesystem for something like a NAS you will
+   probably want an atomic copy-on-write filesystem with checksumming,
+   your best bet is HAMMER2.
+
+   You could of course skip all of this heart ache and just use one /
+   partition formatted to something like EXT3, F2FS, or xfs and call it a
+   day.
+
+Window Managers
+
+   Currently most GNU/Linux and BSD distributions use the X Window System
+   for drawing the desktop. It is designed to be modular and highly
+   customizable. One of the results of this design is that X.org doesn't
+   manage windows. Instead it depends on a special client application
+   called a window manager. The window manager (WM in short) moves and
+   resizes windows, among other things, often in response to user input.
+   Window managers also do much more, like automatic window layout,
+   compositing, drawing decorations, drawing panels, providing multiple
+   workspaces, and so on.
+
+   Window managers can be divided into these three categories:
+     * Stacking - They allow windows to draw their contents one on top of
+       another on the desktop, starting with the one on the bottom and
+       going up in the "Z order".
+     * Compositing - Provide a buffer for each window to draw on and then
+       compose those buffers together creating the desktop image. This
+       type of window manager allows use of semitransparent windows.
+     * Tiling - The windows do not overlap.
+          + Static tiling WMs such as ratpoison always use a set number of
+            equal size tiles, and the tiles do not move
+          + Dynamic tiling WMs such as awesome allow you to change the
+            layout of the tiles, the number of tiles onscreen, and other
+            things. it should be noted that awesome also has a stacking
+            mode in addition to many tiling configurations.
+
+   Many WMs contain both stacking and tiling modes, and the behavior can
+   be switched by the user.
+
+   Finally, there are also composite managers such as xcompmgr that work
+   together with a non-compositing WM making it compose windows, allowing
+   for effects such as transparency and drop shadows.
+
+   Bloat
+     * Dynamic
+          + [78]Awesome - Despite looking pretty bad of the box, it's a
+            very popular tiling window manager. It is completely
+            scriptable in Lua, which makes it one of the most powerful and
+            customizable window managers once you get around to
+            programming the configuration file.
+          + [79]i3 - One of the most popular window managers around, i3 is
+            a fork of wmii that strives to fix the latter's convoluted
+            code and documentation problems. Looks good out of the box and
+            the configuration is simple and intuitive. It also provides a
+            great amount of documentation on the webpage. Good for
+            beginners and developers/hackers alike.
+
+     * Stacking
+          + [80]Openbox
+          + [81]Fluxbox
+          + [82]Blackbox
+
+     * Compositing
+          + [83]Compiz - A compositing WM being developed since 2006. It
+            uses OpenGL (AIGLX). It is know for having a lot functionality
+            and providing many interesting effects. However, it can cause
+            problems if the graphics are faulty.
+          + [84]KWin - A compositing WM used in KDE. It's comparable in
+            feature set to compiz.
+          + [85]Mutter - The default window manager for GNOME.
+          + [86]Xfwm - The default window manager for XFCE.
+
+   Minimal
+     * Dynamic
+          + [87]DWM - Doesn't come with a simple configuration file;
+            instead, you're supposed to edit config.h and recompile dwm
+            yourself. At least they make an effort to keep the code
+            well-commented and under 2000 SLOC. Not for beginners as they
+            themselves claim to want to "keep the userbase small and
+            elitist", though you might want to give this a shot if you
+            know C and you're willing to hack into the source code.
+          + [88]monsterwm - Tiny but monstrous! Currently under 700 lines
+            of code including the configuration file.
+
+     * Tiling
+          + [89]ratpoison - Minimal WM without the need of a mouse.
+          + [90]bspwm
+          + [91]xmonad - A minimal window manager written and configured
+            in Haskell.
+          + [92]WMFS2
+
+     * Stacking
+          + [93]Windowmaker - No-frills, very lightweight, fast. Makes
+            your computer look like a mid-90s NeXTSTEP workstation.
+          + [94]2bwm - Experimental "floating" WM that is only 342K
+          + rio - default WM for plan9
+
+     * Compositing tools (for stacking/tiling WMs)
+          + [95]Compton - Forked of Xcompmgr size is only 255K
+
+   There are also some anons who skip the GUI all together and do
+   everything in framebuffer
+
+   For some more information on this topic, see: [96]this page.
+
+Display Managers
+
+   A display manager is what might typically be thought of as a "bloat".
+   It will prompt you to enter a username to log in as, as well as specify
+   a session to be used, in an inefficiant and bloated way. Use sx from a
+   tty instead.
+
+Screensavers
+
+   [97]slock or none at all
+
+External Resources
+
+     * [98]bitreich gopher hole, [99]the infinitely more lulzy bitreich
+       website
+     * [100]suckless
+     * [101]cat-v considered harmful
+     * [102]ALSA and the Linux Audio Mess
+     * [103]2f30 - division by zero
+     * [104]alternatives to bloatware - a list of software using a
+       different interpretation of minimalism that seeks to solve the same
+       problem.
+
+   Retrieved from
+   "[105]https://wiki.installgentoo.com/index.php?title=Software_minimalis
+   m&oldid=53474"
+   [106]Categories:
+     * [107]Recommendations
+     * [108]What does /g/ use?
+
+Navigation menu
+
+Personal tools
+
+     * [109]Create account
+     * [110]Log in
+
+Namespaces
+
+     * [111]Page
+     * [112]Discussion
+
+   [ ]
+
+Variants
+
+Views
+
+     * [113]Read
+     * [114]View source
+     * [115]View history
+
+   [ ]
+
+More
+
+Search
+
+   ____________________ Search Go
+
+Navigation
+
+     * [116]Main page
+     * [117]Recent changes
+     * [118]Random page
+     * [119]Help
+
+Tools
+
+     * [120]What links here
+     * [121]Related changes
+     * [122]Special pages
+     * [123]Printable version
+     * [124]Permanent link
+     * [125]Page information
+
+     * This page was last edited on 20 June 2023, at 09:17.
+     * Content is available under Public Domain unless otherwise noted.
+
+     * [126]Privacy policy
+     * [127]About InstallGentoo Wiki
+     * [128]Disclaimers
+
+     * Public Domain
+     * [129]Powered by MediaWiki
+
+References
+
+   Visible links:
+   1. https://wiki.installgentoo.com/opensearch_desc.php
+   2. https://wiki.installgentoo.com/index.php?title=Special:RecentChanges&feed=atom
+   3. https://wiki.installgentoo.com/wiki/Software_minimalism#mw-head
+   4. https://wiki.installgentoo.com/wiki/Software_minimalism#p-search
+   5. https://wiki.installgentoo.com/wiki/GNU/Linux
+   6. https://wiki.installgentoo.com/wiki/Software_minimalism#What_does_.2Fg.2F_use.3F
+   7. https://wiki.installgentoo.com/wiki/Software_minimalism#Unix_Philosophy
+   8. https://wiki.installgentoo.com/wiki/Software_minimalism#Justification_for_Minimalism
+   9. https://wiki.installgentoo.com/wiki/Software_minimalism#Minimalism_Rules_of_thumb
+  10. https://wiki.installgentoo.com/wiki/Software_minimalism#Minimal_Operating_Systems
+  11. https://wiki.installgentoo.com/wiki/Software_minimalism#Minimal_metadistros
+  12. https://wiki.installgentoo.com/wiki/Software_minimalism#File_Systems
+  13. https://wiki.installgentoo.com/wiki/Software_minimalism#Window_Managers
+  14. https://wiki.installgentoo.com/wiki/Software_minimalism#Display_Managers
+  15. https://wiki.installgentoo.com/wiki/Software_minimalism#Screensavers
+  16. https://wiki.installgentoo.com/wiki/Software_minimalism#External_Resources
+  17. https://wiki.installgentoo.com/wiki/Gentoo
+  18. https://wiki.installgentoo.com/wiki/OpenBSD
+  19. https://voidlinux.org/
+  20. http://crux.nu/
+  21. https://wiki.installgentoo.com/wiki/9front
+  22. http://alpinelinux.org/
+  23. https://git.2f30.org/hbase/log.html
+  24. http://core.suckless.org/
+  25. https://dwm.suckless.org/
+  26. https://clbin.com/MJdl9
+  27. http://git.2f30.org/noice/
+  28. https://github.com/jarun/nnn
+  29. https://github.com/gokcehan/lf
+  30. https://st.suckless.org/
+  31. https://surf.suckless.org/
+  32. https://lynx.invisible-island.net/
+  33. http://netsurf-browser.org/
+  34. https://lynx.invisible-island.net/
+  35. git://bitreich.org/sacc/
+  36. https://www.mirbsd.org/mksh.htm
+  37. http://gondor.apana.org.au/~herbert/dash/
+  38. https://tools.suckless.org/slock
+  39. http://www.musicpd.org/download.html
+  40. https://www.musicpd.org/clients/mpc/
+  41. https://cmus.github.io/
+  42. http://mpv.io/
+  43. http://www.weechat.org/download/
+  44. http://www.irssi.org/download
+  45. https://github.com/c00kiemon5ter/iii
+  46. http://tools.suckless.org/ii/
+  47. http://scrot.sourcearchive.com/
+  48. http://www.imagemagick.org/script/install-source.php#unix
+  49. https://github.com/younix/lel
+  50. https://feh.finalrewind.org/
+  51. https://github.com/muennich/sxiv
+  52. https://github.com/himdel/hsetroot
+  53. https://pwmt.org/projects/zathura/
+  54. https://mupdf.com/
+  55. http://www.ffmpeg.org/
+  56. http://acme.cat-v.org/
+  57. http://www.vim.org/
+  58. https://github.com/neovim/neovim
+  59. https://github.com/martanne/vis
+  60. http://sam.cat-v.org/
+  61. http://www.nano-editor.org/
+  62. https://github.com/multiplexd/doas
+  63. http://man.cat-v.org/plan_9/4/factotum
+  64. https://harmful.cat-v.org/cat-v/
+  65. https://suckless.org/sucks/
+  66. https://harmful.cat-v.org/software/
+  67. https://harmful.cat-v.org/cat-v/
+  68. https://wiki.installgentoo.com/wiki/9front
+  69. https://harmful.cat-v.org/cat-v/
+  70. https://wiki.installgentoo.com/wiki/OpenBSD
+  71. https://voidlinux.org/
+  72. http://crux.nu/
+  73. https://k1ss.org/
+  74. https://wiki.installgentoo.com/wiki/Gentoo
+  75. http://alpinelinux.org/
+  76. https://larbs.xyz/
+  77. https://instantos.io/
+  78. http://awesome.naquadah.org/
+  79. http://i3wm.org/
+  80. http://openbox.org/wiki/Main_Page
+  81. http://www.fluxbox.org/
+  82. http://blackboxwm.sourceforge.net/
+  83. http://www.compiz.org/
+  84. http://techbase.kde.org/Projects/KWin
+  85. http://git.gnome.org/browse/mutter/
+  86. http://docs.xfce.org/xfce/xfwm4/start
+  87. http://dwm.suckless.org/
+  88. https://github.com/c00kiemon5ter/monsterwm
+  89. https://nongnu.org/ratpoison/
+  90. https://github.com/baskerville/bspwm
+  91. http://xmonad.org/
+  92. http://wmfs.info/
+  93. http://windowmaker.org/
+  94. https://github.com/venam/2bwm
+  95. https://github.com/chjj/compton
+  96. https://wiki.archlinux.org/index.php/Window_Manager
+  97. https://tools.suckless.org/slock
+  98. gopher://bitreich.org/
+  99. http://bitreich.org/
+ 100. https://suckless.org/
+ 101. http://cat-v.org/
+ 102. http://harmful.cat-v.org/software/operating-systems/linux/alsa
+ 103. https://www.2f30.org/home.html
+ 104. https://github.com/mayfrost/guides/blob/master/ALTERNATIVES.md
+ 105. https://wiki.installgentoo.com/index.php?title=Software_minimalism&oldid=53474
+ 106. https://wiki.installgentoo.com/wiki/Special:Categories
+ 107. https://wiki.installgentoo.com/wiki/Category:Recommendations
+ 108. https://wiki.installgentoo.com/wiki/Category:What_does_/g/_use%3F
+ 109. https://wiki.installgentoo.com/index.php?title=Special:CreateAccount&returnto=Software+minimalism
+ 110. https://wiki.installgentoo.com/index.php?title=Special:UserLogin&returnto=Software+minimalism
+ 111. https://wiki.installgentoo.com/wiki/Software_minimalism
+ 112. https://wiki.installgentoo.com/wiki/Talk:Software_minimalism
+ 113. https://wiki.installgentoo.com/wiki/Software_minimalism
+ 114. https://wiki.installgentoo.com/index.php?title=Software_minimalism&action=edit
+ 115. https://wiki.installgentoo.com/index.php?title=Software_minimalism&action=history
+ 116. https://wiki.installgentoo.com/wiki/Main_Page
+ 117. https://wiki.installgentoo.com/wiki/Special:RecentChanges
+ 118. https://wiki.installgentoo.com/wiki/Special:Random
+ 119. https://www.mediawiki.org/wiki/Special:MyLanguage/Help:Contents
+ 120. https://wiki.installgentoo.com/wiki/Special:WhatLinksHere/Software_minimalism
+ 121. https://wiki.installgentoo.com/wiki/Special:RecentChangesLinked/Software_minimalism
+ 122. https://wiki.installgentoo.com/wiki/Special:SpecialPages
+ 123. https://wiki.installgentoo.com/index.php?title=Software_minimalism&printable=yes
+ 124. https://wiki.installgentoo.com/index.php?title=Software_minimalism&oldid=53474
+ 125. https://wiki.installgentoo.com/index.php?title=Software_minimalism&action=info
+ 126. https://wiki.installgentoo.com/wiki/InstallGentoo_Wiki:Privacy_policy
+ 127. https://wiki.installgentoo.com/wiki/InstallGentoo_Wiki:About
+ 128. https://wiki.installgentoo.com/wiki/InstallGentoo_Wiki:General_disclaimer
+ 129. https://www.mediawiki.org/
+
+   Hidden links:
+ 131. https://wiki.installgentoo.com/wiki/Main_Page
