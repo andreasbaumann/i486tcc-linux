@@ -1,6 +1,6 @@
 diff -rauN uflbbl/src/boot.asm uflbbl-boot-options/src/boot.asm
 --- uflbbl/src/boot.asm	2023-07-13 08:47:23.000000000 +0200
-+++ uflbbl-boot-options/src/boot.asm	2023-07-15 15:52:51.045860124 +0200
++++ uflbbl-boot-options/src/boot.asm	2023-07-15 16:30:46.609197671 +0200
 @@ -468,10 +468,10 @@
  	mov [READ_STATE], byte STATE_READ_INITRD
  ; qemu initrd start location 7fab000, 133869568 (this is 128MB) too high for us,

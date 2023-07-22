@@ -73,6 +73,8 @@ test -d "${ROOT}"/mnt || mkdir "${ROOT}"/mnt
 # copy locally adapted scripts
 test -d "${ROOT}/root" || mkdir "${ROOT}/root"
 cp "${LOCAL}"/root/.profile "${ROOT}/root"
+cp "${LOCAL}"/root/.xserverrc "${ROOT}/root"
+cp "${LOCAL}"/root/.xinitrc "${ROOT}/root"
 test -d "${ROOT}/bin" || mkdir "${ROOT}/bin"
 cp -dR "${LOCAL}"/bin/* "${ROOT}/bin"
 test -d "${ROOT}/etc" || mkdir "${ROOT}/etc"

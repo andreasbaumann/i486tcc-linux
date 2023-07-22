@@ -1,0 +1,6 @@
+#!/bin/oksh
+
+insmod /lib/modules/drivers/input/mouse/psmouse.ko
+insmod /lib/modules/drivers/input/mousedev.ko
+
+exec Xfbdev :0 -fp /share/X11/fonts

@@ -434,6 +434,7 @@ EOF
      Only BCF, PCF are supported
 - font handling when installing, currently in local/share/fonts/X11, we
   should generate them from BCF files
+- rxvt: can't load font "7x14"
 
 missing things
 --------------
