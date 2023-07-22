@@ -77,6 +77,8 @@ test -d "${ROOT}/bin" || mkdir "${ROOT}/bin"
 cp -dR "${LOCAL}"/bin/* "${ROOT}/bin"
 test -d "${ROOT}/etc" || mkdir "${ROOT}/etc"
 cp -dR "${LOCAL}"/etc/* "${ROOT}/etc"
+test -d "${ROOT}/share" || mkdir "${ROOT}/share"
+cp -dR "${LOCAL}"/share/* "${ROOT}/share"
 
 # copy ramdisk, boot loader and kernel to /boot
 cp ramdisk.img "${ROOT}/boot"

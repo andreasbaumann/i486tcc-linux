@@ -1,6 +1,6 @@
-diff -rauN a/src/boot.asm b/src/boot.asm
---- a/src/boot.asm	2023-05-05 18:48:22.000000000 +0200
-+++ b/src/boot.asm	2023-05-19 15:44:17.984926907 +0200
+diff -rauN uflbbl/src/boot.asm uflbbl-boot-options/src/boot.asm
+--- uflbbl/src/boot.asm	2023-07-13 08:47:23.000000000 +0200
++++ uflbbl-boot-options/src/boot.asm	2023-07-15 15:52:51.045860124 +0200
 @@ -468,10 +468,10 @@
  	mov [READ_STATE], byte STATE_READ_INITRD
  ; qemu initrd start location 7fab000, 133869568 (this is 128MB) too high for us,
@@ -20,7 +20,7 @@ diff -rauN a/src/boot.asm b/src/boot.asm
  
  KERNEL_CMD_LINE:
 -	db "debug loglevel=7 earlycon=uart8250,io,0x3f8,9600n8 console=tty0 console=ttyS0,9600n8 rdinit=/bin/sinit root=/dev/ram0 rootfstype=ramfs iommu=off", 0
-+	db "debug loglevel=7 earlyprintk=vga earlycon=uart8250,io,0x3f8,9600n8 console=tty0 console=ttyS0,9600n8 init=/init iommu=off nomodeset", 0
++	db "debug loglevel=7 earlyprintk=vga earlycon=uart8250,io,0x3f8,9600n8 console=tty0 console=ttyS0,9600n8 init=/init iommu=off vga=0x311", 0
  
  KERNEL_CMD_SIZE equ $-KERNEL_CMD_LINE
  

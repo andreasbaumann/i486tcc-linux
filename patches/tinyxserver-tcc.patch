@@ -1,0 +1,59 @@
+diff -rauN tinyxserver/Makefile tinyxserver-tcc-patch/Makefile
+--- tinyxserver/Makefile	2023-07-14 09:31:20.000000000 +0200
++++ tinyxserver-tcc-patch/Makefile	2023-07-14 10:14:19.897926578 +0200
+@@ -61,7 +61,7 @@
+ install:
+ 	install -D -m 755 Xfbdev $(DESTDIR)/$(BINDIR)/Xfbdev
+ 	install -m 755 xinit $(DESTDIR)/$(BINDIR)/xinit
+-	ln -s $(BINDIR)/Xfbdev $(DESTDIR)/$(BINDIR)/X
++	ln -fs $(BINDIR)/Xfbdev $(DESTDIR)/$(BINDIR)/X
+ 	install -D -m 644 init/xinit.1 $(DESTDIR)/$(MANDIR)/man1/xinit.1
+ 	install -D -m 644 README $(DESTDIR)/$(DOCDIR)/tinyxserver/README
+ 	install -m 644 changelog $(DESTDIR)/$(DOCDIR)/tinyxserver/changelog
+diff -rauN tinyxserver/standard_definitions.mk tinyxserver-tcc-patch/standard_definitions.mk
+--- tinyxserver/standard_definitions.mk	2023-07-14 09:31:21.000000000 +0200
++++ tinyxserver-tcc-patch/standard_definitions.mk	2023-07-21 17:23:14.589816273 +0200
+@@ -2,12 +2,16 @@
+ ####compiler####
+ CC=/usr/bin/gcc
+ #CC=/opt/musl/bin/musl-gcc
++CC="${BASE}/build/stage1/bin/i386-tcc"
+ 
+ ####compilerflags####
+-COMPFLAGS=-pipe -fPIC -Os -Wall -D_BSD_SOURCE -D_GNU_SOURCE -D__KERNEL_STRICT_NAMES  \
+--fno-strength-reduce -nodefaultlibs -fno-strict-aliasing \
+--ffunction-sections -fdata-sections \
+--I. -I/usr/xsrc/pkg/usr/include
++COMPFLAGS="-Os -I${BASE}/build/stage1/include/X11"
++#LDFLAGS=-static \
++#	COMPFLAGS="-Os -Wall -D_DEFAULT_SOURCE -I${BASE}/include/X11" \
++#COMPFLAGS=-pipe -fPIC -Os -Wall -D_BSD_SOURCE -D_GNU_SOURCE -D__KERNEL_STRICT_NAMES  \
++#-fno-strength-reduce -nodefaultlibs -fno-strict-aliasing \
++#-ffunction-sections -fdata-sections \
++#-I. -I/usr/xsrc/pkg/usr/include
+ 
+ 
+ ####extensions####
+@@ -101,14 +105,17 @@
+ $(BIGREQS) \
+ -D__KERNEL_STRICT_NAMES
+ 
+-LDFLAGS=-static -Wl,--gc-sections,--sort-common,-s
+-LINKDIR=-L/usr/xsrc/pkg/usr/lib
++LDFLAGS=-static
++LINKDIR="-L${BASE}/lib"
+ 
+ #LINKDIR=-L/opt/musl/lib
+ #LIBDIR=/opt/musl/lib
+ #INCDIR=/opt/musl/include
+ 
+-PREDIR=/usr
++PREDIR=/
+ LIBDIR=$(DESTDIR)$(PREDIR)/lib
+-INCDIR=$(DESTIR)$(PREDIR)/include
+-
++INCDIR=$(DESTDIR)$(PREDIR)/include
++BINDIR=$(PREDIR)/bin
++MANDIR=$(PREDIR)/share/man
++DOCDIR=$(PREDIR)/share/doc
++FONTDIR=$(PREDIR)/share/fonts

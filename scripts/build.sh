@@ -422,6 +422,48 @@ else
 	echo "stage1 dropbear exists"
 fi
 
+if [ ! -f "${BASE}/build/stage1/lib/libX11.a" ]; then
+	rm -rf "tinyxlib-${TINYXLIB_VERSION}"
+	tar xf "${BASE}/downloads/tinyxlib-${TINYXLIB_VERSION}.tar.gz"
+	cd "tinyxlib-${TINYXLIB_VERSION}"
+	patch -Np1 < "${BASE}/patches/tinyxlib-tcc.patch"	
+	make -j$CPUS CC="${BASE}/build/stage1/bin/i386-tcc" \
+		COMPFLAGS="-Os -march=i486 -Wall -D_XOPEN_SOURCE=600 -D_BSD_SOURCE -D_GNU_SOURCE -fno-strength-reduce -nostdlib -fno-strict-aliasing  -I. -ffunction-sections -fdata-sections" \
+		LDFLAGS=""
+	mkdir -p "${BASE}/build/stage1/share/X11"
+	make -j$CPUS DESTDIR="${BASE}/build/stage1" PREDIR=/ -j$CPUS install
+	cd ..
+else
+	echo "stage1 tinyxlib exists"
+fi
+
+if [ ! -f "${BASE}/build/stage1/bin/Xfbdev" ]; then
+	rm -rf "tinyxserver-${TINYXSERVER_VERSION}"
+	tar xf "${BASE}/downloads/tinyxserver-${TINYXSERVER_VERSION}.tar.gz"
+	cd "tinyxserver-${TINYXSERVER_VERSION}"
+	patch -Np1 < "${BASE}/patches/tinyxserver-tcc.patch"	
+	make -j$CPUS BASE="${BASE}" core Xfbdev xinit
+	make -j$CPUS BASE="${BASE}" DESTDIR="${BASE}/build/stage1" PREDIR=/ -j$CPUS install
+	cd ..
+else
+	echo "stage1 Xfbdev exists"
+fi
+
+if [ ! -f "${BASE}/build/stage1/bin/rxvt" ]; then
+	rm -rf "rxvt-${RXVT_VERSION}"
+	tar xf "${BASE}/downloads/rxvt-${RXVT_VERSION}.tar.gz"
+	cd "rxvt-${RXVT_VERSION}"
+	CC="${BASE}/build/stage1/bin/i386-tcc" \
+	./configure --enable-static --prefix="${BASE}/build/stage1" \
+		--x-includes="${BASE}/build/stage1/include" \
+		--x-libraries="${BASE}/build/stage1/lib"
+	make -j$CPUS LDFLAGS="-static"
+	make -j$CPUS install
+	cd ..
+else
+	echo "stage1 rxvt exists"
+fi
+
 # TODO FROM HERE
 
 # TODO: have some way to deal with dependencies and with the user

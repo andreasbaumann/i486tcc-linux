@@ -235,6 +235,50 @@ Memory optimization:
   CONFIG_PHYSICAL_ALIGN=0x2000 8K
   CONFIG_RELOCATABLE=n
   boot.asm: set ramdisk and linux addresses correctly
+
+tinyx/framebuffer:
+
+- CONFIG_FB=y
+  => generic framebuffer support
+
+- CONFIG_FRAMEBUFFER_CONSOLE=y
+  => console on framebuffer
+
+- CONFIG_FRAMEBUFFER_CONSOLE_LEGACY_ACCELERATION=y
+- CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY=y
+
+- CONFIG_FONTS
+  => do we need them, at least fk.ko complains about font functions otherwise
+
+- CONFIG_FB_VESA=y
+  => only selectable if framebuffer support is NOT built as modules
+  => this also means we can only start x framebuffer X in the most generic
+     SVGA case when using no modules for the framebuffer modules
+  => works only if a vga=XXX parameter is passed on boot?
+
+
+TODO: CONFIG_FB_VGA16=m
+  => for lowest VGA mode
+  => never got that one working
+
+TODO: looks optional for a simple running system
+- CONFIG_FRAMEBUFFER_CONSOLE_LEGACY_ACCELERATION=y
+  => we use fbdev low-level drivers for Cirrus, Alix, etc.
+
+- CONFIG_FB_CIRRUS=y
+  => for the Unisys 486 machine, also for qemu?
+
+- CONFIG_FB_GEODE_LX=y
+  => for the Alix 1.E
+
+- CONFIG_MOUSE_PS2=m
+- CONFIG_INPUT_MOUSEDEV=m
+  CONFIG_INPUT_MOUSEDEV_PSAUX=y
+  
+- CONFIG_INPUT_EVDEV=m
+  => /dev/input/eventX
+
+TODO: CONFIG_SYSFB_SIMPLEFB=y
   
 TODO FROM HERE:
 
@@ -358,7 +402,39 @@ bugs
   -> right, where to, or does it live in the cache only?
   Freeing initrd memory: 688K
   -> is this our ramdisk? we didn't to switch_root yet
-  
+- tcc is almost usable inside the i486 system, just some pathes are
+  wrong, this small example works fine:
+  mkdir -p /home/abaumann/projects/i486tcc-linux/build/stage1
+  /home/abaumann/projects/i486tcc-linux/build/stage1
+  ln -s /include .
+  ln -s /lib .
+  cat test.c <<EOF
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+int main( int argc, char *argv[] )
+{
+    puts( "hello" );
+    
+    exit( EXIT_SUCCESS );
+}
+EOF
+  i386-tcc -c -o test.o test.c
+  i386-tcc -static -o test test.o
+  => recompilation of tcc inside the 486 system might be a problem because
+     of the build system
+- modern Xorg ist out of reach (and old devices DO have good framebuffer support!),
+  Xvesa from tinyx doesn't build because of missin vm86 stuff (presumable for mode
+  timing), this might be because we use musl?
+  Xfbdev builds, vesafb only works when started at boot time (not as module) which is
+  annoying.
+- "Could not init font path element ../share/X11/fonts/, removing from list"
+  https://www.x.org/releases/X11R7.5/doc/libXfont/fontlib.html
+  => the pathes must be absolute and no errors in any file whatsover!
+     Only BCF, PCF are supported
+- font handling when installing, currently in local/share/fonts/X11, we
+  should generate them from BCF files
+
 missing things
 --------------
 
@@ -638,7 +714,21 @@ links
   - https://patchwork.kernel.org/project/linux-block/patch_20190612163144.18486-2/roman.stratiienko@globallogic.com/
 - debugging
   - https://www.kernel.org/doc/html/v4.15/dev-tools/kgdb.html
-
+- X
+  - tiny X
+    - https://github.com/idunham/tinyxserver (puppy linux): has nice simple
+      makefiles
+    - https://github.com/tinycorelinux/tinyx, is newer, but requires autoconf mess
+      to build
+  - X terminal
+    - xterm: bloat
+    - st, requires Xft, requiring fontconfig, freetype2, etc. can eventually
+      be redone to use old font library?
+    - rxvt: simple and uses normal bitmap fonts (old font library)
+- terminal multiplexing
+  - tmux: newer
+  - screen: looks a little bit aged, might habe more features but also more code
+    
 Real hardware
 -------------
 
