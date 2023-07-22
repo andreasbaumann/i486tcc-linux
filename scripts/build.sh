@@ -582,6 +582,8 @@ fi
 if [ ! -f "${BASE}/floppy.img" ]; then
 	touch EOF
 	cp "${BASE}/build/stage1/boot/bzImage" .
+	# old way of setting video mode on boot into real mode (0x317)
+	tools/rdev -v bzImage 791
 	tar cvf data.tar -b1 bzImage ramdisk.img EOF
 	cat "${BASE}/build/stage1/boot/boot.img" data.tar > "${BASE}/floppy.img"
 	split -d -b 1474560 floppy.img floppy

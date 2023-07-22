@@ -31,6 +31,7 @@ local/     local adaptions and configurations which go into the ramdisk
 ramdisk/   the ramdisk being later compressed to ramdisk.img
 root/      the root filesystem later being used via NBD or directly as image
 tests/     test programs to test sanity of stages
+tools/     various tools needed on the host to build the distro
 
 patches
 -------
@@ -260,6 +261,7 @@ tinyx/framebuffer:
 TODO: CONFIG_FB_VGA16=m
   => for lowest VGA mode
   => never got that one working
+  => not sure if that one is needed when choosing VGA in framebuffer
 
 TODO: looks optional for a simple running system
 - CONFIG_FRAMEBUFFER_CONSOLE_LEGACY_ACCELERATION=y
@@ -278,7 +280,12 @@ TODO: looks optional for a simple running system
 - CONFIG_INPUT_EVDEV=m
   => /dev/input/eventX
 
-TODO: CONFIG_SYSFB_SIMPLEFB=y
+- CONFIG_SYSFB_SIMPLEFB=y
+  => so we get output after the vga= mode is set, so the output
+     continues on the VGA text console
+     
+TODO: CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY=y
+TODO: FRAMEBUFFER_CONSOLE_DEFERRED_TAKEOVER=y
   
 TODO FROM HERE:
 
