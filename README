@@ -442,6 +442,16 @@ EOF
 - font handling when installing, currently in local/share/fonts/X11, we
   should generate them from BCF files
 - rxvt: can't load font "7x14"
+- we need to set the video mode for the floppy loading mode with rdev,
+  vga=? seems not to be used when booting via Linux real mode boot mode
+  (qemu_direct works fine with vga=?)
+
+tools
+-----
+
+- util-linux, version 2.17: rdev, for setting the video mode in real mode
+  load mode
+- bdftopcf 1.1: for converting BDF to PCF
 
 missing things
 --------------
@@ -733,10 +743,16 @@ links
     - st, requires Xft, requiring fontconfig, freetype2, etc. can eventually
       be redone to use old font library?
     - rxvt: simple and uses normal bitmap fonts (old font library)
+  - X fonts
+    - https://www.x.org/archive/X11R6.8.0/doc/fonts2.html
+    - https://www.x.org/archive/X11R7.5/doc/man/man1/mkfontdir.1.html
+    - https://www.x.org/archive//individual/font
 - terminal multiplexing
   - tmux: newer
   - screen: looks a little bit aged, might habe more features but also more code
-    
+- window manager
+  - dwm/dmenu or notion3
+      
 Real hardware
 -------------
 
