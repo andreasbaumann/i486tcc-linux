@@ -84,6 +84,10 @@ dependencies
     some non-compiling fallback when there is no curses?)
 - mandoc
   - zlib
+- lua51
+- tinyxserver
+  - tinyxlib
+  - some basic fonts for default and cursor
   
 kernel options
 --------------
@@ -445,6 +449,7 @@ EOF
 - we need to set the video mode for the floppy loading mode with rdev,
   vga=? seems not to be used when booting via Linux real mode boot mode
   (qemu_direct works fine with vga=?)
+- notion: keyboard XCB missing in tinyxlib? tcc: error: undefined symbol 'XkbKeycodeToKeysym'
 
 tools
 -----
@@ -747,6 +752,8 @@ links
     - https://www.x.org/archive/X11R6.8.0/doc/fonts2.html
     - https://www.x.org/archive/X11R7.5/doc/man/man1/mkfontdir.1.html
     - https://www.x.org/archive//individual/font
+  - X apps and stuff
+    - https://www.x.org/archive/individual/app/
 - terminal multiplexing
   - tmux: newer
   - screen: looks a little bit aged, might habe more features but also more code

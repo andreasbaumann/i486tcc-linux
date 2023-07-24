@@ -1,0 +1,34 @@
+diff -rauN notion/modulelist.mk notion-minimal-patch/modulelist.mk
+--- notion/modulelist.mk	2023-07-24 05:52:11.000000000 +0200
++++ notion-minimal-patch/modulelist.mk	2023-07-24 18:29:19.240836995 +0200
+@@ -4,4 +4,5 @@
+ 
+ MODULE_LIST = mod_tiling mod_query mod_menu \
+ 	      mod_dock mod_sp mod_sm mod_statusbar \
+-	      de mod_xinerama mod_xrandr mod_xkbevents mod_notionflux
++	      de mod_xkbevents
++# mod_xinerama mod_xrandr mod_notionflux
+diff -rauN notion/system-autodetect.mk notion-minimal-patch/system-autodetect.mk
+--- notion/system-autodetect.mk	2023-07-24 05:52:11.000000000 +0200
++++ notion-minimal-patch/system-autodetect.mk	2023-07-24 18:31:38.701041540 +0200
+@@ -174,7 +174,8 @@
+           -DHAS_SYSTEM_ASPRINTF=$(HAS_SYSTEM_ASPRINTF)
+ 
+ LDFLAGS += -Wl,--as-needed $(LIBS) $(EXTRA_LIBS)
+-EXPORT_DYNAMIC=-Xlinker --export-dynamic
++#EXPORT_DYNAMIC=-Xlinker --export-dynamic
++EXPORT_DYNAMIC=-rdynamic
+ 
+ # The following options are mainly for development use and can be used
+ # to check that the code seems to conform to some standards. Depending
+@@ -230,7 +231,7 @@
+ INSTALL_STRIP =
+ CFLAGS += -g
+ 
+-ifeq ($(PRELOAD_MODULES),1)
+-X11_LIBS += -lXinerama -lXrandr
+-endif
++#ifeq ($(PRELOAD_MODULES),1)
++#X11_LIBS += -lXinerama -lXrandr
++#endif
+ 

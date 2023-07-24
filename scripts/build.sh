@@ -464,6 +464,36 @@ else
 	echo "stage1 rxvt exists"
 fi
 
+if [ ! -f "${BASE}/build/stage1/bin/lua" ]; then
+	rm -rf "lua-${LUA_VERSION}"
+	tar xf "${BASE}/downloads/lua-${LUA_VERSION}.tar.gz"
+	cd "lua-${LUA_VERSION}"
+	patch -Np1 < "${BASE}/patches/lua51-no-readline.patch"
+	make -j$CPUS linux CC="${BASE}/build/stage1/bin/i386-tcc" \
+		MYLDFLAGS=-static AR="${BASE}/build/stage1/bin/i386-tcc -ar" RANLIB=echo
+	make -j$CPUS install INSTALL_TOP="${BASE}/build/stage1"
+	cd ..
+else
+	echo "stage1 lua exists"
+fi
+
+if [ ! -f "${BASE}/build/stage1/bin/notion" ]; then
+	rm -rf "notion-${NOTION_VERSION}"
+	tar xf "${BASE}/downloads/notion-${NOTION_VERSION}.tar.gz"
+	cd "notion-${NOTION_VERSION}"
+	patch -Np1 < "${BASE}/patches/notion-minimal.patch"
+#	sed -i "s|@@BASE@@|${BASE}|g" mod_tiling/
+	CC="${BASE}/build/stage1/bin/i386-tcc" \
+	make INCLUDE="-I${BASE}/src/stage1/notion-${NOTION_VERSION}" \
+		X11_INCLUDES="-I${BASE}/build/stage1/include" \
+		X11_LIBS="-W,-static -L${BASE}/build/stage1/lib -lX11 -lXext -lX11 -W,-dynamic" \
+		USE_XFT=0 \
+		LUA_VERSION=5.1 PREFIX=/ ETCDIR=/etc/notion
+	cd ..
+else
+	echo "stage1 notion exists"
+fi
+
 # TODO FROM HERE
 
 # TODO: have some way to deal with dependencies and with the user
@@ -504,11 +534,6 @@ fi
 #~ CC=/data/work/i486/build/stage1/bin/i386-tcc ./configure --prefix=/data/work/i486/build/stage1 --enable-static
 #~ make LDFLAGS=-static
 #~ make install
-
-#~ cd ../lua
-#~ make linux CC=/data/work/i486/build/stage1/bin/i386-tcc \
-	#~ MYLDFLAGS=-static AR='/data/work/i486/build/stage0/bin/i386-tcc -ar' RANLIB=echo
-#~ make install INSTALL_TOP=/data/work/i486/build/stage1
 
 #~ cd ../iproute2
 #~ PKG_CONFIG=false CC=/data/work/i486/build/stage1/bin/i386-tcc \

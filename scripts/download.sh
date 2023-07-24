@@ -148,6 +148,11 @@ if [ ! -f "${BASE}/downloads/rxvt-${RXVT_VERSION}.tar.gz" ]; then
 		"https://sourceforge.net/projects/rxvt/files/rxvt/${RXVT_VERSION}/rxvt-${RXVT_VERSION}.tar.gz/download"
 fi
 
+if [ ! -f "${BASE}/downloads/lua-${LUA_VERSION}.tar.gz" ]; then
+	wget -O "${BASE}/downloads/lua-${LUA_VERSION}.tar.gz" \
+		"https://www.lua.org/ftp/lua-${LUA_VERSION}.tar.gz"
+fi
+
 if [ ! -f "${BASE}/downloads/uflbbl-${UFLBBL_VERSION}.tar.gz" ]; then
 	git clone git://git.andreasbaumann.cc/uflbbl.git "uflbbl-${UFLBBL_VERSION}"
 	git -C "uflbbl-${UFLBBL_VERSION}" checkout "${UFLBBL_VERSION}"
