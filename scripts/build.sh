@@ -482,13 +482,18 @@ if [ ! -f "${BASE}/build/stage1/bin/notion" ]; then
 	tar xf "${BASE}/downloads/notion-${NOTION_VERSION}.tar.gz"
 	cd "notion-${NOTION_VERSION}"
 	patch -Np1 < "${BASE}/patches/notion-minimal.patch"
-#	sed -i "s|@@BASE@@|${BASE}|g" mod_tiling/
+	sed -i "s|@@BASE@@|${BASE}|g" \
+		mod_sm/Makefile notion/Makefile
 	CC="${BASE}/build/stage1/bin/i386-tcc" \
+	LDFLAGS="-static" \
 	make INCLUDE="-I${BASE}/src/stage1/notion-${NOTION_VERSION}" \
 		X11_INCLUDES="-I${BASE}/build/stage1/include" \
-		X11_LIBS="-W,-static -L${BASE}/build/stage1/lib -lX11 -lXext -lX11 -W,-dynamic" \
+		X11_LIBS="${BASE}/build/stage1/lib/libX11.a ${BASE}/build/stage1/lib/libXext.a ${BASE}/build/stage1/lib/libSM.a ${BASE}/build/stage1/lib/libICE.a ${BASE}/build/stage1/lib/libX11.a" \
 		USE_XFT=0 \
+		PRELOAD_MODULES=1 \
 		LUA_VERSION=5.1 PREFIX=/ ETCDIR=/etc/notion
+	#make -j$CPUS DESTDIR="${BASE}/build/stage1" PREFIX=/ -j$CPUS install
+	cp "${BASE}/src/stage1/notion-435631f/notion/notion" "${BASE}/build/stage1/bin"
 	cd ..
 else
 	echo "stage1 notion exists"

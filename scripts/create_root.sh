@@ -26,7 +26,7 @@ test -f /dev/loop0 && losetup -d /dev/loop0
 test -d "${ROOT}" && rmdir "${ROOT}"
 test -f root.img && rm -f root.img
 
-dd if=/dev/zero of=root.img bs=512 count=128520
+dd if=/dev/zero of=root.img bs=512 count=257040
 chmod 666 root.img
 losetup /dev/loop0 root.img
 mke2fs /dev/loop0

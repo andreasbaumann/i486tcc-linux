@@ -1,3 +1,36 @@
+diff -rauN notion/ioncore/bindmaps.c notion-minimal-patch/ioncore/bindmaps.c
+--- notion/ioncore/bindmaps.c	2023-07-24 05:52:11.000000000 +0200
++++ notion-minimal-patch/ioncore/bindmaps.c	2023-07-25 16:15:07.594406076 +0200
+@@ -208,6 +208,7 @@
+     if(bindmap==NULL)
+         return NULL;
+ 
++#ifdef HAVE_X11_XCB
+     b.ksb=XkbKeycodeToKeysym(ioncore_g.dpy, kcb, 0, 0);
+     b.kcb=kcb;
+     b.state=state;
+@@ -228,6 +229,9 @@
+         b.state|=ShiftMask;
+         bindmap_add_binding(bindmap, &b);
+     }
++#else
++    return NULL;
++#endif
+ 
+     return bindmap;
+ }
+diff -rauN notion/mod_sm/Makefile notion-minimal-patch/mod_sm/Makefile
+--- notion/mod_sm/Makefile	2023-07-24 05:52:11.000000000 +0200
++++ notion-minimal-patch/mod_sm/Makefile	2023-07-25 16:31:41.145863309 +0200
+@@ -10,7 +10,7 @@
+ 
+ INCLUDES += $(X11_INCLUDES) $(LIBTU_INCLUDES) $(LIBEXTL_INCLUDES) -I..
+ CFLAGS += $(XOPEN_SOURCE) $(C99_SOURCE)
+-LIBS += $(X11_LIBS) -lSM -lICE
++LIBS += $(X11_LIBS) @@BASE@@/build/stage1/lib/libSM.a @@BASE@@/build/stage1/lib/libICE.a
+ 
+ SOURCES=sm.c sm_matchwin.c sm_session.c
+ 
 diff -rauN notion/modulelist.mk notion-minimal-patch/modulelist.mk
 --- notion/modulelist.mk	2023-07-24 05:52:11.000000000 +0200
 +++ notion-minimal-patch/modulelist.mk	2023-07-24 18:29:19.240836995 +0200
@@ -8,6 +41,18 @@ diff -rauN notion/modulelist.mk notion-minimal-patch/modulelist.mk
 -	      de mod_xinerama mod_xrandr mod_xkbevents mod_notionflux
 +	      de mod_xkbevents
 +# mod_xinerama mod_xrandr mod_notionflux
+diff -rauN notion/notion/Makefile notion-minimal-patch/notion/Makefile
+--- notion/notion/Makefile	2023-07-24 05:52:11.000000000 +0200
++++ notion-minimal-patch/notion/Makefile	2023-07-25 16:34:22.066099329 +0200
+@@ -19,7 +19,7 @@
+ INCLUDES += $(LIBMAINLOOP_INCLUDES) $(LIBTU_INCLUDES) $(LIBEXTL_INCLUDES)
+ INCLUDES += -I..
+ 
+-LIBS += $(X11_LIBS) -lSM -lICE
++LIBS += $(X11_LIBS) @@BASE@@/build/stage1/lib/libSM.a @@BASE@@/build/stage1/lib/libICE.a
+ LIBS += $(WHOLEA) $(LIBMAINLOOP_LIBS) $(LIBEXTL_LIBS) $(LIBTU_LIBS) $(NO_WHOLEA)
+ LIBS += $(LUA_LIBS) $(DL_LIBS)
+ LIBS += -lm
 diff -rauN notion/system-autodetect.mk notion-minimal-patch/system-autodetect.mk
 --- notion/system-autodetect.mk	2023-07-24 05:52:11.000000000 +0200
 +++ notion-minimal-patch/system-autodetect.mk	2023-07-24 18:31:38.701041540 +0200
