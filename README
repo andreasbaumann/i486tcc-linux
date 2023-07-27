@@ -450,11 +450,11 @@ EOF
   vga=? seems not to be used when booting via Linux real mode boot mode
   (qemu_direct works fine with vga=?)
 - notion: keyboard XCB missing in tinyxlib? tcc: error: undefined symbol 'XkbKeycodeToKeysym'
-- notion: mod_tiling.so: we have a problem, we need modules, shared linking
-  and dynamic loading (PRELOAD_MODULES=0), with (PRELOAD_MODULES=1) we get
-  an installation error (install: mod_tiling.so does not exist) and miss some
-  precompiled lua code (.lc files)
-
+- notion: some dummy Xrandr implementation, but as long as we don't use
+  the mod_xrandr module, we should be fine (tinyxlib has some Xrandr function
+  stubs for a possible extention - similar like XCB - but the implementation
+  is somehow missing) 
+       
 tools
 -----
 

@@ -33,14 +33,138 @@ diff -rauN notion/mod_sm/Makefile notion-minimal-patch/mod_sm/Makefile
  
 diff -rauN notion/modulelist.mk notion-minimal-patch/modulelist.mk
 --- notion/modulelist.mk	2023-07-24 05:52:11.000000000 +0200
-+++ notion-minimal-patch/modulelist.mk	2023-07-24 18:29:19.240836995 +0200
-@@ -4,4 +4,5 @@
++++ notion-minimal-patch/modulelist.mk	2023-07-27 15:05:56.899756802 +0200
+@@ -4,4 +4,4 @@
  
  MODULE_LIST = mod_tiling mod_query mod_menu \
  	      mod_dock mod_sp mod_sm mod_statusbar \
 -	      de mod_xinerama mod_xrandr mod_xkbevents mod_notionflux
-+	      de mod_xkbevents
-+# mod_xinerama mod_xrandr mod_notionflux
++	      de mod_xkbevents mod_xinerama mod_xrandr mod_notionflux
+diff -rauN notion/mod_xrandr/mod_xrandr.c notion-minimal-patch/mod_xrandr/mod_xrandr.c
+--- notion/mod_xrandr/mod_xrandr.c	2023-07-24 05:52:11.000000000 +0200
++++ notion-minimal-patch/mod_xrandr/mod_xrandr.c	2023-07-27 16:18:57.586181913 +0200
+@@ -145,6 +145,7 @@
+     if(rotations==NULL)
+         return FALSE;
+ 
++#ifdef HAVE_XRANDR
+     FOR_ALL_SCREENS(scr){
+         Rotation rot=RR_Rotate_90;
+         int randr_screen_id = XRRRootToScreen(ioncore_g.dpy, ((WMPlex*) scr)->win.win);
+@@ -153,6 +154,9 @@
+ 
+         insrot(scr->id, rr2scrrot(rot));
+     }
++#else
++    return FALSE;
++#endif
+ 
+     return TRUE;
+ }
+@@ -163,18 +167,26 @@
+ 
+ bool mod_xrandr_init()
+ {
++#ifdef HAVE_XRANDR
+     hasXrandR=
+         XRRQueryExtension(ioncore_g.dpy,&xrr_event_base,&xrr_error_base);
++#else
++    hasXrandR=FALSE;
++#endif
+ 
+     if(!check_pivots())
+         return FALSE;
+ 
++#ifdef HAVE_XRANDR
+     if(hasXrandR){
+         XRRSelectInput(ioncore_g.dpy,ioncore_g.rootwins->dummy_win,
+                        RRScreenChangeNotifyMask);
+     }else{
++#endif
+         warn_obj("mod_xrandr","XRandR is not supported on this display");
++#ifdef HAVE_XRANDR
+     }
++#endif
+ 
+     hook_add(ioncore_handle_event_alt,(WHookDummy *)handle_xrandr_event);
+ 
+@@ -192,6 +204,7 @@
+     return TRUE;
+ }
+ 
++#ifdef HAVE_XRANDR
+ void add_output(ExtlTab result, XRROutputInfo *output_info, XRRCrtcInfo *crtc_info)
+ {
+     ExtlTab details = extl_create_table();
+@@ -207,15 +220,34 @@
+     extl_table_sets_i(details, "h", (int)crtc_info->height);
+     extl_table_sets_t(result, strdup(output_info->name), details);
+ }
++#else
++/* for now return one default screen resolution (fitting to the VESA mode
++ * 0x317, TODO: use older Xrandr functions to get mode data)
++ */
++void add_default_output(ExtlTab result)
++{
++    ExtlTab details = extl_create_table();
++    extl_table_sets_s(details, "name", strdup("standard"));
++    extl_table_sets_i(details, "x", 0);
++    extl_table_sets_i(details, "y", 0);
++    extl_table_sets_i(details, "w", 1024);
++    extl_table_sets_i(details, "h", 768);
++    extl_table_sets_t(result, strdup("standard"), details);
++}
++#endif
+ 
+ EXTL_SAFE
+ EXTL_EXPORT
+ ExtlTab mod_xrandr_get_all_outputs()
+ {
+     int i;
++
++#ifdef HAVE_XRANDR
+     XRRScreenResources *res = XRRGetScreenResources(ioncore_g.dpy, ioncore_g.rootwins->dummy_win);
++#endif
+     ExtlTab result = extl_create_table();
+ 
++#ifdef HAVE_XRANDR
+     for(i=0; i < res->noutput; i++){
+         XRROutputInfo *output_info = XRRGetOutputInfo(ioncore_g.dpy, res, res->outputs[i]);
+         if(output_info->crtc != None){
+@@ -227,6 +259,9 @@
+         }
+         XRRFreeOutputInfo(output_info);
+     }
++#else
++    add_default_output(result);
++#endif
+ 
+     return result;
+ 
+@@ -242,9 +277,13 @@
+ ExtlTab mod_xrandr_get_outputs_for_geom(ExtlTab geom)
+ {
+     int i;
++
++#ifdef HAVE_XRANDR
+     XRRScreenResources *res = XRRGetScreenResources(ioncore_g.dpy, ioncore_g.rootwins->dummy_win);
++#endif
+     ExtlTab result = extl_create_table();
+ 
++#ifdef HAVE_XRANDR
+     for(i=0; i < res->noutput; i++){
+         int x,y;
+         int w,h;
+@@ -265,6 +304,9 @@
+         }
+         XRRFreeOutputInfo(output_info);
+     }
++#else
++    add_default_output(result);
++#endif
+ 
+     return result;
+ }
 diff -rauN notion/notion/Makefile notion-minimal-patch/notion/Makefile
 --- notion/notion/Makefile	2023-07-24 05:52:11.000000000 +0200
 +++ notion-minimal-patch/notion/Makefile	2023-07-25 16:34:22.066099329 +0200
@@ -55,7 +179,7 @@ diff -rauN notion/notion/Makefile notion-minimal-patch/notion/Makefile
  LIBS += -lm
 diff -rauN notion/system-autodetect.mk notion-minimal-patch/system-autodetect.mk
 --- notion/system-autodetect.mk	2023-07-24 05:52:11.000000000 +0200
-+++ notion-minimal-patch/system-autodetect.mk	2023-07-24 18:31:38.701041540 +0200
++++ notion-minimal-patch/system-autodetect.mk	2023-07-27 16:10:46.675461899 +0200
 @@ -174,7 +174,8 @@
            -DHAS_SYSTEM_ASPRINTF=$(HAS_SYSTEM_ASPRINTF)
  

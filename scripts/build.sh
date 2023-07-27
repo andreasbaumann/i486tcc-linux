@@ -488,11 +488,12 @@ if [ ! -f "${BASE}/build/stage1/bin/notion" ]; then
 	CC="${BASE}/build/stage1/bin/i386-tcc" \
 	make INCLUDE="-I${BASE}/src/stage1/notion-${NOTION_VERSION}" \
 		X11_INCLUDES="-I${BASE}/build/stage1/include" \
-		X11_LIBS="${BASE}/build/stage1/lib/libX11.a ${BASE}/build/stage1/lib/libXext.a ${BASE}/build/stage1/lib/libSM.a ${BASE}/build/stage1/lib/libICE.a ${BASE}/build/stage1/lib/libX11.a" \
+		X11_LIBS="${BASE}/build/stage1/lib/libX11.a ${BASE}/build/stage1/lib/libXext.a ${BASE}/build/stage1/lib/libSM.a ${BASE}/build/stage1/lib/libICE.a ${BASE}/build/stage1/lib/libX11.a ${BASE}/build/stage1/lib/libXext.a ${BASE}/build/stage1/lib/libXinerama.a" \
+		XRANDR_LDLIBS="" \
 		USE_XFT=0 \
 		LUA_DIR="${BASE}/build/stage1" \
 		LUAC="${BASE}/build/stage1/bin/luac" \
-		PRELOAD_MODULES=0 \
+		PRELOAD_MODULES=1 \
 		LUA_VERSION=5.1 PREFIX=/ ETCDIR=/etc/notion
 	cd notion || exit 1
 	rm notion
@@ -500,15 +501,16 @@ if [ ! -f "${BASE}/build/stage1/bin/notion" ]; then
 	LDFLAGS="-static" \
 	make INCLUDE="-I${BASE}/src/stage1/notion-${NOTION_VERSION}" \
 		X11_INCLUDES="-I${BASE}/build/stage1/include" \
-		X11_LIBS="${BASE}/build/stage1/lib/libX11.a ${BASE}/build/stage1/lib/libXext.a ${BASE}/build/stage1/lib/libSM.a ${BASE}/build/stage1/lib/libICE.a ${BASE}/build/stage1/lib/libX11.a" \
+		X11_LIBS="${BASE}/build/stage1/lib/libX11.a ${BASE}/build/stage1/lib/libXext.a ${BASE}/build/stage1/lib/libSM.a ${BASE}/build/stage1/lib/libICE.a ${BASE}/build/stage1/lib/libX11.a ${BASE}/build/stage1/lib/libXext.a ${BASE}/build/stage1/lib/libXinerama.a" \
+		XRANDR_LDLIBS="" \
 		USE_XFT=0 \
 		LUA_DIR="${BASE}/build/stage1" \
 		LUAC="${BASE}/build/stage1/bin/luac" \
-		PRELOAD_MODULES=0 \
+		PRELOAD_MODULES=1 \
 		LUA_VERSION=5.1 PREFIX=/ ETCDIR=/etc/notion \
 		notion
 	cd .. || exit 1
-	make -j$CPUS DESTDIR="${BASE}/build/stage1" PREFIX=/ -j$CPUS install
+	make -j$CPUS DESTDIR="${BASE}/build/stage1" PRELOAD_MODULES=1 PREFIX=/ -j$CPUS install
 	cd ..
 else
 	echo "stage1 notion exists"
