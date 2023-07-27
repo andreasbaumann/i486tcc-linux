@@ -450,6 +450,10 @@ EOF
   vga=? seems not to be used when booting via Linux real mode boot mode
   (qemu_direct works fine with vga=?)
 - notion: keyboard XCB missing in tinyxlib? tcc: error: undefined symbol 'XkbKeycodeToKeysym'
+- notion: mod_tiling.so: we have a problem, we need modules, shared linking
+  and dynamic loading (PRELOAD_MODULES=0), with (PRELOAD_MODULES=1) we get
+  an installation error (install: mod_tiling.so does not exist) and miss some
+  precompiled lua code (.lc files)
 
 tools
 -----
@@ -759,7 +763,11 @@ links
   - screen: looks a little bit aged, might habe more features but also more code
 - window manager
   - dwm/dmenu or notion3
-      
+  - notion3/notion: uses lua, loadable modules, etc. has xinerama/xrandr support,
+    this is all a little bit too much
+  - ion1: more suckless, maybe patchable to do what we want
+    https://github.com/apenwarr/ion1
+
 Real hardware
 -------------
 
