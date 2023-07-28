@@ -153,6 +153,13 @@ if [ ! -f "${BASE}/downloads/lua-${LUA_VERSION}.tar.gz" ]; then
 		"https://www.lua.org/ftp/lua-${LUA_VERSION}.tar.gz"
 fi
 
+if [ ! -f "${BASE}/downloads/notion-${NOTION_VERSION}.tar.gz" ]; then
+	git clone https://github.com/raboof/notion.git "notion-${NOTION_VERSION}"
+	git -C "notion-${NOTION_VERSION}" checkout "${NOTION_VERSION}"
+	tar zcf "${BASE}/downloads/notion-${NOTION_VERSION}.tar.gz" "notion-${NOTION_VERSION}"
+	rm -rf "notion-${NOTION_VERSION}"
+fi
+
 if [ ! -f "${BASE}/downloads/uflbbl-${UFLBBL_VERSION}.tar.gz" ]; then
 	git clone git://git.andreasbaumann.cc/uflbbl.git "uflbbl-${UFLBBL_VERSION}"
 	git -C "uflbbl-${UFLBBL_VERSION}" checkout "${UFLBBL_VERSION}"
