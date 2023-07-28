@@ -5,7 +5,7 @@ Build a small Linux system with as little resource usage as possible.
 Modern kernel, suckless if possible, i486 as target. Trying to
 squeeze binaries with NetBSD cruch. Using a floppy boot loader
 which uses a USTAR-like format for storing kernel and ramdisk.
-Using musl for it's ability to produce small static binaries.
+Using musl for its ability to produce small static binaries.
 
 requirements
 ------------
@@ -586,7 +586,6 @@ bearssl instead of openssl
 byacc instead of bison
 perp and sinit instead of sysvinit or systemd
 netsurf instead of chromium or firefox
-velox instead of Xorg
 
 morpheus
 --------
@@ -763,6 +762,7 @@ links
       makefiles
     - https://github.com/tinycorelinux/tinyx, is newer, but requires autoconf mess
       to build
+    - alernatives would have been velox?
   - X terminal
     - xterm: bloat
     - st, requires Xft, requiring fontconfig, freetype2, etc. can eventually
