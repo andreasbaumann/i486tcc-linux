@@ -492,6 +492,9 @@ if [ ! -f "${BASE}/build/stage1/bin/notion" ]; then
 		XRANDR_LDLIBS="" \
 		USE_XFT=0 \
 		LUA_DIR="${BASE}/build/stage1" \
+		LUA_INCLUDES="-I${BASE}/build/stage1/include" \
+		LUA_LIBS="${BASE}/build/stage1/lib/liblua.a" \
+		LUA="${BASE}/build/stage1/bin/lua" \
 		LUAC="${BASE}/build/stage1/bin/luac" \
 		PRELOAD_MODULES=1 \
 		LUA_VERSION=5.1 PREFIX=/ ETCDIR=/etc/notion
@@ -505,6 +508,9 @@ if [ ! -f "${BASE}/build/stage1/bin/notion" ]; then
 		XRANDR_LDLIBS="" \
 		USE_XFT=0 \
 		LUA_DIR="${BASE}/build/stage1" \
+		LUA_INCLUDES="-I${BASE}/build/stage1/include" \
+		LUA_LIBS="${BASE}/build/stage1/lib/liblua.a" \
+		LUA="${BASE}/build/stage1/bin/lua" \
 		LUAC="${BASE}/build/stage1/bin/luac" \
 		PRELOAD_MODULES=1 \
 		LUA_VERSION=5.1 PREFIX=/ ETCDIR=/etc/notion \
@@ -605,6 +611,11 @@ else
 fi
 
 cd ../..
+
+# tools on the host
+if [ ! -x "${BASE}/tools/rdev" ]; then
+	tcc -o tools/rdev tools/rdev.c
+fi
 
 # ramdisk
 
