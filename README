@@ -496,7 +496,7 @@ to abase).
   - awk
   - bc and dc
   - diff
-  - mk
+  - mk (instead of samu)
   - yacc
   - troff
 - others
@@ -643,6 +643,9 @@ links
     - https://www.glaucuslinux.org/
     - https://github.com/ZilchOS/bootstrap-from-tcc: this is more for having
       a minimal tcc-based binary core for bootstrapping
+    - https://github.com/GataOS/musl-tcc.git: especially interesting to
+      have a look at the patches for making musl build with tcc (we sort
+      of yoloed the complex and floating point stuff)
     - https://github.com/oriansj
     - https://bellard.org/tcc/tccboot.html
     - https://github.com/michaelforney/
@@ -703,7 +706,16 @@ links
     - https://omaera.org/wlog/tech/runit_init
     - https://forums.gentoo.org/viewtopic-t-1000292-start-0.html
 - minimal userland
-  - https://github.com/ibara/oksh
+  - shells
+     - POSIX compliant
+      - https://github.com/ibara/oksh: good compromise of good and small
+        code base and functionality
+      - https://yash.osdn.jp/index.html.en
+      - dash: something bothered be there in the build process (TODO: what?)
+    - minimalistic to the extreme:
+      - https://github.com/hacheigriega/sshell.git: very minimal, more an
+        education project
+      - the 'S' shell
   - suckless
     - git://git.suckless.org/sbase
     - git://git.suckless.org/ubase
@@ -715,7 +727,11 @@ links
     - https://github.com/leahneukirchen/obase
     - https://beastiebox.sourceforge.net/
   - gopher://bitreich.org
-  - https://git.2f30.org/hbase/log.html
+  - https://git.2f30.org/hbase/log.html: Heirlom
+  - https://www.glendix.org/: we could also go into the direction of using
+    plan 9 things (as they tend to be more minimalistic):
+    - git://git.9front.org/plan9front/plan9front
+    - git://git.suckless.org/9base
 - minimalism
   - https://wiki.installgentoo.com/wiki/Software_minimalism
 - Link collections of interesting software
