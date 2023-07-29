@@ -587,6 +587,11 @@ byacc instead of bison
 perp and sinit instead of sysvinit or systemd
 netsurf instead of chromium or firefox
 
+embutils for our abase version of:
+
+domainname
+install
+
 morpheus
 --------
 
@@ -725,6 +730,7 @@ links
     - https://tools.suckless.org/9base/
     - https://github.com/leahneukirchen/obase
     - https://beastiebox.sourceforge.net/
+    - https://www.fefe.de/embutils/
   - gopher://bitreich.org
   - https://git.2f30.org/hbase/log.html: Heirlom
   - https://www.glendix.org/: we could also go into the direction of using
