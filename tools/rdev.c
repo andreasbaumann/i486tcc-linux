@@ -67,6 +67,10 @@ Wed Jun 22 21:12:29 1994: Applied patches from Dave
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#ifndef PATH_MAX
+#define PATH_MAX 255
+#endif
+
 /* rdev.c  -  query/set root device. */
 
 static void

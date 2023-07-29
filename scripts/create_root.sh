@@ -70,7 +70,7 @@ test -d "${ROOT}"/var || mkdir "${ROOT}"/var
 test -d "${ROOT}"/var/run || mkdir "${ROOT}"/var/run
 test -d "${ROOT}"/mnt || mkdir "${ROOT}"/mnt
 
-# copy locally adapted scripts
+# copy locally adapted scripts, configuration
 test -d "${ROOT}/root" || mkdir "${ROOT}/root"
 cp "${LOCAL}"/root/.profile "${ROOT}/root"
 cp "${LOCAL}"/root/.xserverrc "${ROOT}/root"
@@ -80,7 +80,6 @@ cp -dR "${LOCAL}"/bin/* "${ROOT}/bin"
 test -d "${ROOT}/etc" || mkdir "${ROOT}/etc"
 cp -dR "${LOCAL}"/etc/* "${ROOT}/etc"
 test -d "${ROOT}/share" || mkdir "${ROOT}/share"
-cp -dR "${LOCAL}"/share/* "${ROOT}/share"
 
 # copy ramdisk, boot loader and kernel to /boot
 cp ramdisk.img "${ROOT}/boot"

@@ -1,0 +1,17 @@
+diff -rauN rxvt/src/feature.h rxvt-font-patch/src/feature.h
+--- rxvt/src/feature.h	2000-07-05 09:26:17.000000000 +0200
++++ rxvt-font-patch/src/feature.h	2023-07-29 18:24:33.175186686 +0200
+@@ -376,10 +376,10 @@
+  * sets (NFONT_LIST) have been matched up
+  */
+ #ifndef MULTICHAR_SET		/* no Kanji or Big5 or GB support */
+-# define NFONTS		5
+-# define FONT0_IDX	2
++# define NFONTS		1
++# define FONT0_IDX	0
+ # undef  MFONT_LIST
+-# define NFONT_LIST	"7x14", "6x10", "6x13", "8x13", "9x15"
++# define NFONT_LIST	"fixed"
+ #endif
+ #ifdef KANJI
+ # define NFONTS		5

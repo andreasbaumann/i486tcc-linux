@@ -1,0 +1,25 @@
+diff -rauN bdftopcf/bdfint.h bdftopcf-tcc-patch/bdfint.h
+--- bdftopcf/bdfint.h	2017-11-07 20:11:44.000000000 +0100
++++ bdftopcf-tcc-patch/bdfint.h	2023-07-29 11:02:26.916280874 +0200
+@@ -65,8 +65,8 @@
+     BOOL        haveDefaultCh;
+ }           bdfFileState;
+ 
+-extern void bdfError ( const char * message, ... ) _X_ATTRIBUTE_PRINTF(1, 2);
+-extern void bdfWarning ( const char *message, ... ) _X_ATTRIBUTE_PRINTF(1, 2);
++extern void bdfError ( const char * message, ... );
++extern void bdfWarning ( const char *message, ... );
+ extern unsigned char * bdfGetLine ( FontFilePtr file, unsigned char *buf,
+ 				    int len );
+ extern Atom bdfForceMakeAtom ( const char *str, int *size );
+diff -rauN bdftopcf/pcf.h bdftopcf-tcc-patch/pcf.h
+--- bdftopcf/pcf.h	2017-11-07 20:11:44.000000000 +0100
++++ bdftopcf-tcc-patch/pcf.h	2023-07-29 11:02:31.786288017 +0200
+@@ -92,6 +92,6 @@
+ 			 int bit, int byte, int glyph, int scan );
+ extern int pcfReadFontInfo ( FontInfoPtr pFontInfo, FontFilePtr file );
+ extern int pcfWriteFont ( FontPtr pFont, FontFilePtr file );
+-extern void pcfError ( const char *, ... ) _X_ATTRIBUTE_PRINTF(1, 2);
++extern void pcfError ( const char *, ... );
+ 
+ #endif				/* _PCF_H_ */

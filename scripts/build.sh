@@ -69,6 +69,32 @@ else
 	echo "stage0 musl C library exists"
 fi
 
+# tools on the host (assuming we use i386 code compiled with tcc and run
+# on a AMD64/i386 host)
+
+cd "${BASE}"
+
+if [ ! -x "${BASE}/tools/rdev" ]; then
+	"${BASE}/build/stage1/bin/i386-tcc" -static -o tools/rdev tools/rdev.c
+else
+	echo "tool rdev exists"
+fi
+
+cd "${BASE}/src/stage1"
+
+if [ ! -f "${BASE}/tools/bdftopcf" ]; then
+	rm -rf "bdftopcf-${BDFTOPCF_VERSION}"
+	tar xf "${BASE}/downloads/bdftopcf-${BDFTOPCF_VERSION}.tar.gz"
+	cd "bdftopcf-${BDFTOPCF_VERSION}"
+	patch -Np1 < "${BASE}/patches/bdftopcf-tcc.patch"
+	"${BASE}/build/stage1/bin/i386-tcc" -static -I. -DPACKAGE_STRING='"bdftopdf ${BDFTOPCF_VERSION}"' -o "${BASE}/tools/bdftopcf" *.c
+	cd ..
+else
+	echo "tool bdftopcf exists"
+fi
+
+cd ..
+
 # build tcc with tcc from stage1 against musl from stage0, it should
 # have no dependencies on the host anymore
 
@@ -449,10 +475,25 @@ else
 	echo "stage1 Xfbdev exists"
 fi
 
+# generate fonts and install them
+if [ ! -d "${BASE}/build/stage1/share/X11/fonts" ]; then
+	rm -rf "font-cursor-misc-${FONT_CURSOR_MISC_VERSION}"
+	rm -rf "font-misc-misc-${FONT_MISC_MISC_VERSION}"
+	tar xf "${BASE}/downloads/font-cursor-misc-${FONT_CURSOR_MISC_VERSION}.tar.gz"
+	tar xf "${BASE}/downloads/font-misc-misc-${FONT_MISC_MISC_VERSION}.tar.gz"
+	mkdir -p "${BASE}/build/stage1/share/X11/fonts"
+	cp -dR "${BASE}/local/share/X11/fonts/"* "${BASE}/build/stage1/share/X11/fonts/."
+	"${BASE}/tools/bdftopcf" -t "font-cursor-misc-${FONT_CURSOR_MISC_VERSION}/cursor.bdf" | gzip -9 > "${BASE}/build/stage1/share/X11/fonts/cursor.pcf.gz"
+	"${BASE}/tools/bdftopcf" -t "font-misc-misc-${FONT_MISC_MISC_VERSION}/6x13.bdf" | gzip -9 > "${BASE}/build/stage1/share/X11/fonts/6x13-ISO8859-1.pcf.gz"
+else
+	echo "stage1 X11 fonts exist"
+fi
+
 if [ ! -f "${BASE}/build/stage1/bin/rxvt" ]; then
 	rm -rf "rxvt-${RXVT_VERSION}"
 	tar xf "${BASE}/downloads/rxvt-${RXVT_VERSION}.tar.gz"
 	cd "rxvt-${RXVT_VERSION}"
+	patch -Np1 < "${BASE}/patches/rxvt-font.patch"
 	CC="${BASE}/build/stage1/bin/i386-tcc" \
 	./configure --enable-static --prefix="${BASE}/build/stage1" \
 		--x-includes="${BASE}/build/stage1/include" \
@@ -605,17 +646,12 @@ if [ ! -f "${BASE}/build/stage1/boot/boot.img" ]; then
 	cd src
 	nasm -o boot.img boot.asm
 	cp boot.img "${BASE}/build/stage1/boot/boot.img"
-	cd ../..
+	cd ..
 else
 	echo "stage1 uflbbl exists"
 fi
 
 cd ../..
-
-# tools on the host
-if [ ! -x "${BASE}/tools/rdev" ]; then
-	tcc -o tools/rdev tools/rdev.c
-fi
 
 # ramdisk
 

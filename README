@@ -454,7 +454,9 @@ EOF
   the mod_xrandr module, we should be fine (tinyxlib has some Xrandr function
   stubs for a possible extention - similar like XCB - but the implementation
   is somehow missing) 
-       
+- notion: startup issues: ion-statusd, ion-completefile  (should be in
+  /lib/notionbin)
+         
 tools
 -----
 
@@ -522,7 +524,7 @@ an initial change_root?), so is this in RAM?
 Uses buildroot for the toolchain.
 Boot loader is LILO.
 C-library is uclibc.
-There are 486-related kernel patches, but e run without issues on 6.2 on
+There are 486-related kernel patches, but it runs without issues on 6.x on
 a real machine, so why?
 
 I really like the shell scripts to build the system, they are extremely
@@ -531,14 +533,14 @@ simple.
 gray486linux
 ------------
 
-Maybe the final system is nice, but the NIX build system is not..
+Maybe the final system is nice, but the Nix build system is not..
 
 0001-WIP-patch-kernel-to-skip-endbr32-instruction-on-real.patch
 interesting approach to ignore endbr32 without the help of fixing
 gcc/binutils (we should check again, why we got it inside busybox,
 musl and tinycc don't to this kind of stuff).
 
-Use of dropbear could be a good idea.
+Using dropbear could be a good idea.
 
 aboriginal
 ----------
@@ -599,10 +601,12 @@ statically linked
 Plan 9 mk build system
 x86_64 and i486 builds
 quite old (kernel 3.10.32)
-git://git.2f30.org/hbase (Heirloom as alernative base for some Unix tools)
-textbased tools like abduco and dvtm for easy text console multiplexing
+git://git.2f30.org/hbase (Heirloom as alternative base for some Unix tools)
+text-based tools like abduco and dvtm for easy text console multiplexing
 and window manager, no X
 tinyalsa sounds interesting too
+
+how is id prefering tools over other tools?
 
 stali
 -----
@@ -668,6 +672,7 @@ links
     - https://github.com/firasuke/awesome
     - https://github.com/firasuke/mussel (Firas Khalil Khana)
     - https://github.com/pikhq/bootstrap-linux
+    - https://www.glendix.org/: Plan9-like distro
 - C Compilers
   - https://repo.or.cz/w/tinycc.git
 - C Libraries
@@ -709,6 +714,8 @@ links
     - https://github.com/hut/minirc
     - https://omaera.org/wlog/tech/runit_init
     - https://forums.gentoo.org/viewtopic-t-1000292-start-0.html
+  - service/daemon management
+    - http://r-36.net/scm/svc/log.html
 - minimal userland
   - shells
      - POSIX compliant
@@ -737,6 +744,7 @@ links
     plan 9 things (as they tend to be more minimalistic):
     - git://git.9front.org/plan9front/plan9front
     - git://git.suckless.org/9base
+  - https://github.com/ecki/net-tools.git
 - minimalism
   - https://wiki.installgentoo.com/wiki/Software_minimalism
 - Link collections of interesting software
@@ -764,11 +772,14 @@ links
   - https://www.kernel.org/doc/html/v4.15/dev-tools/kgdb.html
 - X
   - tiny X
-    - https://github.com/idunham/tinyxserver (puppy linux): has nice simple
+    - https://github.com/idunham/tinyxserver and
+      https://github.com/idunham/tinyxlib (puppy linux): has nice simple
       makefiles
-    - https://github.com/tinycorelinux/tinyx, is newer, but requires autoconf mess
+    - https://github.com/tinycorelinux/tinyx, is newer, but requires autoconf
       to build
-    - alernatives would have been velox?
+    - alternatives:
+      - https://github.com/michaelforney/velox, https://github.com/michaelforney/swc: but
+        this is wayland
   - X terminal
     - xterm: bloat
     - st, requires Xft, requiring fontconfig, freetype2, etc. can eventually
