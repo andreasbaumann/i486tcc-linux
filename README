@@ -454,9 +454,33 @@ EOF
   the mod_xrandr module, we should be fine (tinyxlib has some Xrandr function
   stubs for a possible extention - similar like XCB - but the implementation
   is somehow missing) 
-- notion: startup issues: ion-statusd, ion-completefile  (should be in
-  /lib/notionbin)
-         
+- notion: default font contains all glyphs and not only the ISO-8859-1 ones
+- notion: more fonts (for status bar? menues?):
+2023-07-29 21:14:41 WARN  /notion/../font.c:184: de_load_font: Could not load font "-*-helvetica-medium-r-normal-*-14-*-*-*-*-*-*-*", trying "fixed"
+2023-07-29 21:14:41 WARN  /notion/../font.c:184: de_load_font: Could not load font "-*-helvetica-medium-r-normal-*-12-*-*-*-*-*-*-*", trying "fixed"
+2023-07-29 21:14:41 WARN  /notion/../font.c:184: de_load_font: Could not load font "-*-helvetica-medium-r-normal-*-17-*-*-*-*-*-*-*", trying "fixed"
+- notion:
+notion: XSupportsLocale() failed.
+notion: Reverting locale settings to "C".
+2023-07-29 21:14:40 INFO  /notion/../ioncore.c:613: ioncore_startup: Starting Notion
+notion: Failed to open input method.
+>> mod_xrandr: Unable to initialise module.
+>> Stack trace:
+   0 [C]: in 'load_module'
+   1 mod_xrandr.lua:5
+     [Skipping unnamed C functions.]
+   4 [C]: in 'dopath'
+   5 /etc/notion/cfg_defaults.lua:15
+     [Skipping unnamed C functions.]
+   8 [C]: in 'dopath'
+   9 /etc/notion/cfg_notion.lua:115
+     [Skipping unnamed C functions.]
+sh: xmessage: not found
+notion: Caught signal 2. Dying.
+Segmentation fault 
+=> xrandr is a dummy module (but the shared library should be loaded by lua?)
+=> xmessage: do we really want to install that Xorg app?
+
 tools
 -----
 

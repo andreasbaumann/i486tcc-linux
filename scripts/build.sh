@@ -539,8 +539,8 @@ if [ ! -f "${BASE}/build/stage1/bin/notion" ]; then
 		LUAC="${BASE}/build/stage1/bin/luac" \
 		PRELOAD_MODULES=1 \
 		LUA_VERSION=5.1 PREFIX=/ ETCDIR=/etc/notion
-	cd notion || exit 1
-	rm notion
+	# remove wrongly dynamically linked binaries and rebuild them
+	rm notion/notion mod_notionflux/notionflux/notionflux utils/ion-completefile/ion-completefile utils/ion-statusd/ion-statusd
 	CC="${BASE}/build/stage1/bin/i386-tcc" \
 	LDFLAGS="-static" \
 	make INCLUDE="-I${BASE}/src/stage1/notion-${NOTION_VERSION}" \
@@ -554,9 +554,7 @@ if [ ! -f "${BASE}/build/stage1/bin/notion" ]; then
 		LUA="${BASE}/build/stage1/bin/lua" \
 		LUAC="${BASE}/build/stage1/bin/luac" \
 		PRELOAD_MODULES=1 \
-		LUA_VERSION=5.1 PREFIX=/ ETCDIR=/etc/notion \
-		notion
-	cd .. || exit 1
+		LUA_VERSION=5.1 PREFIX=/ ETCDIR=/etc/notion
 	make -j$CPUS DESTDIR="${BASE}/build/stage1" PRELOAD_MODULES=1 PREFIX=/ -j$CPUS install
 	cd ..
 else
