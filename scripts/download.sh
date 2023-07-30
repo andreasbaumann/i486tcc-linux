@@ -175,6 +175,11 @@ if [ ! -f "${BASE}/downloads/notion-${NOTION_VERSION}.tar.gz" ]; then
 	rm -rf "notion-${NOTION_VERSION}"
 fi
 
+if [ ! -f "${BASE}/downloads/wordgrinder-${WORDGRINDER_VERSION}.tar.gz" ]; then
+	wget -O "${BASE}/downloads/wordgrinder-${WORDGRINDER_VERSION}.tar.gz" \
+		"https://github.com/davidgiven/wordgrinder/archive/refs/tags/${WORDGRINDER_VERSION}.tar.gz"
+fi
+
 if [ ! -f "${BASE}/downloads/uflbbl-${UFLBBL_VERSION}.tar.gz" ]; then
 	git clone git://git.andreasbaumann.cc/uflbbl.git "uflbbl-${UFLBBL_VERSION}"
 	git -C "uflbbl-${UFLBBL_VERSION}" checkout "${UFLBBL_VERSION}"

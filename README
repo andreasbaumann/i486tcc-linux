@@ -480,7 +480,9 @@ notion: Caught signal 2. Dying.
 Segmentation fault 
 => xrandr is a dummy module (but the shared library should be loaded by lua?)
 => xmessage: do we really want to install that Xorg app?
-
+- wordgrinder: segfaults in luapeg on first script, probably a static linking
+  issue or a tcc issue?
+  
 tools
 -----
 

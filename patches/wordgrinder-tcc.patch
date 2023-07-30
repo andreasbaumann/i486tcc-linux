@@ -1,0 +1,87 @@
+diff -rauN wordgrinder/build.lua wordgrinder-tcc-patch/build.lua
+--- wordgrinder/build.lua	2020-10-23 23:48:53.000000000 +0200
++++ wordgrinder-tcc-patch/build.lua	2023-07-30 11:21:52.270479062 +0200
+@@ -107,8 +107,8 @@
+         "-Wno-unused-function",
+         "-ffunction-sections",
+         "-fdata-sections",
+-        "-Werror=implicit-function-declaration",
+-        "--std=gnu99",
++        "-Werror=implicit-function-declaration"
++--        "--std=gnu99",
+     }
+     local ldflags = {
+         "$LDFLAGS",
+diff -rauN wordgrinder/Makefile wordgrinder-tcc-patch/Makefile
+--- wordgrinder/Makefile	2020-10-23 23:48:53.000000000 +0200
++++ wordgrinder-tcc-patch/Makefile	2023-07-30 10:56:28.258243808 +0200
+@@ -114,7 +114,8 @@
+ 
+ hide = @
+ 
+-LUA_INTERPRETER = $(OBJDIR)/lua
++#LUA_INTERPRETER = $(OBJDIR)/lua
++LUA_INTERPRETER = @@BASE@@/build/stage1/bin/lua
+ 
+ NINJABUILD = \
+ 	$(hide) $(NINJA) -f $(OBJDIR)/build.ninja $(NINJAFLAGS)
+diff -rauN wordgrinder/src/c/arch/unix/cursesw/dpy.c wordgrinder-tcc-patch/src/c/arch/unix/cursesw/dpy.c
+--- wordgrinder/src/c/arch/unix/cursesw/dpy.c	2020-10-23 23:48:53.000000000 +0200
++++ wordgrinder-tcc-patch/src/c/arch/unix/cursesw/dpy.c	2023-07-30 09:58:16.533122528 +0200
+@@ -113,7 +113,7 @@
+ 			mvaddnstr(y, x, &cc, 1);
+ }
+ 
+-uni_t dpy_getchar(double timeout)
++uni_t dpy_getchar(double t)
+ {
+ 	struct timeval then;
+ 	gettimeofday(&then, NULL);
+@@ -122,13 +122,13 @@
+ 	for (;;)
+ 	{
+ 
+-		if (timeout != -1)
++		if (t != -1)
+ 		{
+ 			struct timeval now;
+ 			gettimeofday(&now, NULL);
+ 			u_int64_t nowms = (now.tv_usec/1000) + ((u_int64_t) now.tv_sec*1000);
+ 
+-			int delay = ((u_int64_t) (timeout*1000)) + nowms - thenms;
++			int delay = ((u_int64_t) (t*1000)) + nowms - thenms;
+ 			if (delay <= 0)
+ 				return -KEY_TIMEOUT;
+ 
+diff -rauN wordgrinder/src/c/emu/lpeg/makefile wordgrinder-tcc-patch/src/c/emu/lpeg/makefile
+--- wordgrinder/src/c/emu/lpeg/makefile	2020-10-23 23:48:53.000000000 +0200
++++ wordgrinder-tcc-patch/src/c/emu/lpeg/makefile	2023-07-30 07:54:41.402246826 +0200
+@@ -22,14 +22,15 @@
+ # -Wunreachable-code \
+ 
+ 
+-CFLAGS = $(CWARNS) $(COPT) -std=c99 -I$(LUADIR) -fPIC
+-CC = gcc
++CFLAGS = $(CWARNS) $(COPT) -I$(LUADIR)
++CC = @@BASE@@/build/stage1/bin/i386-tcc
+ 
+ FILES = lpvm.o lpcap.o lptree.o lpcode.o lpprint.o
+ 
+ # For Linux
+ linux:
+-	$(MAKE) lpeg.so "DLLFLAGS = -shared -fPIC"
++#	$(MAKE) lpeg.so "DLLFLAGS = -shared -fPIC"
++	$(MAKE) lpeg.a "DLLFLAGS = -static"
+ 
+ # For Mac OS
+ macosx:
+@@ -38,6 +39,9 @@
+ lpeg.so: $(FILES)
+ 	env $(CC) $(DLLFLAGS) $(FILES) -o lpeg.so
+ 
++lpeg.a: $(FILES)
++	env $(CC) $(DLLFLAGS) $(FILES) -o lpeg.so
++
+ $(FILES): makefile
+ 
+ test: test.lua re.lua lpeg.so
