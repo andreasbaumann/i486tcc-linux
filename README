@@ -459,6 +459,8 @@ EOF
 2023-07-29 21:14:41 WARN  /notion/../font.c:184: de_load_font: Could not load font "-*-helvetica-medium-r-normal-*-14-*-*-*-*-*-*-*", trying "fixed"
 2023-07-29 21:14:41 WARN  /notion/../font.c:184: de_load_font: Could not load font "-*-helvetica-medium-r-normal-*-12-*-*-*-*-*-*-*", trying "fixed"
 2023-07-29 21:14:41 WARN  /notion/../font.c:184: de_load_font: Could not load font "-*-helvetica-medium-r-normal-*-17-*-*-*-*-*-*-*", trying "fixed"
+  => de/font.c if(ioncore_g.use_mb), if not use_mb, then is should use fixed
+  => this depends on the LANG setting supposedly
 - notion:
 notion: XSupportsLocale() failed.
 notion: Reverting locale settings to "C".

@@ -1,6 +1,6 @@
 diff -rauN notion/ioncore/bindmaps.c notion-minimal-patch/ioncore/bindmaps.c
 --- notion/ioncore/bindmaps.c	2023-07-24 05:52:11.000000000 +0200
-+++ notion-minimal-patch/ioncore/bindmaps.c	2023-07-25 16:15:07.594406076 +0200
++++ notion-minimal-patch/ioncore/bindmaps.c	2023-07-31 19:44:35.484759283 +0200
 @@ -208,6 +208,7 @@
      if(bindmap==NULL)
          return NULL;
@@ -21,7 +21,7 @@ diff -rauN notion/ioncore/bindmaps.c notion-minimal-patch/ioncore/bindmaps.c
  }
 diff -rauN notion/mod_sm/Makefile notion-minimal-patch/mod_sm/Makefile
 --- notion/mod_sm/Makefile	2023-07-24 05:52:11.000000000 +0200
-+++ notion-minimal-patch/mod_sm/Makefile	2023-07-25 16:31:41.145863309 +0200
++++ notion-minimal-patch/mod_sm/Makefile	2023-07-31 19:44:35.484759283 +0200
 @@ -10,7 +10,7 @@
  
  INCLUDES += $(X11_INCLUDES) $(LIBTU_INCLUDES) $(LIBEXTL_INCLUDES) -I..
@@ -33,7 +33,7 @@ diff -rauN notion/mod_sm/Makefile notion-minimal-patch/mod_sm/Makefile
  
 diff -rauN notion/modulelist.mk notion-minimal-patch/modulelist.mk
 --- notion/modulelist.mk	2023-07-24 05:52:11.000000000 +0200
-+++ notion-minimal-patch/modulelist.mk	2023-07-27 15:05:56.899756802 +0200
++++ notion-minimal-patch/modulelist.mk	2023-07-31 19:44:35.484759283 +0200
 @@ -4,4 +4,4 @@
  
  MODULE_LIST = mod_tiling mod_query mod_menu \
@@ -42,7 +42,7 @@ diff -rauN notion/modulelist.mk notion-minimal-patch/modulelist.mk
 +	      de mod_xkbevents mod_xinerama mod_xrandr mod_notionflux
 diff -rauN notion/mod_xrandr/mod_xrandr.c notion-minimal-patch/mod_xrandr/mod_xrandr.c
 --- notion/mod_xrandr/mod_xrandr.c	2023-07-24 05:52:11.000000000 +0200
-+++ notion-minimal-patch/mod_xrandr/mod_xrandr.c	2023-07-27 16:18:57.586181913 +0200
++++ notion-minimal-patch/mod_xrandr/mod_xrandr.c	2023-07-31 19:44:35.484759283 +0200
 @@ -145,6 +145,7 @@
      if(rotations==NULL)
          return FALSE;
@@ -167,7 +167,7 @@ diff -rauN notion/mod_xrandr/mod_xrandr.c notion-minimal-patch/mod_xrandr/mod_xr
  }
 diff -rauN notion/notion/Makefile notion-minimal-patch/notion/Makefile
 --- notion/notion/Makefile	2023-07-24 05:52:11.000000000 +0200
-+++ notion-minimal-patch/notion/Makefile	2023-07-25 16:34:22.066099329 +0200
++++ notion-minimal-patch/notion/Makefile	2023-07-31 19:44:35.484759283 +0200
 @@ -19,7 +19,7 @@
  INCLUDES += $(LIBMAINLOOP_INCLUDES) $(LIBTU_INCLUDES) $(LIBEXTL_INCLUDES)
  INCLUDES += -I..
@@ -179,7 +179,7 @@ diff -rauN notion/notion/Makefile notion-minimal-patch/notion/Makefile
  LIBS += -lm
 diff -rauN notion/system-autodetect.mk notion-minimal-patch/system-autodetect.mk
 --- notion/system-autodetect.mk	2023-07-24 05:52:11.000000000 +0200
-+++ notion-minimal-patch/system-autodetect.mk	2023-07-27 16:10:46.675461899 +0200
++++ notion-minimal-patch/system-autodetect.mk	2023-07-31 19:44:35.494759298 +0200
 @@ -174,7 +174,8 @@
            -DHAS_SYSTEM_ASPRINTF=$(HAS_SYSTEM_ASPRINTF)
  
