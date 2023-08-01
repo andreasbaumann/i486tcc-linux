@@ -26,6 +26,7 @@ insmod /lib/modules/crypto/crc32c_generic.ko
 insmod /lib/modules/fs/ext4/ext4.ko
 insmod /lib/modules/drivers/block/nbd.ko
 nbd-client -N ROOT 10.0.0.2 /dev/nbd0
+#nbd-client -N ROOT 192.168.1.31 /dev/nbd0
 mount -t ext4 /dev/nbd0 /mnt
 
 echo "Loading additional modules.."

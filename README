@@ -484,7 +484,30 @@ Segmentation fault
 => xmessage: do we really want to install that Xorg app?
 - wordgrinder: segfaults in luapeg on first script, probably a static linking
   issue or a tcc issue?
-  
+- rxvt: 2.7.10 doesn't link statically and has a rxvt-2.7.10 additionally to
+  rxvt. we use rxvt-2.6.4, why exactly?
+- real hardware (Unisys): softirq kernel panic
+Starting network via DHCP..                                                                              
+ne ne.0 (unnamed net_device) (uninitialized): NE*000 ethercard probe at 0x300:                           
+00:00:e8:cd:05:88                                                                                        
+ne ne.0 eth0: NE2000 found at 0x300, using IRQ 10.                                                       
+random: crng init done                                                                                   
+------------[ cut here ]------------                                                                     
+NETDEV WATCHDOG: eth0 (ne): transmit queue 0 timed out 444 ms                                            
+WARNING: CPU: 0 PID: 0 at net/sched/sch_generic.c:525 0xc02921bb                                         
+Modules linked in: ne 8390p                                                                              
+CPU: 0 PID: 0 Comm: swapper Not tainted 6.4.7 #1                                                         
+EIP: 0xc02921bb                                                                                          
+Code: 3f c0 00 75 2a 89 45 e8 c6 05 1f 2f 3f c0 01 8b 45 ec e8 a7 e9 fd ff 8b 55 e8 52 56 50 ff 75 ec 68b
+EAX: 0000003d EBX: c112d234 ECX: 00000066 EDX: 00000000                                                  
+ESI: 00000000 EDI: c13fd680 EBP: c0811f60 ESP: c0811f34                                                  
+DS: 007b ES: 007b FS: 0000 GS: 0000 SS: 0068 EFLAGS: 00210282                                            
+CR0: 80050033 CR2: b7fe1080 CR3: 008b8000 CR4: 00000000                                                  
+Call Trace:                                                                                              
+ <SOFTIRQ>                                                                                               
+- also real hardware (Unisys): no graphic VESA, only text-VESA modes, missing
+  => cirrus framebuffer drivers at boot time (cannot be a module)?
+   
 tools
 -----
 
