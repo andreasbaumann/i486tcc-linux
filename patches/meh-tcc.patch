@@ -1,0 +1,110 @@
+diff -rauN meh/Makefile meh-tcc-patch/Makefile
+--- meh/Makefile	2023-08-03 13:53:51.000000000 +0200
++++ meh-tcc-patch/Makefile	2023-08-03 14:01:09.239337827 +0200
+@@ -31,7 +31,7 @@
+ -include $(DEPFILES)
+ 
+ %.o: %.c Makefile
+-	$(CC) $(CFLAGS) -MMD -MP -MT "$*.d" -c -o $@ $<
++	$(CC) $(CFLAGS) -c -o $@ $<
+ 
+ install:
+ 	install -Dm 755 meh $(DESTDIR)$(BINDIR)/meh
+diff -rauN meh/src/gif.c meh-tcc-patch/src/gif.c
+--- meh/src/gif.c	2023-08-03 13:53:51.000000000 +0200
++++ meh-tcc-patch/src/gif.c	2023-08-03 14:03:39.889558784 +0200
+@@ -1,3 +1,4 @@
++#ifdef HAVE_GIFLIB
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -124,3 +125,4 @@
+ 	gif_close
+ };
+ 
++#endif
+diff -rauN meh/src/imagemagick.c meh-tcc-patch/src/imagemagick.c
+--- meh/src/imagemagick.c	2023-08-03 13:53:51.000000000 +0200
++++ meh-tcc-patch/src/imagemagick.c	2023-08-03 14:08:50.440014266 +0200
+@@ -1,3 +1,4 @@
++#ifdef HAVE_IMAGEMAGICK
+ 
+ #define _GNU_SOURCE
+ 
+@@ -69,3 +70,4 @@
+ 	NULL
+ };
+ 
++#endif
+diff -rauN meh/src/jpeg.c meh-tcc-patch/src/jpeg.c
+--- meh/src/jpeg.c	2023-08-03 13:53:51.000000000 +0200
++++ meh-tcc-patch/src/jpeg.c	2023-08-03 14:04:03.379593237 +0200
+@@ -1,3 +1,4 @@
++#ifdef HAVE_LIBJPEG
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -162,3 +163,4 @@
+ 	jpeg_close
+ };
+ 
++#endif
+diff -rauN meh/src/main.c meh-tcc-patch/src/main.c
+--- meh/src/main.c	2023-08-03 13:53:51.000000000 +0200
++++ meh-tcc-patch/src/main.c	2023-08-03 14:09:12.060045975 +0200
+@@ -17,13 +17,21 @@
+ 
+ /* Supported Formats */
+ static struct imageformat *formats[] = {
++#ifdef HAVE_LIBJPEG
+ 	&libjpeg,
++#endif
+ 	&bmp,
++#ifdef HAVE_LIBPNG
+ 	&libpng,
++#endif
+ 	&netpbm,
++#ifdef HAVE_GIFLIB
+ 	&giflib, /* HACK! make gif last (uses read()) */
++#endif
+ 	&qoi,
++#ifdef HAVE_IMAGEMAGICK
+ 	&imagemagick,
++#endif
+ 	NULL
+ };
+ 
+diff -rauN meh/src/meh.h meh-tcc-patch/src/meh.h
+--- meh/src/meh.h	2023-08-03 13:53:51.000000000 +0200
++++ meh-tcc-patch/src/meh.h	2023-08-03 14:07:02.309855672 +0200
+@@ -66,9 +66,15 @@
+ #endif
+ 
+ /* Supported Formats */
++#ifdef HAVE_LIBJPEG
+ extern struct imageformat libjpeg;
++#endif
++#ifdef HAVE_GIFLIB
+ extern struct imageformat giflib;
++#endif
++#ifdef HAVE_LIBPNG
+ extern struct imageformat libpng;
++#endif
+ extern struct imageformat bmp;
+ extern struct imageformat netpbm;
+ extern struct imageformat imagemagick;
+diff -rauN meh/src/png.c meh-tcc-patch/src/png.c
+--- meh/src/png.c	2023-08-03 13:53:51.000000000 +0200
++++ meh-tcc-patch/src/png.c	2023-08-03 14:04:22.809621735 +0200
+@@ -1,3 +1,5 @@
++#ifdef HAVE_LIBPNG
++
+ #include <stdlib.h>
+ #include <png.h>
+ 
+@@ -127,4 +129,4 @@
+ 	png_close
+ };
+ 
+-
++#endif

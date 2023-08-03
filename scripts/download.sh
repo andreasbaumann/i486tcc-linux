@@ -158,6 +158,13 @@ if [ ! -f "${BASE}/downloads/xauth-${XAUTH_VERSION}.tar.gz" ]; then
 		"https://www.x.org/archive//individual/app/xauth-${XAUTH_VERSION}.tar.gz"
 fi
 
+if [ ! -f "${BASE}/downloads/meh-${MEH_VERSION}.tar.gz" ]; then
+	git clone https://github.com/andreasbaumann/meh.git "meh-${MEH_VERSION}"
+	git -C "meh-${MEH_VERSION}" checkout "${MEH_VERSION}"
+	tar zcf "${BASE}/downloads/meh-${MEH_VERSION}.tar.gz" "meh-${MEH_VERSION}"
+	rm -rf "meh-${MEH_VERSION}"
+fi
+
 if [ ! -f "${BASE}/downloads/bdftopcf-${BDFTOPCF_VERSION}.tar.gz" ]; then
 	wget -O "${BASE}/downloads/bdftopcf-${BDFTOPCF_VERSION}.tar.gz" \
 		"https://www.x.org/archive/individual/app/bdftopcf-${BDFTOPCF_VERSION}.tar.gz"

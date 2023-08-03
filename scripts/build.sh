@@ -537,6 +537,21 @@ else
 	echo "stage1 xhost exists"
 fi
 
+if [ ! -f "${BASE}/build/stage1/bin/meh" ]; then
+	rm -rf "meh-${MEH_VERSION}"
+	tar xf "${BASE}/downloads/meh-${MEH_VERSION}.tar.gz"
+	cd "meh-${MEH_VERSION}"
+	patch -Np1 < "${BASE}/patches/meh-tcc.patch"
+	make -j$CPUS CC="${BASE}/build/stage1/bin/i386-tcc" \
+		CFLAGS="-Os -I${BASE}/build/stage1/include" \
+		LDFLAGS="-static" \
+		LIBS="${BASE}/build/stage1/lib/libXext.a ${BASE}/build/stage1/lib/libX11.a"
+	make -j$CPUS DESTDIR="${BASE}/build/stage1" PREFIX="" install
+	cd ..
+else
+	echo "stage1 meh exists"
+fi
+
 if [ ! -f "${BASE}/build/stage1/bin/lua" ]; then
 	rm -rf "lua-${LUA_VERSION}"
 	tar xf "${BASE}/downloads/lua-${LUA_VERSION}.tar.gz"
