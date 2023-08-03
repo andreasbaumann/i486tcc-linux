@@ -1,0 +1,50 @@
+diff -rauN xauth/gethost.c xauth-ipv6-patch/gethost.c
+--- xauth/gethost.c	2022-04-20 04:04:52.000000000 +0200
++++ xauth-ipv6-patch/gethost.c	2023-08-03 12:08:37.729435452 +0200
+@@ -64,6 +64,8 @@
+ #include <arpa/inet.h>
+ #endif
+ 
++#undef IPv6
++
+ const char *
+ get_hostname (Xauth *auth)
+ {
+diff -rauN xauth/parsedpy.c xauth-ipv6-patch/parsedpy.c
+--- xauth/parsedpy.c	2022-04-20 04:04:52.000000000 +0200
++++ xauth-ipv6-patch/parsedpy.c	2023-08-03 12:11:14.119664828 +0200
+@@ -45,6 +45,8 @@
+ #include <sys/stat.h>
+ #include <limits.h>
+ 
++#undef IPv6
++
+ #if defined(UNIXCONN) || defined(LOCALCONN)
+ #define UNIX_CONNECTION "unix"
+ #define UNIX_CONNECTION_LENGTH 4
+@@ -141,11 +143,13 @@
+ 	    family = FamilyInternet;
+ 	}
+ #endif
++#if defined(IPv6) && defined(AF_INET6)
+     } else if (!dnet && (*displayname == '[') && (*(ptr - 1) == ']')) {
+ 	/* Allow RFC2732-like [<IPv6NumericAddress>]:display syntax */
+ 	family = FamilyInternet6;
+ 	host = copystring (displayname + 1, len - 2);
+     } else {
++#endif
+ 	host = copystring (displayname, len);
+ 	if (dnet) {
+ 	    family = dnet;
+diff -rauN xauth/process.c xauth-ipv6-patch/process.c
+--- xauth/process.c	2022-04-20 04:04:52.000000000 +0200
++++ xauth-ipv6-patch/process.c	2023-08-03 12:11:46.849712832 +0200
+@@ -51,6 +51,8 @@
+ #include <X11/Xlib.h>
+ #include <X11/extensions/security.h>
+ 
++#undef IPv6
++
+ #ifndef DEFAULT_PROTOCOL_ABBREV		/* to make add command easier */
+ #define DEFAULT_PROTOCOL_ABBREV "."
+ #endif

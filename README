@@ -507,7 +507,12 @@ Call Trace:
  <SOFTIRQ>                                                                                               
 - also real hardware (Unisys): no graphic VESA, only text-VESA modes, missing
   => cirrus framebuffer drivers at boot time (cannot be a module)?
-   
+- ${BASE} and @@BASE@@ with sed are both used to pass the build pathes to
+  builds in patches. ${BASE} sounds like it is working more by accident..
+- 'cd DIR' used everywhere without 'cd DIR || exit 1'
+- can we do a crunch binary for X apps, they get 400k when linked statically
+  with X libraries1
+  
 tools
 -----
 

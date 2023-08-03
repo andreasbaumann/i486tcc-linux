@@ -1,0 +1,82 @@
+diff -rauN xhost/xhost.c xhost-ipv6-patch/xhost.c
+--- xhost/xhost.c	2022-12-13 00:44:28.000000000 +0100
++++ xhost-ipv6-patch/xhost.c	2023-08-03 12:17:50.820246665 +0200
+@@ -119,6 +119,9 @@
+ #endif
+ #endif
+ 
++#undef IPv6
++#define _X_UNUSED
++
+ #ifdef USE_GETTEXT
+ # include <locale.h>	/* setlocale()  */
+ # include <libintl.h>	/* gettext(), textdomain(), etc. */
+@@ -232,9 +235,11 @@
+ 		    case FamilyInternet:
+ 			printf("INET:");
+ 			break;
++#if defined(IPv6) && defined(AF_INET6)
+ 		    case FamilyInternet6:
+ 			printf("INET6:");
+ 			break;
++#endif
+ 		    case FamilyDECnet:
+ 			printf("DNET:");
+ 			break;
+@@ -247,9 +252,11 @@
+ 		    case FamilyLocalHost:
+ 			printf("LOCAL:");
+ 			break;
++#if 0
+ 		    case FamilyServerInterpreted:
+ 			printf("SI:");
+ 			break;
++#endif
+ 		    default:
+ 			printf(gettext("<unknown family type %d>:"), list[i].family);
+ 			break;
+@@ -411,10 +418,12 @@
+     else if (!strncmp("local:", lname, 6)) {
+ 	family = FamilyLocalHost;
+     }
++#if 0
+     else if (!strncmp("si:", lname, 3)) {
+ 	family = FamilyServerInterpreted;
+ 	name += 3;
+     }
++#endif
+     if (family == FamilyWild && (cp = strchr(lname, ':'))) {
+ #ifdef IPv6
+ 	/*
+@@ -434,6 +443,7 @@
+     }
+     free(lname);
+ 
++#if 0
+     if (family == FamilyServerInterpreted) {
+ 	XServerInterpretedAddress siaddr;
+ 	int rc;
+@@ -461,6 +471,7 @@
+ 	    return 0;
+ 	return 1;
+     }
++#endif
+ 
+ #ifdef K5AUTH
+     if (family == FamilyKrb5Principal) {
+@@ -826,6 +837,7 @@
+     if (ha->family == FamilyLocalHost) {
+ 	return "";
+     }
++#if 0
+     if (ha->family == FamilyServerInterpreted) {
+ 	XServerInterpretedAddress *sip;
+ 	static char *addressString;
+@@ -854,6 +866,7 @@
+ 	}
+ 	return addressString;
+     }
++#endif
+     return (NULL);
+ }
+ 

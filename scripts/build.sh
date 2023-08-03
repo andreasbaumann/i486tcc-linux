@@ -505,6 +505,38 @@ else
 	echo "stage1 rxvt exists"
 fi
 
+if [ ! -f "${BASE}/build/stage1/bin/xauth" ]; then
+	rm -rf "xauth-${XAUTH_VERSION}"
+	tar xf "${BASE}/downloads/xauth-${XAUTH_VERSION}.tar.gz"
+	cd "xauth-${XAUTH_VERSION}"
+	patch -Np1 < "${BASE}/patches/xauth-ipv6.patch"
+	CC="${BASE}/build/stage1/bin/i386-tcc" \
+	./configure --enable-static --prefix="${BASE}/build/stage1" \
+		--x-includes="${BASE}/build/stage1/include" \
+		--x-libraries="${BASE}/build/stage1/lib"
+	make -j$CPUS LDFLAGS="-static"
+	make -j$CPUS install
+	cd ..
+else
+	echo "stage1 xauth exists"
+fi
+
+if [ ! -f "${BASE}/build/stage1/bin/xhost" ]; then
+	rm -rf "xhost-${XHOST_VERSION}"
+	tar xf "${BASE}/downloads/xhost-${XHOST_VERSION}.tar.gz"
+	cd "xhost-${XHOST_VERSION}"
+	patch -Np1 < "${BASE}/patches/xhost-ipv6.patch"
+	CC="${BASE}/build/stage1/bin/i386-tcc" \
+	./configure --enable-static --prefix="${BASE}/build/stage1" \
+		--x-includes="${BASE}/build/stage1/include" \
+		--x-libraries="${BASE}/build/stage1/lib"
+	make -j$CPUS LDFLAGS="-static"
+	make -j$CPUS install
+	cd ..
+else
+	echo "stage1 xhost exists"
+fi
+
 if [ ! -f "${BASE}/build/stage1/bin/lua" ]; then
 	rm -rf "lua-${LUA_VERSION}"
 	tar xf "${BASE}/downloads/lua-${LUA_VERSION}.tar.gz"
