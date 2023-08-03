@@ -165,6 +165,13 @@ if [ ! -f "${BASE}/downloads/meh-${MEH_VERSION}.tar.gz" ]; then
 	rm -rf "meh-${MEH_VERSION}"
 fi
 
+if [ ! -f "${BASE}/downloads/slock-${SLOCK_VERSION}.tar.gz" ]; then
+	git clone git://git.suckless.org/slock "slock-${SLOCK_VERSION}"
+	git -C "slock-${SLOCK_VERSION}" checkout "${SLOCK_VERSION}"
+	tar zcf "${BASE}/downloads/slock-${SLOCK_VERSION}.tar.gz" "slock-${SLOCK_VERSION}"
+	rm -rf "slock-${SLOCK_VERSION}"
+fi
+
 if [ ! -f "${BASE}/downloads/bdftopcf-${BDFTOPCF_VERSION}.tar.gz" ]; then
 	wget -O "${BASE}/downloads/bdftopcf-${BDFTOPCF_VERSION}.tar.gz" \
 		"https://www.x.org/archive/individual/app/bdftopcf-${BDFTOPCF_VERSION}.tar.gz"

@@ -1,0 +1,26 @@
+diff -rauN slock/slock.c slock-no-xrandr-patch/slock.c
+--- slock/slock.c	2023-08-03 14:54:34.474038914 +0200
++++ slock-no-xrandr-patch/slock.c	2023-08-03 14:57:25.574289865 +0200
+@@ -272,8 +272,10 @@
+ 		/* input is grabbed: we can lock the screen */
+ 		if (ptgrab == GrabSuccess && kbgrab == GrabSuccess) {
+ 			XMapRaised(dpy, lock->win);
++#ifdef HAVE_XRANDR
+ 			if (rr->active)
+ 				XRRSelectInput(dpy, lock->win, RRScreenChangeNotifyMask);
++#endif
+ 
+ 			XSelectInput(dpy, lock->root, SubstructureNotifyMask);
+ 			return lock;
+@@ -356,7 +358,11 @@
+ 		die("slock: setuid: %s\n", strerror(errno));
+ 
+ 	/* check for Xrandr support */
++#ifdef HAVE_XRANDR
+ 	rr.active = XRRQueryExtension(dpy, &rr.evbase, &rr.errbase);
++#else
++	rr.active = 0;
++#endif
+ 
+ 	/* get number of screens in display "dpy" and blank them */
+ 	nscreens = ScreenCount(dpy);

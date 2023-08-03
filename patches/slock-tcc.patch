@@ -1,0 +1,14 @@
+diff -rauN slock/slock.c slock-tcc-patch/slock.c
+--- slock/slock.c	2023-08-03 14:54:34.474038914 +0200
++++ slock-tcc-patch/slock.c	2023-08-03 14:54:56.284070903 +0200
+@@ -348,8 +348,10 @@
+ 		die("slock: cannot open display\n");
+ 
+ 	/* drop privileges */
++#ifdef HAVE_SETGROUPS
+ 	if (setgroups(0, NULL) < 0)
+ 		die("slock: setgroups: %s\n", strerror(errno));
++#endif
+ 	if (setgid(dgid) < 0)
+ 		die("slock: setgid: %s\n", strerror(errno));
+ 	if (setuid(duid) < 0)

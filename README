@@ -515,7 +515,9 @@ Call Trace:
 - depth 16 -> 24 on Xfbdev?
 - meh segfaults with the test.qoi image from the meh branch in qemu, works
   on the host
-    
+- slock runs but cannot unlock the screen (shadow issue?), also we need
+  a hard-coded nobody and nogroup user and group
+      
 tools
 -----
 
