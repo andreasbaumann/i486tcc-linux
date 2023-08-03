@@ -512,6 +512,7 @@ Call Trace:
 - 'cd DIR' used everywhere without 'cd DIR || exit 1'
 - can we do a crunch binary for X apps, they get 400k when linked statically
   with X libraries1
+- depth 16 -> 24 on Xfbdev?
   
 tools
 -----

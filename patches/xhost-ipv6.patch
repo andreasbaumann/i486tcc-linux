@@ -1,6 +1,6 @@
 diff -rauN xhost/xhost.c xhost-ipv6-patch/xhost.c
---- xhost/xhost.c	2022-12-13 00:44:28.000000000 +0100
-+++ xhost-ipv6-patch/xhost.c	2023-08-03 12:17:50.820246665 +0200
+--- xhost/xhost.c	2019-02-19 23:51:09.000000000 +0100
++++ xhost-ipv6-patch/xhost.c	2023-08-03 13:13:43.035163326 +0200
 @@ -119,6 +119,9 @@
  #endif
  #endif
@@ -8,10 +8,10 @@ diff -rauN xhost/xhost.c xhost-ipv6-patch/xhost.c
 +#undef IPv6
 +#define _X_UNUSED
 +
- #ifdef USE_GETTEXT
- # include <locale.h>	/* setlocale()  */
- # include <libintl.h>	/* gettext(), textdomain(), etc. */
-@@ -232,9 +235,11 @@
+ static int change_host(Display *dpy, char *name, Bool add);
+ static const char *get_hostname(XHostAddress *ha);
+ static int local_xerror(Display *dpy, XErrorEvent *rep);
+@@ -211,9 +214,11 @@
  		    case FamilyInternet:
  			printf("INET:");
  			break;
@@ -23,7 +23,7 @@ diff -rauN xhost/xhost.c xhost-ipv6-patch/xhost.c
  		    case FamilyDECnet:
  			printf("DNET:");
  			break;
-@@ -247,9 +252,11 @@
+@@ -226,9 +231,11 @@
  		    case FamilyLocalHost:
  			printf("LOCAL:");
  			break;
@@ -33,9 +33,9 @@ diff -rauN xhost/xhost.c xhost-ipv6-patch/xhost.c
  			break;
 +#endif
  		    default:
- 			printf(gettext("<unknown family type %d>:"), list[i].family);
+ 			printf("<unknown family type %d>:", list[i].family);
  			break;
-@@ -411,10 +418,12 @@
+@@ -389,10 +396,12 @@
      else if (!strncmp("local:", lname, 6)) {
  	family = FamilyLocalHost;
      }
@@ -46,9 +46,9 @@ diff -rauN xhost/xhost.c xhost-ipv6-patch/xhost.c
      }
 +#endif
      if (family == FamilyWild && (cp = strchr(lname, ':'))) {
- #ifdef IPv6
- 	/*
-@@ -434,6 +443,7 @@
+ 	*cp = '\0';
+ 	fprintf (stderr, "%s: unknown address family \"%s\"\n",
+@@ -402,6 +411,7 @@
      }
      free(lname);
  
@@ -56,7 +56,7 @@ diff -rauN xhost/xhost.c xhost-ipv6-patch/xhost.c
      if (family == FamilyServerInterpreted) {
  	XServerInterpretedAddress siaddr;
  	int rc;
-@@ -461,6 +471,7 @@
+@@ -429,6 +439,7 @@
  	    return 0;
  	return 1;
      }
@@ -64,7 +64,7 @@ diff -rauN xhost/xhost.c xhost-ipv6-patch/xhost.c
  
  #ifdef K5AUTH
      if (family == FamilyKrb5Principal) {
-@@ -826,6 +837,7 @@
+@@ -794,6 +805,7 @@
      if (ha->family == FamilyLocalHost) {
  	return "";
      }
@@ -72,7 +72,7 @@ diff -rauN xhost/xhost.c xhost-ipv6-patch/xhost.c
      if (ha->family == FamilyServerInterpreted) {
  	XServerInterpretedAddress *sip;
  	static char *addressString;
-@@ -854,6 +866,7 @@
+@@ -822,6 +834,7 @@
  	}
  	return addressString;
      }

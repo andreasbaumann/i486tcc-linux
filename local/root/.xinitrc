@@ -1,1 +1,5 @@
-rxvt
+#!/bin/oksh
+
+rxvt &
+exec notion
+

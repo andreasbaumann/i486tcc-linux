@@ -150,12 +150,12 @@ fi
 
 if [ ! -f "${BASE}/downloads/xhost-${XHOST_VERSION}.tar.gz" ]; then
 	wget -O "${BASE}/downloads/xhost-${XHOST_VERSION}.tar.gz" \
-		"https://www.x.org/archive//individual/app/xhost-${XHOST_VERSION}.tar.xz"
+		"https://www.x.org/archive//individual/app/xhost-${XHOST_VERSION}.tar.gz"
 fi
 
 if [ ! -f "${BASE}/downloads/xauth-${XAUTH_VERSION}.tar.gz" ]; then
 	wget -O "${BASE}/downloads/xauth-${XAUTH_VERSION}.tar.gz" \
-		"https://www.x.org/archive//individual/app/xauth-${XAUTH_VERSION}.tar.xz"
+		"https://www.x.org/archive//individual/app/xauth-${XAUTH_VERSION}.tar.gz"
 fi
 
 if [ ! -f "${BASE}/downloads/bdftopcf-${BDFTOPCF_VERSION}.tar.gz" ]; then
