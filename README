@@ -69,7 +69,40 @@ patches
     directly to 'configure'
 - dropbear
   * patched binary locations and pathes in default_options.h
-
+- tinyxlib
+  * added a missing stdint.h
+  * patched compiler and linker flags
+- tinyxserver
+  * patched installation
+  * patched compiler and linker flags
+- xauth
+  * disabled IPv6
+- xhost
+  * disabled IPv6
+  * fixed some missing IPv6 conditionals
+  * added conditional for FamilyServerInterpreted ("si:")
+- meh
+  * disabled external libraries for gif, png, jpeg, imagemagick
+  * fixed dependency generator
+- slock
+  * fixed for missing setgroups in musl
+  * disabled XRandr extension
+- lua
+  * removed dependency on readline
+- wordgrinder
+  * TODO: work in progress
+- rxvt
+  * use the 'fixed' font per default and only that one
+- notion
+  * disabled XCB for keysum definitions
+  * patched for using the stage1 libraries and header files
+  * heavily patched Xrandr so at least the lua module builds
+    (it cannot possibly work though), made the module return
+    some default VGA mode values to at least work as a dummy.
+  * linker fix for -rdynamic
+  * patches for building statically and doing a lua module preload
+  * disabled Xinerama
+  
 dependencies
 ------------
 
