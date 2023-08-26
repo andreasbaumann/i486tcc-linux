@@ -11,7 +11,7 @@ echo "Starting network via DHCP.."
 # TODO: replace modprobe with samurai script
 #modprobe ne io=0x300
 insmod /lib/modules/drivers/net/ethernet/8390/8390p.ko
-insmod /lib/modules/drivers/net/ethernet/8390/ne.ko io=0x300
+#insmod /lib/modules/drivers/net/ethernet/8390/ne.ko io=0x300
 ifconfig eth0 up
 sdhcp
 
