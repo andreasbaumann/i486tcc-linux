@@ -550,7 +550,14 @@ Call Trace:
   on the host
 - slock runs but cannot unlock the screen (shadow issue?), also we need
   a hard-coded nobody and nogroup user and group
-      
+- qemu on Arch fails to find a vgabios.bin in the local directory?
+  => cp /usr/share/qemu/vgabios-isavga.bin vgabios.bin
+- some man pages are in /man, some in /share/man
+- non-English pages notion.1 in cs
+- we have a non-empty sbin
+- building for the first time blocks root.img in losetup, doens't create
+  ramdisk.img, etc. races? missing trap in build.sh?
+
 tools
 -----
 
