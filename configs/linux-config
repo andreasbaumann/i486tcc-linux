@@ -1569,7 +1569,7 @@ CONFIG_FB_CFB_IMAGEBLIT=y
 #
 # Frame buffer hardware drivers
 #
-# CONFIG_FB_CIRRUS is not set
+CONFIG_FB_CIRRUS=y
 # CONFIG_FB_PM2 is not set
 # CONFIG_FB_CYBER2000 is not set
 # CONFIG_FB_ARC is not set

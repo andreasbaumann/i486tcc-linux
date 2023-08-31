@@ -557,6 +557,10 @@ Call Trace:
 - we have a non-empty sbin
 - building for the first time blocks root.img in losetup, doens't create
   ramdisk.img, etc. races? missing trap in build.sh?
+- makewhatis /share/man not called on installation of root.img,
+  results in warnings when issuing 'man xxx'
+- too big 6x13-ISO8859-1.pcf.gz: 4k on host, 64k in root.img. Most likely we
+  package too many charset variants
 
 tools
 -----
