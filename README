@@ -609,7 +609,18 @@ to abase).
 - others
   - byacc
   - bison
-
+- minimal languages
+  - lua: is already minimal and easy to build, luajit would be nice to
+    have for lua 5.1
+  - microperl/miniperl
+    https://www.foo.be/docs/tpj/issues/vol5_3/tpj0503-0003.html
+    seems not really be working anymore after perl 5.20
+    microperl 5.20 segfaults
+  - micropython: https://github.com/micropython/micropython
+    Their definition of micro is quite different from mine in terms of
+    size and library dependencies)
+    I also doubt it works with tcc, needs python3 on the host to build
+    
 other approaches
 ----------------
 

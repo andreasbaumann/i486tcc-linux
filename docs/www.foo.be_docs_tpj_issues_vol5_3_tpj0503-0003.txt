@@ -1,0 +1,326 @@
+                 [1]PREVIOUS  [2]TABLE OF CONTENTS  [3]NEXT
+     __________________________________________________________________
+
+                                  Microperl
+
+Simon Cozens
+
+   Perl 5.7.0 shipped with an obscure and barely announced new feature --
+   microperl. microperl is something I've worked on for quite a few months
+   now and, while I expect it to be useful to a tiny fraction of Perl
+   users, I'd like to explain why it's included and what's so cool about
+   it.
+
+   First, though, what is it? Well, when you compile a version of Perl,
+   the first thing that gets built is a program called miniperl. miniperl
+   is more or less just like your ordinary perl, except that it doesn't
+   have the DynaLoader XS module linked in. An XS module is a C extension
+   module, allowing Perl to run C code, and it's usually written in a
+   special glue language, XS, rather than in C.
+
+   What makes DynaLoader special is that it's the module which allows Perl
+   to load other XS modules dynamically -- without that, you can't use
+   modules like IO::File, your DBM database library (DB_File, SDBM_File or
+   equivalent) or any of the modules on CPAN with XS components.
+
+   miniperl, however, has just enough brains to run a program which
+   translates the XS language in which DynaLoader is written into a C
+   program; once we've done that, we can compile DynaLoader and link it
+   into perl. In effect, we're building perl in stages: first without XS
+   support, and then using that first effort to help build the next stage
+   with XS support.
+
+  Bootstrapping
+
+   This process -- starting small and using the result to build up to the
+   next stage -- is called "bootstrapping", since you've started from the
+   ground and are pulling yourself up by your own bootstraps. In fact,
+   it's exactly what happens when you turn up your computer and it "boots
+   up" -- the raw circuitry knows enough to activate the BIOS, the BIOS
+   knows enough to find and run the first block on the disk, which is a
+   program which in turn knows enough to find the boot loader, which finds
+   and runs the operating system.
+
+   The idea behind microperl is to take the bootstrapping nature of
+   miniperl and perl to its logical conclusion. microperl is a very, very
+   simple build of perl which will hopefully one day be used to build
+   miniperl.
+
+   At the moment, before miniperl can be built, a program called Configure
+   must be run. To make sure that perl builds properly on the plethora of
+   different computers it supports, Configure performs hundreds of tests
+   to work out the characteristics of the current system -- which
+   character set is being used, how large the various C datatypes are on
+   the machine, what libraries are available, how to use the C compiler,
+   and so on.
+
+   The problem with Configure is that you need to make a few assumptions
+   about the system in order to run it. Configure is written in Bourne
+   shell, so you need a copy of sh around. It also uses grep, awk, sed and
+   a bunch of other Unix utilities to probe the system. Of course, this
+   will only work on something that smells like Unix. It would be a lot
+   better if Configure was written in something portable -- something like
+   Perl, for instance. Of course, you'd need a Perl interpreter to be able
+   to run it, and since the purpose of the exercise is to build a Perl
+   interpreter, we've hit a chicken-and-egg problem.
+
+   This is where microperl comes in. The aim of microperl is to be a Perl
+   interpreter which can be built on as many machines as possible, even
+   small operating systems like WinCE and PalmOS, before any probing of
+   the system occurs. Simply unpack your Perl distribution, compile it,
+   and go. In fact, let's do that.
+
+  Building Microperl
+
+   Unpack Perl 5.7.0, and change to the directory perl5.7.0/. Now issue
+   this command:
+        % make -f Makefile.micro
+
+   If all goes well, you should see something like this happen:
+  cc -c -o uav.o -DPERL_CORE -DPERL_MICRO av.c
+  cc -c -o udeb.o -DPERL_CORE -DPERL_MICRO deb.c
+  cc -c -o udoio.o -DPERL_CORE -DPERL_MICRO doio.c
+  cc -c -o udoop.o -DPERL_CORE -DPERL_MICRO doop.c
+  [... time passes ...]
+  cc -c -o uutil.o -DPERL_CORE -DPERL_MICRO util.c
+  cc -c -o uperlapi.o -DPERL_CORE -DPERL_MICRO perlapi.c
+  cc -o microperl uav.o udeb.o udoio.o udoop.o udump.o uglobals.o ugv.o
+  uhv.o umg.o uperlmain.o uop.o uperl.o uperlio.o uperly.o upp.o upp_ctl.o
+  upp_hot.o upp_sys.o uregcomp.o uregexec.o urun.o uscope.o usv.o utaint.o
+  utoke.o uuniversal.o uutf8.o uutil.o uperlapi.o -lm
+
+   You might see a few warnings, which are probably harmless. If you don't
+   get past the first file, check that your C compiler is available and
+   replace the line CC = cc in Makefile.micro with CC = /path/to/your/cc.
+   If you use a separate linker, alter the line LD = $(CC) to, for
+   example, LD = ld. Eventually, you should end up with an executable file
+   called microperl. (If you get stuck between the first file and the big
+   statement at the end, then we probably have a bug.)
+
+   microperl is a real, honest-to-goodness Perl interpreter; no core
+   elements of the Perl language have been removed. The regular expression
+   engine is exactly the same, the language is exactly the same, it has
+   the same Unicode support, and so on. The only things that have been
+   removed from it are functions that are completely system-specific, like
+   crypt and readdir.
+        % ./microperl -le 'print q/Hello world/'
+        Hello world
+        % ./microperl t/base/cond.t
+        1..4
+        ok 1
+        ok 2
+        ok 3
+        ok 4
+
+  How Does It Work?
+
+   The idea for microperl came from Ilya Zakharevich, who produced a
+   package called crazyperl very much along the same lines. What I've
+   done, together with a lot of help from Jarkko Hietaniemi, is to make it
+   easy to build, extend the number of systems it can work on, and keep up
+   it to date with the changes as Perl develops.
+
+   To understand how it works, however, we've got to go back to looking at
+   how perl is built. Once Configure has tested the system and found
+   everything it needs to know, it writes out its results to a shell file,
+   config.sh. This file is then re-arranged into a C header file,
+   config.h, and the rest of the Perl source files use the values from
+   that as they are compiled.
+
+   You can examine the config.sh file that was used to build your version
+   of Perl through the Config module:
+    #!/usr/bin/perl
+    use warnings;
+    use strict;
+    use Config qw(config_sh);
+    print config_sh();
+
+   This should print out something like the following:
+    archlibexp='/usr/local/lib/perl5/5.7.0/cygwin'
+    archname='cygwin'
+    cc='gcc'
+    ccflags='-fno-strict-aliasing -I/usr/local/include'
+    cppflags='-fno-strict-aliasing -I/usr/local/include'
+    ...
+
+   This tells us that this Perl will store its machine-specific modules in
+   the directory /usr/local/lib/perl5/5.7.0/cygwin, that the architecture
+   we're running on is cygwin, and the flags passed to the C compiler and
+   C preprocessor respectively; you can find documentation on what the
+   rest of the options mean with perldoc Config. You can use this to
+   determine characteristics about the current Perl build:
+    #!/usr/bin/perl
+    use warnings;
+    use strict;
+    use Config;
+    ...
+    if ($Config{use5005threads}) {
+        # OK, we have threads:
+        require Threads; import Threads;
+        threading_child();
+    } else {
+        # Make do with fork:
+        forking_child();
+    }
+
+   microperl provides a config.sh which specifies the lowest common
+   denominator: almost all optional items are turned off, all tests are
+   set to have failed, and so on. We then build a version of Perl with
+   this minimal configuration -- since Perl is able to cope with pretty
+   much every combination that can be thrown at it, it does its best to
+   work around everything that we claim is lacking.
+
+  Why?
+
+   What's the point? Is microperl anything more than a cool hack?
+
+   Well, it certainly is a cool hack, and I quite like it just for that,
+   but here are three real, practical uses for microperl.
+
+   &#149; Hacking
+
+     When you're working on the Perl core, you'll naturally end up doing
+     a load of tweaking, testing ideas, and so on. This means a lot of
+     recompiling, and recompiling a full perl -- or even just miniperl --
+     takes a lot of time. microperl builds fast. Furthermore, it's simple
+     and uncluttered, and therefore useful for debugging and making
+     patches; the microperl kit, if placed in a separate directory, would
+     be a core of 71 files, (29 C program files) rather than the
+     1700-or-so files in a full Perl distribution.
+
+     It's also great for checking out a fresh Perl distribution without
+     having to take the time to plod through Configure; Configure is
+     pretty slow, taking between ten and twenty minutes on my old
+     machine.
+
+     On top of this, because microperl assumes the absolute minimum
+     permissible, it can help root out edge cases in the configure
+     process -- if a function is used on the assumption that everyone has
+     it, for instance. microperl has already found a few assumptions in
+     the Perl source, and will hopefully guard against any more.
+
+   &#149; Porting
+
+     Because microperl is a lowest common denominator, it's very, very
+     easy to port to new systems: you don't need to know anything about
+     the characteristics of the system you're compiling on. Replace CC in
+     Makefile.micro with a cross-compiler, and you can instantly port a
+     version of Perl to another operating system. (In fact, this is what
+     I'm doing to put Perl onto the Palm Pilot port of Linux, but there
+     are a few wrinkles left to be smoothed.)
+
+     Further, since you can build microperl with nothing other than a C
+     compiler and make, it's useful for porting to systems which don't
+     have sh, awk, grep, and all the other things Configure demands. Once
+     you have experience of how config.sh works, you can build up a
+     version of Perl by steadily adding features to microperl.
+
+   &#149; Bootstrapping
+
+     As mentioned before, we can theoretically use microperl to bootstrap
+     a Perl build; the "steadily adding features" part mentioned above
+     can be automated and run by the machine itself. Ideally, you'd
+     unpack your Perl kit, type make, and a microperl would be built,
+     which would run a Perl version of Configure and then build a full
+     perl.
+
+     Now, when someone says "theoretically", they usually mean "not
+     really", but let's have a look at a simple proof of concept. One of
+     the tests we need to do is to examine the size of C integer storage:
+
+    $ ./microperl.exe fixbytes.pl
+    Checking to see how big your integers are...
+    ints are 4, longs are 4, shorts are 2
+    Fixing uconfig.sh
+    Reprocessing uconfig.sh
+    Extracting uconfig.h (with variable substitutions)
+    Making myself!
+    cc -c -o uav.o -DPERL_CORE -DPERL_MICRO av.c
+    ...
+        cc -o microperl uav.o udeb.o udoio.o udoop.o udump.o
+        uglobals.o ugv.o uhv.o umg.o uperlmain.o uop.o uperl.o
+        uperlio.o uperly.o upp.o upp_ctl.o
+        upp_hot.o upp_sys.o uregcomp.o uregexec.o urun.o
+        uscope.o usv.o utaint.o utoke.o uuniversal.o uutf8.o
+        uutil.o uperlapi.o -lm
+    I'm still here.
+
+     Now we've built a new version of microperl using the information
+     we've discovered. Here's the code which did that:
+
+    require "bootstrap.pl";
+    print "Checking to see how big your integers are...\n";
+    open (OUT, ">intsize.c") or die $!;
+    print OUT <<'EOF';
+    #include <stdio.h>
+    int main()
+    {
+        printf("$intsize=%d;\n",   (int)sizeof(int)  );
+        printf("$longsize=%d;\n",  (int)sizeof(long) );
+        printf("$shortsize=%d;\n", (int)sizeof(short));
+        exit(0);
+    }
+    EOF
+    close OUT;
+    system("cc -o intsize intsize.c");
+    if (!-x "./intsize") { die "Didn't compile" }
+    $sizes = './intsize';
+    unlink "intsize", "intsize.c";
+    eval $sizes;
+    print "ints are $intsize, longs are $longsize, shorts are $shortsize\n";
+    changeit ( intsize   => $intsize,
+              longsize  => $longsize,
+              shortsize => $shortsize
+    );
+    rebuild();
+
+     Of course, it'll take a lot of work before we can bootstrap Perl to
+     the same degree as an ordinary Configure run. But I'll get there!
+
+  Problems
+
+   The major problem I've had developing microperl is that the definitions
+   that config.sh needs to provide to config.h constantly change, and so
+   I've had to add new entries to microperl's config.sh.
+
+   To avoid doing this manually, I wrote a little Perl program that checks
+   for undefined symbols during the make process and attempts to divine
+   what they should be for microperl, adds in the relevant entries to
+   config.sh and tries again. It's a crude future-proofing, but it saves
+   me a lot of work.
+
+   Apart from that, it's been a question of re-arranging things in the
+   Perl core to make them more friendly to completely impotent
+   configurations like microperl's: signal handling, for instance, had to
+   be excised, and file modes such as O_CREAT generated for systems
+   without the relevant system header files.
+
+  The Future
+
+   Where do I see microperl going? Hopefully, it'll one day be more than
+   just a toy for me. It's certainly useful for anyone working on the Perl
+   core to quickly check out their changes or Perl's operation; it's good
+   for people learning the internals of Perl because it strips away
+   everything but the essentials. I'd like to see it building itself and
+   hopefully making an attack on the current Configure system.
+
+   But no matter what happens to it, it's still a neat hack.
+   _ _END_ _
+     __________________________________________________________________
+
+   Simon Cozens is an open source programmer and author, and a member of
+   the Perl development team. He lives in Tokyo, and his hobbies include
+   the Greek language and culture. He is the author of "Beginning Perl"
+   and a number of articles on Perl and on Open Source topics.
+     __________________________________________________________________
+
+                 [4]PREVIOUS  [5]TABLE OF CONTENTS  [6]NEXT
+
+References
+
+   1. https://www.foo.be/docs/tpj/issues/vol5_3/tpj0503-0002.html
+   2. https://www.foo.be/docs/tpj/issues/vol5_3/ewtoc.html
+   3. https://www.foo.be/docs/tpj/issues/vol5_3/tpj0503-0004.html
+   4. https://www.foo.be/docs/tpj/issues/vol5_3/tpj0503-0002.html
+   5. https://www.foo.be/docs/tpj/issues/vol5_3/ewtoc.html
+   6. https://www.foo.be/docs/tpj/issues/vol5_3/tpj0503-0004.html
