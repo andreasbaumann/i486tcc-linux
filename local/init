@@ -30,8 +30,7 @@ nbd-client -N ROOT 10.0.0.2 /dev/nbd0
 #nbd-client -N ROOT 192.168.1.31 /dev/nbd0
 mount -t ext4 /dev/nbd0 /mnt
 
-echo "Loading additional modules.."
-insmod /lib/modules/net/unix/unix.ko
+#echo "Loading additional modules.."
 
 echo "Mounting new root.."
 mount -M /proc /mnt/proc
