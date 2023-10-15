@@ -739,6 +739,12 @@ This is the first distro based on musl which made musl much more suitable
 to build a Linux userspace upon. Since alpine linux switched to musl,
 sabotage seems to be not heavily developed anymore.
 
+Minimal Linux Live
+------------------
+
+No toolchain, so we depend on the hosts toolchain, this breaks when building
+too easily. Kernel 5.18 no longer compiles with newer gcc versions.
+
 links
 -----
 
@@ -789,6 +795,8 @@ links
     - https://github.com/firasuke/mussel (Firas Khalil Khana)
     - https://github.com/pikhq/bootstrap-linux
     - https://www.glendix.org/: Plan9-like distro
+  - Minimal Linux Live
+    - https://github.com/ivandavidov/minimal
 - C Compilers
   - https://repo.or.cz/w/tinycc.git
 - C Libraries
