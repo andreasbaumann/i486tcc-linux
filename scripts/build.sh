@@ -18,8 +18,8 @@ set -e
 SCRIPT=$(readlink -f "$0")
 BASE=$(dirname ${SCRIPT})/..
 
-#CPUS=$(nproc)
-CPUS=1
+CPUS=$(nproc)
+#CPUS=1
 
 . "${BASE}/configs/versions"
 

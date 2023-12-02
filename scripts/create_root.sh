@@ -22,13 +22,13 @@ ROOT="${BASE}"/root
 LOCAL="${BASE}"/local
 
 mountpoint -q "${ROOT}" && sudo umount "${ROOT}"
-test -f /dev/loop0 && losetup -d /dev/loop0
+test -f /dev/loop0 && sudo losetup -d /dev/loop0
 test -d "${ROOT}" && rmdir "${ROOT}"
-test -f root.img && rm -f root.img
+test -f "${BASE}/root.img" && rm -f "${BASE}/root.img"
 
-dd if=/dev/zero of=root.img bs=512 count=257040
-chmod 666 root.img
-losetup /dev/loop0 root.img
+dd if=/dev/zero of="${BASE}/root.img" bs=512 count=257040
+chmod 666 "${BASE}/root.img"
+sudo losetup /dev/loop0 "${BASE}/root.img"
 mke2fs /dev/loop0
 mkdir "${BASE}/root"
 sudo mount /dev/loop0 "${BASE}/root"
@@ -82,7 +82,7 @@ cp -dR "${LOCAL}"/etc/* "${ROOT}/etc"
 test -d "${ROOT}/share" || mkdir "${ROOT}/share"
 
 # copy ramdisk, boot loader and kernel to /boot
-cp ramdisk.img "${ROOT}/boot"
+cp "${BASE}/ramdisk.img" "${ROOT}/boot"
 cp "${BASE}/build/stage1/boot/bzImage" "${ROOT}/boot"
 cp "${BASE}/build/stage1/boot/boot.img" "${ROOT}/boot"
 
@@ -92,10 +92,10 @@ HASH=$(openssl passwd -1 -salt '5RPVAd' 'xx')
 echo "root:${HASH}:17718::::::" >"${ROOT}/etc/shadow"
 
 du -hs "${BASE}/root"
-ls -h root.img
+ls -h "${BASE}/root.img"
 
 sudo umount "${BASE}/root"
-losetup -d /dev/loop0
+sudo losetup -d /dev/loop0
 
 trap - 0
 
