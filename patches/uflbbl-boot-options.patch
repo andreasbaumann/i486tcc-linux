@@ -6,12 +6,12 @@ diff -rauN uflbbl/src/boot.asm uflbbl-boot-options/src/boot.asm
  ; qemu initrd start location 7fab000, 133869568 (this is 128MB) too high for us,
  ; kernel gives us alignment hints and hints where to load initrd to?
 -; let's use 8MB, TODO: does the kernel release the initial ramdisk? I think so. is
-+; let's use 6MB, TODO: does the kernel release the initial ramdisk? I think so. is
++; let's use 8MB, TODO: does the kernel release the initial ramdisk? I think so. is
  ; it relocating it's structures? or do we get fragmented heap and stuff?
 -	a32 mov [READ_DESTINATION_PTR], dword 0x00800000
 -	a32 mov [INITRD_ADDRESS], dword 0x00800000
-+	a32 mov [READ_DESTINATION_PTR], dword 0x00580000
-+	a32 mov [INITRD_ADDRESS], dword 0x00580000
++	a32 mov [READ_DESTINATION_PTR], dword 0x00800000
++	a32 mov [INITRD_ADDRESS], dword 0x00800000
  	a32 mov eax, [READ_DATA_SIZE]
  	a32 mov [INITRD_SIZE], eax
  	mov al, '!'
