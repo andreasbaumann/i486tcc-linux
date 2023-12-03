@@ -1,0 +1,12 @@
+diff -rauN uflbb/src/boot.asm uflbb-debug/src/boot.asm
+--- uflbb/src/boot.asm	2023-12-02 16:34:04.000000000 +0100
++++ uflbb-debug/src/boot.asm	2023-12-03 14:52:27.325432384 +0100
+@@ -322,7 +322,7 @@
+ 
+ ; print (C/H/S) info where we are currently reading and in which state
+ ; and how many data sectors are left in the current tar entry
+-	jmp .no_verbose
++;	jmp .no_verbose
+ 
+ ; states
+ 	mov al, 0x0d

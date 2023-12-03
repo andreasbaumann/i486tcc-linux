@@ -715,6 +715,7 @@ if [ ! -f "${BASE}/build/stage1/boot/boot.img" ]; then
 	tar xf "${BASE}/downloads/uflbbl-${UFLBBL_VERSION}.tar.gz"
 	cd "uflbbl-${UFLBBL_VERSION}" || exit 1
 	patch -Np1 < "${BASE}/patches/uflbbl-boot-options.patch"
+	patch -Np1 < "${BASE}/patches/uflbbl-debug.patch"
 	cd src
 	nasm -o boot.img boot.asm
 	cp boot.img "${BASE}/build/stage1/boot/boot.img"
@@ -764,8 +765,14 @@ if [ ! -f "${BASE}/floppy.img" ]; then
 	tar cvf data.tar -b1 bzImage ramdisk.img EOF
 	cat "${BASE}/build/stage1/boot/boot.img" data.tar > "${BASE}/floppy.img"
 	split -d -b 1474560 floppy.img floppy
-else
-	echo "floppy images exist"
+	LASTFILE=`ls floppy?? | sort | tail -n 1`
+	FILESIZE=`wc -c < "${LASTFILE}"`
+	PADSIZE=`echo "1474560-${FILESIZE}" | bc`
+	if [ "${PADSIZE}" -gt 0 ]; then
+		dd if=/dev/zero count=1 bs="${PADSIZE}" > PAD
+		cat "${LASTFILE}" PAD > "${LASTFILE}-padded"
+		mv "${LASTFILE}-padded" "${LASTFILE}"
+	fi
 fi
 
 trap - 0
