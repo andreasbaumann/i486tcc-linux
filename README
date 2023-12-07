@@ -310,6 +310,21 @@ TODO: looks optional for a simple running system
 - CONFIG_FB_GEODE_LX=y
   => for the Alix 1.E
 
+TODO: needed? and for which cards?
+- CONFIG_FB_SIMPLE=y
+
+- CONFIG_FB_DEVICE=y
+  => to get a /dev/fb*
+  => TODO: check if XF86fbdev need that
+
+TODO: which one of the hardware acceleration options are needed for
+which cards and have performace benefits (Cirrus for instance should
+have BtBlt functions)
+- CONFIG_FB_TILEBLITTING=y
+
+TODO: what happens when we have multiple framebuffer drivers, which one
+takes precedence (for instance SVGA over VGA16 over CIRRUS?).
+  
 - CONFIG_MOUSE_PS2=m
 - CONFIG_INPUT_MOUSEDEV=m
   CONFIG_INPUT_MOUSEDEV_PSAUX=y
@@ -540,6 +555,8 @@ Call Trace:
  <SOFTIRQ>                                                                                               
 - also real hardware (Unisys): no graphic VESA, only text-VESA modes, missing
   => cirrus framebuffer drivers at boot time (cannot be a module)?
+  => same behaviour with cirrus in qemu and 86box, enabling a PCI bus suddently
+     gives us cirrusfb messages and a working /dev/fb* (not more modes though)
 - ${BASE} and @@BASE@@ with sed are both used to pass the build pathes to
   builds in patches. ${BASE} sounds like it is working more by accident..
 - 'cd DIR' used everywhere without 'cd DIR || exit 1'

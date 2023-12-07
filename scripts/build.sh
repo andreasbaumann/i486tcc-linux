@@ -773,6 +773,9 @@ if [ ! -f "${BASE}/floppy.img" ]; then
 		cat "${LASTFILE}" PAD > "${LASTFILE}-padded"
 		mv "${LASTFILE}-padded" "${LASTFILE}"
 	fi
+	for floppy in `ls floppy??`; do
+		mv "${floppy}" "${floppy}.img"
+	done
 fi
 
 trap - 0
