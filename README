@@ -81,9 +81,11 @@ patches
   * disabled IPv6
   * fixed some missing IPv6 conditionals
   * added conditional for FamilyServerInterpreted ("si:")
-- meh
-  * disabled external libraries for gif, png, jpeg, imagemagick
-  * fixed dependency generator
+- image viewer
+  - meh
+    * disabled external libraries for gif, png, jpeg, imagemagick
+    * fixed dependency generator
+  - feh as alternative?
 - slock
   * fixed for missing setgroups in musl
   * disabled XRandr extension
@@ -229,6 +231,7 @@ The starting point of the Linux kernel configuration is 'make tinyconfig'.
   - for 32-bit time parameter as in pselect (this of course made the
     whole thing non-2038-safe)
     "vis: mainloop function not implemented", needs 'pselect'
+    "pselect, function not implemented SYS_pselect6_time64"
 
 - CONFIG_MSDOS_PARTITION
   - for fdisk
@@ -487,6 +490,8 @@ EOF
   timing), this might be because we use musl?
   Xfbdev builds, vesafb only works when started at boot time (not as module) which is
   annoying.
+- minimize fonts
+- Xfbdev :0 -fp /share/X11/fonts
 - "Could not init font path element ../share/X11/fonts/, removing from list"
   https://www.x.org/releases/X11R7.5/doc/libXfont/fontlib.html
   => the pathes must be absolute and no errors in any file whatsover!
@@ -533,7 +538,8 @@ Segmentation fault
 - wordgrinder: segfaults in luapeg on first script, probably a static linking
   issue or a tcc issue?
 - rxvt: 2.7.10 doesn't link statically and has a rxvt-2.7.10 additionally to
-  rxvt. we use rxvt-2.6.4, why exactly?
+  rxvt.
+  TODO: we use rxvt-2.6.4, why exactly?
 - real hardware (Unisys): softirq kernel panic
 Starting network via DHCP..                                                                              
 ne ne.0 (unnamed net_device) (uninitialized): NE*000 ethercard probe at 0x300:                           
@@ -578,6 +584,15 @@ Call Trace:
   results in warnings when issuing 'man xxx'
 - too big 6x13-ISO8859-1.pcf.gz: 4k on host, 64k in root.img. Most likely we
   package too many charset variants
+- "Linux as a Boot Loader - Peter Chubb", kernel assumes to have space after
+  it for decompression in address space and overwrites the ramdisk, explains
+  our fiddling with loading addresses and random crashes till they no longer
+  overlap sessions.
+- suckless:
+  - sup: not really suckless, sha256 summing and listing, daemonizing should be
+    separate binaries in Unix sense
+  - sandy: not really stable and maintained, it seems
+  - static: minial cgit version with static pages
 
 tools
 -----
@@ -637,7 +652,18 @@ to abase).
     Their definition of micro is quite different from mine in terms of
     size and library dependencies)
     I also doubt it works with tcc, needs python3 on the host to build
-    
+
+Some todos to sort out
+----------------------
+
+- zlib
+  - use libz or zlib-ng
+- st/rxvt
+  - https://opensource.com/article/19/10/why-use-rxvt-terminal
+- tmux/screen
+- joe/vis
+- vesa/frambuffer
+     
 other approaches
 ----------------
 
@@ -693,6 +719,7 @@ user land.
 oasis
 -----
 
+by Michael Forney, author of cproc
 statically linked, the Lua build thing is weird.
 He also rewrote ninja as samurai in C (which is nice).
 Also with QBE and cproc the user land can be built with a small C
@@ -772,11 +799,14 @@ links
     - https://github.com/landley/aboriginal
     - https://github.com/landley/mkroot
     - https://landley.net/aboriginal/documentation.html
+    - http://landley.net/aboriginal/history.html
   - Morpheus
     - https://git.2f30.org/morpheus/
   - Oasis
     - https://git.sr.ht/~mcf/oasis
+    - https://github.com/oasislinux/oasis
   - Stali
+    - https://sta.li
     - https://pub.nethence.com/xen/guest-stali
   - Graylinux
     - https://github.com/marmolak/gray386linux
@@ -786,7 +816,8 @@ links
     - http://sabo.xyz/
     - https://sabotage-linux.neocities.org/
     - https://sabotage-linux.neocities.org/blog/11/
-  - others:
+    - https://github.com/scanlime/avc-edge-linux (disappeared)
+  - others minimal linux:
     - https://www.glaucuslinux.org/
     - https://github.com/ZilchOS/bootstrap-from-tcc: this is more for having
       a minimal tcc-based binary core for bootstrapping
@@ -812,10 +843,27 @@ links
     - https://github.com/firasuke/mussel (Firas Khalil Khana)
     - https://github.com/pikhq/bootstrap-linux
     - https://www.glendix.org/: Plan9-like distro
-  - Minimal Linux Live
-    - https://github.com/ivandavidov/minimal
+    - https://github.com/ivandavidov/minimal: Minimal Linux Live
+    - https://github.com/yeokm1/gentoo-on-486
+    - https://distr1.org/: Michael Stapelberg, alternative package management for Linux
+    - https://kisslinux.org/
+    - https://git.sdf.org/midfavila/musl-tcc
+  - other minimal floppy system
+    - https://github.com/gotoco/PE_Bootloader_x86
+    - https://github.com/fysnet/FYSOS/ (smallc, boot loader in C for unreal mode)
+    - https://github.com/alexfru/BootProg
+    - http://dc0d32.blogspot.com/2010/06/real-mode-in-c-with-gcc-writing.html
+    - https://wiki.osdev.org/Disk_access_using_the_BIOS_(INT_13h)
+    - https://en.wikipedia.org/wiki/INT_13H#INT_13h_AH=08h:_Read_Drive_Parameters
+    - https://stanislavs.org/helppc/dbt.html
+    - http://vitaly_filatov.tripod.com/ng/asm/asm_024.9.html
+    - https://web.archive.org/web/20160619063203/http://www.ctyme.com/intr/rb-0621.htm
+    - https://students.mimuw.edu.pl/SO/Linux/Kod/arch/i386/boot/bootsect.S.html
+  - other minimal toolchains
+    - https://github.com/pts/pts-tcc
 - C Compilers
   - https://repo.or.cz/w/tinycc.git
+  - https://blog.stephencleary.com/2010/10/implementing-gccs-builtin-functions.html: on __builtin_clz
 - C Libraries
   - https://www.fefe.de/dietlibc
     (https://www.monperrus.net/martin/compiling-tcc-with-dietlibc: sadly
@@ -834,12 +882,15 @@ links
   - https://github.com/martanne/vis
   - https://joe-editor.sourceforge.io/
   - https://ex-vi.sourceforge.net/
+  - https://git.sdf.org/midfavila/mse
 - Kernel
   - Tinification
     - https://weeraman.com/building-a-tiny-linux-kernel-8c07579ae79d
     - https://tiny.wiki.kernel.org/
     - http://events17.linuxfoundation.org/sites/events/files/slides/tiny.pdf
     - https://z49x2vmq.github.io/2020/12/24/linux-tiny-qemu/
+    - http://elinux.org/Kernel_Size_Reduction_Work
+    - https://stackoverflow.com/questions/27941775/what-is-the-minimum-amount-of-ram-required-to-run-linux-kernel-on-an-embedded-de    
 - Boot process
   - ramdisks
     - https://linuxlink.timesys.com/docs/startup_overview
@@ -847,6 +898,7 @@ links
     - https://firasuke.github.io/DOTSLASHLINUX/post/booting-the-linux-kernel-without-an-initrd-initramfs/
     - https://docs.kernel.org/admin-guide/initrd.html
     - https://landley.net/writing/rootfs-programming.html
+    - https://github.com/chris-se/tiny-initramfs
   - device management
     - https://git.suckless.org/smdev
   - init systems
@@ -855,6 +907,8 @@ links
     - https://github.com/hut/minirc
     - https://omaera.org/wlog/tech/runit_init
     - https://forums.gentoo.org/viewtopic-t-1000292-start-0.html
+    - https://busybox.busybox.narkive.com/PBeyeZOM/custom-initrd-using
+    - https://github.com/shiftypenguin/uinit
   - service/daemon management
     - http://r-36.net/scm/svc/log.html
 - minimal userland
@@ -879,6 +933,7 @@ links
     - https://github.com/leahneukirchen/obase
     - https://beastiebox.sourceforge.net/
     - https://www.fefe.de/embutils/
+    - https://heirloom.sourceforge.net/
   - gopher://bitreich.org
   - https://git.2f30.org/hbase/log.html: Heirlom
   - https://www.glendix.org/: we could also go into the direction of using
@@ -886,8 +941,13 @@ links
     - git://git.9front.org/plan9front/plan9front
     - git://git.suckless.org/9base
   - https://github.com/ecki/net-tools.git
+  - https://www.reddit.com/r/suckless/comments/n14xnq/can_sbase_replace_busybox/
+  - https://exactcode.com/opensource/minised/ (Eroc S. Raymond, maintained by Rene Rebe)
+  - https://stackoverflow.com/questions/4327942/non-buffering-stdin-reading
 - minimalism
   - https://wiki.installgentoo.com/wiki/Software_minimalism
+  - https://suckless.org/philosophy
+  - https://github.com/173duprot/harm-less
 - Link collections of interesting software
   - https://suckless.org/rocks/
   - https://suckless.org/other_projects/
@@ -909,8 +969,12 @@ links
   - https://virtuallyfun.com/2020/07/31/using-qemu-in-2020/
 - nbd
   - https://patchwork.kernel.org/project/linux-block/patch_20190612163144.18486-2/roman.stratiienko@globallogic.com/
+  - http://patraulea.com/nbd-http/
+  - https://github.com/NetworkBlockDevice/nbd/
+  - https://patchwork.kernel.org/project/linux-block/patch/20190612163144.18486-2-roman.stratiienko@globallogic.com/
 - debugging
   - https://www.kernel.org/doc/html/v4.15/dev-tools/kgdb.html
+  - https://ja.nsommer.dk/articles/linux-and-tiny-c-compiler-in-the-browser-part-one.html
 - X
   - tiny X
     - https://github.com/idunham/tinyxserver and
@@ -921,6 +985,12 @@ links
     - alternatives:
       - https://github.com/michaelforney/velox, https://github.com/michaelforney/swc: but
         this is wayland
+      - http://www.microwindows.org/
+      - KDrive (Tiny X, TinyX): Keith Packard
+      - https://www.pps.jussieu.fr/~jch/software/kdrive.html
+      - https://github.com/Earnestly/sx: alternative xinit/startx
+      - http://www.microwindows.org/
+    - http://forum.tinycorelinux.net/index.php?topic=16299.0: fork of tinyx for tinycorelinux
   - X terminal
     - xterm: bloat
     - st, requires Xft, requiring fontconfig, freetype2, etc. can eventually
@@ -941,6 +1011,63 @@ links
     this is all a little bit too much
   - ion1: more suckless, maybe patchable to do what we want
     https://github.com/apenwarr/ion1
+- debugging
+  - automatic serial without getty
+    - https://github.com/Angstrom-distribution/meta-linaro/blob/master/recipes-core/auto-serial-console/auto-serial-console/auto-getty
+- suspend/hibernate
+  - https://docs.kernel.org/power/s2ram.html
+- philosophical stuff
+  - 1983 Rob Pike made a presentation titled ‘UNIX Style, or cat -v Considered Harmful’ 
+  - http://harmful.cat-v.org/cat-v/
+- hardware-specific stuff
+  - Unisys CWD-4002
+    - http://www.dosdays.co.uk/topics/Manufacturers/cirrus_logic.php: graphic chip
+- graphic programming
+  - https://www.svgalib.org/
+  - https://benpfaff.org/projects.html: BOGL graphics library for framebuffers
+
+performance
+-----------
+
+Building i486tcc-linux
+
+5 minutes userland including cross-toolchain
+15 minutes kernel
+1 minute ramdisk/floppy creation
+
+framebuffer
+-----------
+
+insmod /lib/modules/drivers/video/fbdev/core/cfbcopyarea.ko
+insmod /lib/modules/drivers/video/fbdev/core/cfbfillrect.ko
+insmod /lib/modules/drivers/video/fbdev/core/cfbimgblt.ko
+insmod /lib/modules/arch/x86/video/fbdev.ko
+insmod /lib/modules/lib/fonts/font.ko
+insmod /lib/modules/drivers/video/fbdev/core/fb.ko
+insmod /lib/modules/drivers/video/fbdev/cirrusfb.ko
+
+insmod /lib/modules/drivers/video/vgastate.ko
+insmod /lib/modules/lib/fonts/font.ko
+insmod /lib/modules/drivers/video/fbdev/vga16fb.ko
+
+mknod /dev/fb0 c 29 0
+cat /sys/class/graphics/fb0/name 
+
+Unsorted links
+--------------
+
+- framebuffer
+  - https://higfxback.github.io/
+  - https://github.com/rothgar/awesome-tuis
+  - https://dev1galaxy.org/viewtopic.php?id=5400
+  - https://directfb2.github.io/
+  - https://github.com/directfb2/DirectFB2
+  - https://github.com/8l/fbui
+  - https://manpages.ubuntu.com/manpages/xenial/man1/fbi.1.html
+  - https://kevinboone.me/linuxfbc.html?i=1
+  - https://benpfaff.org/projects.html: vga16fb
+- fonts
+  - https://github.com/ntwk/vga-font
 
 Real hardware
 -------------
@@ -953,3 +1080,4 @@ insmod 8390p.ko
 insmod ne.ko io=0x300 irq=10
 ifconfig eth0 up
 sdhcp
+

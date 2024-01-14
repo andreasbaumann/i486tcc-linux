@@ -1,0 +1,567 @@
+   #[1]pts.blog - Atom [2]pts.blog - RSS [3]pts.blog - Atom
+
+[4]pts.blog
+
+Flattr this blog
+
+Blog Archive
+
+     * [5]|>  [6]2021 (1)
+          + [7]|>  [8]October (1)
+
+     * [9]|>  [10]2020 (3)
+          + [11]|>  [12]December (1)
+          + [13]|>  [14]April (2)
+
+     * [15]|>  [16]2019 (2)
+          + [17]|>  [18]February (2)
+
+     * [19]|>  [20]2018 (5)
+          + [21]|>  [22]June (1)
+          + [23]|>  [24]April (4)
+
+     * [25]|>  [26]2017 (6)
+          + [27]|>  [28]December (1)
+          + [29]|>  [30]October (1)
+          + [31]|>  [32]September (1)
+          + [33]|>  [34]February (3)
+
+     * [35]|>  [36]2016 (8)
+          + [37]|>  [38]November (1)
+          + [39]|>  [40]July (1)
+          + [41]|>  [42]June (1)
+          + [43]|>  [44]May (1)
+          + [45]|>  [46]April (1)
+          + [47]|>  [48]March (1)
+          + [49]|>  [50]February (1)
+          + [51]|>  [52]January (1)
+
+     * [53]|>  [54]2015 (5)
+          + [55]|>  [56]December (1)
+          + [57]|>  [58]November (1)
+          + [59]|>  [60]March (2)
+          + [61]|>  [62]February (1)
+
+     * [63]|>  [64]2014 (22)
+          + [65]|>  [66]October (2)
+          + [67]|>  [68]September (3)
+          + [69]|>  [70]August (2)
+          + [71]|>  [72]July (3)
+          + [73]|>  [74]June (2)
+          + [75]|>  [76]April (3)
+          + [77]|>  [78]January (7)
+
+     * [79]|>  [80]2013 (24)
+          + [81]|>  [82]December (9)
+          + [83]|>  [84]November (2)
+          + [85]|>  [86]October (3)
+          + [87]|>  [88]August (5)
+          + [89]|>  [90]May (1)
+          + [91]|>  [92]April (2)
+          + [93]|>  [94]March (1)
+          + [95]|>  [96]February (1)
+
+     * [97]|>  [98]2012 (21)
+          + [99]|>  [100]December (2)
+          + [101]|>  [102]November (5)
+          + [103]|>  [104]September (2)
+          + [105]|>  [106]August (2)
+          + [107]|>  [108]June (2)
+          + [109]|>  [110]April (2)
+          + [111]|>  [112]March (2)
+          + [113]|>  [114]February (1)
+          + [115]|>  [116]January (3)
+
+     * [117]|>  [118]2011 (30)
+          + [119]|>  [120]December (2)
+          + [121]|>  [122]November (3)
+          + [123]|>  [124]October (5)
+          + [125]|>  [126]September (1)
+          + [127]|>  [128]August (6)
+          + [129]|>  [130]June (3)
+          + [131]|>  [132]May (1)
+          + [133]|>  [134]April (3)
+          + [135]|>  [136]March (1)
+          + [137]|>  [138]February (2)
+          + [139]|>  [140]January (3)
+
+     * [141]|>  [142]2010 (49)
+          + [143]|>  [144]December (6)
+          + [145]|>  [146]November (6)
+          + [147]|>  [148]October (3)
+          + [149]|>  [150]September (1)
+          + [151]|>  [152]August (4)
+          + [153]|>  [154]July (3)
+          + [155]|>  [156]June (10)
+          + [157]|>  [158]May (2)
+          + [159]|>  [160]April (2)
+          + [161]|>  [162]March (3)
+          + [163]|>  [164]February (4)
+          + [165]|>  [166]January (5)
+
+     * [167]v  [168]2009 (53)
+          + [169]|>  [170]December (5)
+          + [171]v  [172]November (9)
+               o [173]How fast does 8g in Google Go compile?
+               o [174]How to write a program with multiple packages in
+                 G...
+               o [175]FUSE protocol tutorial for Linux 2.6
+               o [176]Buffered IO speed test of Google Go
+               o [177]How to read a whole file to String in Java
+               o [178]How to convert a Unix timestamp to a civil date
+               o [179]AES encpytion in Python using C extensions
+               o [180]How to use \showhyphens with beamer
+               o [181]Tiny, self-contained C compiler using TCC + uClibc
+          + [182]|>  [183]October (7)
+          + [184]|>  [185]September (4)
+          + [186]|>  [187]August (4)
+          + [188]|>  [189]July (3)
+          + [190]|>  [191]June (6)
+          + [192]|>  [193]May (6)
+          + [194]|>  [195]April (5)
+          + [196]|>  [197]March (4)
+
+     * [198]|>  [199]2008 (1)
+          + [200]|>  [201]September (1)
+
+Recommended
+
+     * [javascript]
+       [202]IO Digital Sec
+       1 year ago
+
+2009-11-01
+
+Tiny, self-contained C compiler using TCC + uClibc
+
+   This post presents how I played with a small C compiler and a small
+   libc on Linux. I've combined TCC (the [203]Tiny C Compiler) 0.9.25 and
+   [204]uClibc 0.9.26, compressed with [205]UPX 3.03 to a tiny,
+   self-contained C compiler for Linux i386. You don't need any external
+   files (apart from the compiler executable) to compile (or interpret) C
+   code, and the compiled executable will be self-contained as well.
+
+   Here is how to download and use it for compilation on a Linux x86 or
+   x86_64 system:
+$ uname
+Linux
+$ wget -O pts-tcc https://raw.githubusercontent.com/pts/pts-tcc/master/pts-tcc-0
+.9.26-uclibc-0.9.30.1
+$ chmod +x pts-tcc
+$ ls -l pts-tcc
+-rwxrwxr-- 1 pts pts 349640 Nov  1 13:07 pts-tcc
+$ wget -O example1.c https://raw.githubusercontent.com/pts/pts-tcc/master/pts-tc
+c/example1.c
+$ cat example1.c
+#! ./pts-tcc -run
+int printf(char const*fmt, ...);
+double sqrt(double x);
+int main() {
+  printf("Hello, World!\n");
+  return sqrt(36) * 7;
+}
+$ ./pts-tcc example1.c
+$ file a.out
+a.out: ELF 32-bit LSB executable, Intel 80386, version 1 (SYSV), statically link
+ed, not stripped
+$ ls -l a.out
+-rwxrwxr-x 1 pts pts 17124 Nov  1 13:17 a.out
+$ ./a.out; echo "$?"
+Hello, World!
+42
+$ strace -e open ./pts-tcc example1.c
+open("/proc/self/mem", O_RDONLY)        = 3
+open("/proc/self/mem", O_RDONLY)        = 3
+open("example1.c", O_RDONLY)            = 3
+open("/proc/self/mem", O_RDONLY)        = 3
+open("/proc/self/mem", O_RDONLY)        = 3
+open("a.out", O_WRONLY|O_CREAT|O_TRUNC, 0777) = 3
+$ strace ./a.out
+execve("./a.out", ["./a.out"], [/* 47 vars */]) = 0
+ioctl(0, SNDCTL_TMR_TIMEBASE or TCGETS, {B38400 opost isig icanon echo ...}) = 0
+ioctl(1, SNDCTL_TMR_TIMEBASE or TCGETS, {B38400 opost isig icanon echo ...}) = 0
+write(1, "Hello, World!\n", 14Hello, World!
+)         = 14
+_exit(42)                               = ?
+
+   As you can see above, my version the compiler is less than 250k in
+   size, and it doesn't need any library files (such as libc.so) for
+   compilation (as indicated by the strace output above), and the compiled
+   binary doesn't need library files either.
+
+   TCC can run the C program without creating any binaries:
+$ rm -f a.out
+$ ./pts-tcc -run example1.c; echo "$?"
+Hello, World!
+42
+$ head -1 example1.c
+#! ./pts-tcc -run
+$ chmod +x example1.c
+$ ./example1.c; echo "$?"
+Hello, World!
+
+   TCC is a very fast compiler (see the speed comparisons on it web site),
+   it is versatile (it can compile the Linux kernel), but it doesn't
+   optimize much: the code it produces is usually larger and slower than
+   the output of a traditional, optimizing C compiler such as gcc -O2.
+
+   The shell script [206]pts-tcc-0.9.26-compile.sh builds TCC from source,
+   adding uClibc, and compressing with UPX.
+
+Update: TCC 0.9.25 and uClibc 0.9.29 (or older)
+
+   Please note that TCC 0.9.25 is buggy, don't use it!
+$ wget -O pts-tcc https://raw.githubusercontent.com/pts/pts-tcc/master/pts-tcc/p
+ts-tcc-0.9.25
+$ chmod +x pts-tcc
+$ ls -l pts-tcc
+-rwxr-xr-x 1 pts eng 241728 Apr  8 16:53 pts-tcc
+
+Update: TCC 0.9.25 and uClibc 0.9.30.1
+
+   Please note that TCC 0.9.25 is buggy, don't use it!
+$ wget -O pts-tcc https://raw.githubusercontent.com/pts/pts-tcc/master/pts-tcc-0
+.9.25-uclibc-0.9.30.1
+$ chmod +x pts-tcc
+$ ls -l pts-tcc
+-rwxr-xr-x 1 pts eng 336756 Apr  8 16:53 pts-tcc
+
+Update: TCC 0.9.26 and uClibc 0.9.30.1
+
+$ wget -O pts-tcc https://raw.githubusercontent.com/pts/pts-tcc/master/pts-tcc-0
+.9.26-uclibc-0.9.30.1
+$ chmod +x pts-tcc
+$ ls -l pts-tcc
+-rwxr-xr-x 1 pts eng 349640 Apr  8 16:53 pts-tcc
+
+   Posted by pts at [207]13:06
+
+6 comments:
+
+   [208]Porcupine Saul said...
+          This looks like a cool tool, man. Thanks for sticking it out
+          there.
+
+          [209]April 2, 2010 at 4:03:00PM GMT+2 [210][icon_delete13.gif]
+
+   [211]Biff said...
+          I tried unsuccessfully to get this working on a build of
+          OpenWrt. Not sure what I've done wrong. It would be nice to
+          understand what configuration I need to do to transfer the
+          resultant tcc exe to an embedded system and make it work.
+          See here for the error.
+          https://forum.openwrt.org/viewtopic.php?id=26000
+
+          [212]August 6, 2010 at 12:29:00PM GMT+2 [213][icon_delete13.gif]
+
+   [214]Unknown said...
+          I really really want to get this working, and I have tried many
+          different things, however I cannot seem to replicate the setup
+          you have.
+          When I use your wrapper, I get the following:
+          + echo 'int printf(char*fmt,...);main(){return
+          1>printf("he110\n");}'
+          + ./i386-uclibc-gcc -static -o test test.c
+          + ./test
+          + grep -l he110 test.out
+          test.out
+          + ./i386-uclibc-gcc -o test test.c
+          /usr/bin/ld: cannot find /lib//libc.so.0
+          /usr/bin/ld: cannot find /usr/lib//uclibc_nonshared.a
+          /usr/bin/ld: cannot find /lib//ld-uClibc.so.0
+          collect2: ld returned 1 exit status
+          It seems to work statically, however I have something wrong with
+          ld, (the double slashes) and I cannot seem to find where in the
+          script or wrapper (or the proper environment variable) that can
+          fix this. I should note that I have also build the uclibc
+          toolchain using buildroot, and have it stored in
+          /usr/local/uclibc, but I cannot seem to get the uclibc ld to run
+          instead of the (/usr/bin/ld) one.
+          Furthermore, by using my compiler instead of the wrapper, I am
+          able to compile pts-tcc and it displays its help output, however
+          when trying to use it to compile I get:
+          user@ubuntu:~/Downloads/Tcc$ ./pts-tcc test.c
+          tcc: undefined symbol '__uClibc_main'
+          tcc: undefined symbol 'printf'
+          So if you could please give a little more details as to how to
+          set up your environment, and where things need to be located, I
+          would appreciate it.
+          Also, if you could tell me what is going on with this perl line:
+          for F in tcclibc.a "$UCLIBC_USR"/lib/{crt1.o,crti.o,crtn.o}; do
+          G="${F##*/}"
+          export NAME="data_${G%.*}"
+          perl -e '$_=join("",); my$L=length;
+          s@([^-+/\w])@sprintf"\\%03o",ord$1@ge; print".globl
+          $ENV{NAME}\n.section .data\n.align 4\n.size
+          $ENV{NAME},$L\n$ENV{NAME}:\n.string \"$_\\001\"\n"' <"$F"
+          done >tcc-0.9.25/libcdata.s
+          Thank you so much, I would really like to get this working.
+          (On a side note, would there be an binary copy already lying
+          around, for the i386 architecture?)
+
+          [215]October 29, 2010 at 5:33:00AM GMT+2
+          [216][icon_delete13.gif]
+
+   [217]Unknown said...
+          Oops, found the binary, and it works great. I just cannot figure
+          out how you did it.
+
+          [218]October 29, 2010 at 5:42:00AM GMT+2
+          [219][icon_delete13.gif]
+
+   [220]Darren said...
+          I -_love_ this - it's solved a big problem for me - trouble is I
+          just found a bug in tcc*.25, that's fixed in '26. I went to try
+          to modify your build script, but I don't have all the right
+          versions of things... any chance of an update?
+          (thx)
+          Darren
+
+          [221]April 7, 2013 at 1:00:00PM GMT+2 [222][icon_delete13.gif]
+
+   [223]pts said...
+          @Darren: I've updated pts-tcc so a version using TCC 0.9.26 is
+          available. Please see it in the updated blog post.
+
+          [224]April 8, 2013 at 5:04:00PM GMT+2 [225][icon_delete13.gif]
+
+   [226]Post a Comment
+   [227]Newer Post [228]Older Post [229]Home
+   Subscribe to: [230]Post Comments (Atom)
+
+References
+
+   Visible links:
+   1. https://ptspts.blogspot.com/feeds/posts/default
+   2. https://ptspts.blogspot.com/feeds/posts/default?alt=rss
+   3. https://ptspts.blogspot.com/feeds/6808943651025396418/comments/default
+   4. https://ptspts.blogspot.com/
+   5. javascript:void(0)
+   6. https://ptspts.blogspot.com/2021/
+   7. javascript:void(0)
+   8. https://ptspts.blogspot.com/2021/10/
+   9. javascript:void(0)
+  10. https://ptspts.blogspot.com/2020/
+  11. javascript:void(0)
+  12. https://ptspts.blogspot.com/2020/12/
+  13. javascript:void(0)
+  14. https://ptspts.blogspot.com/2020/04/
+  15. javascript:void(0)
+  16. https://ptspts.blogspot.com/2019/
+  17. javascript:void(0)
+  18. https://ptspts.blogspot.com/2019/02/
+  19. javascript:void(0)
+  20. https://ptspts.blogspot.com/2018/
+  21. javascript:void(0)
+  22. https://ptspts.blogspot.com/2018/06/
+  23. javascript:void(0)
+  24. https://ptspts.blogspot.com/2018/04/
+  25. javascript:void(0)
+  26. https://ptspts.blogspot.com/2017/
+  27. javascript:void(0)
+  28. https://ptspts.blogspot.com/2017/12/
+  29. javascript:void(0)
+  30. https://ptspts.blogspot.com/2017/10/
+  31. javascript:void(0)
+  32. https://ptspts.blogspot.com/2017/09/
+  33. javascript:void(0)
+  34. https://ptspts.blogspot.com/2017/02/
+  35. javascript:void(0)
+  36. https://ptspts.blogspot.com/2016/
+  37. javascript:void(0)
+  38. https://ptspts.blogspot.com/2016/11/
+  39. javascript:void(0)
+  40. https://ptspts.blogspot.com/2016/07/
+  41. javascript:void(0)
+  42. https://ptspts.blogspot.com/2016/06/
+  43. javascript:void(0)
+  44. https://ptspts.blogspot.com/2016/05/
+  45. javascript:void(0)
+  46. https://ptspts.blogspot.com/2016/04/
+  47. javascript:void(0)
+  48. https://ptspts.blogspot.com/2016/03/
+  49. javascript:void(0)
+  50. https://ptspts.blogspot.com/2016/02/
+  51. javascript:void(0)
+  52. https://ptspts.blogspot.com/2016/01/
+  53. javascript:void(0)
+  54. https://ptspts.blogspot.com/2015/
+  55. javascript:void(0)
+  56. https://ptspts.blogspot.com/2015/12/
+  57. javascript:void(0)
+  58. https://ptspts.blogspot.com/2015/11/
+  59. javascript:void(0)
+  60. https://ptspts.blogspot.com/2015/03/
+  61. javascript:void(0)
+  62. https://ptspts.blogspot.com/2015/02/
+  63. javascript:void(0)
+  64. https://ptspts.blogspot.com/2014/
+  65. javascript:void(0)
+  66. https://ptspts.blogspot.com/2014/10/
+  67. javascript:void(0)
+  68. https://ptspts.blogspot.com/2014/09/
+  69. javascript:void(0)
+  70. https://ptspts.blogspot.com/2014/08/
+  71. javascript:void(0)
+  72. https://ptspts.blogspot.com/2014/07/
+  73. javascript:void(0)
+  74. https://ptspts.blogspot.com/2014/06/
+  75. javascript:void(0)
+  76. https://ptspts.blogspot.com/2014/04/
+  77. javascript:void(0)
+  78. https://ptspts.blogspot.com/2014/01/
+  79. javascript:void(0)
+  80. https://ptspts.blogspot.com/2013/
+  81. javascript:void(0)
+  82. https://ptspts.blogspot.com/2013/12/
+  83. javascript:void(0)
+  84. https://ptspts.blogspot.com/2013/11/
+  85. javascript:void(0)
+  86. https://ptspts.blogspot.com/2013/10/
+  87. javascript:void(0)
+  88. https://ptspts.blogspot.com/2013/08/
+  89. javascript:void(0)
+  90. https://ptspts.blogspot.com/2013/05/
+  91. javascript:void(0)
+  92. https://ptspts.blogspot.com/2013/04/
+  93. javascript:void(0)
+  94. https://ptspts.blogspot.com/2013/03/
+  95. javascript:void(0)
+  96. https://ptspts.blogspot.com/2013/02/
+  97. javascript:void(0)
+  98. https://ptspts.blogspot.com/2012/
+  99. javascript:void(0)
+ 100. https://ptspts.blogspot.com/2012/12/
+ 101. javascript:void(0)
+ 102. https://ptspts.blogspot.com/2012/11/
+ 103. javascript:void(0)
+ 104. https://ptspts.blogspot.com/2012/09/
+ 105. javascript:void(0)
+ 106. https://ptspts.blogspot.com/2012/08/
+ 107. javascript:void(0)
+ 108. https://ptspts.blogspot.com/2012/06/
+ 109. javascript:void(0)
+ 110. https://ptspts.blogspot.com/2012/04/
+ 111. javascript:void(0)
+ 112. https://ptspts.blogspot.com/2012/03/
+ 113. javascript:void(0)
+ 114. https://ptspts.blogspot.com/2012/02/
+ 115. javascript:void(0)
+ 116. https://ptspts.blogspot.com/2012/01/
+ 117. javascript:void(0)
+ 118. https://ptspts.blogspot.com/2011/
+ 119. javascript:void(0)
+ 120. https://ptspts.blogspot.com/2011/12/
+ 121. javascript:void(0)
+ 122. https://ptspts.blogspot.com/2011/11/
+ 123. javascript:void(0)
+ 124. https://ptspts.blogspot.com/2011/10/
+ 125. javascript:void(0)
+ 126. https://ptspts.blogspot.com/2011/09/
+ 127. javascript:void(0)
+ 128. https://ptspts.blogspot.com/2011/08/
+ 129. javascript:void(0)
+ 130. https://ptspts.blogspot.com/2011/06/
+ 131. javascript:void(0)
+ 132. https://ptspts.blogspot.com/2011/05/
+ 133. javascript:void(0)
+ 134. https://ptspts.blogspot.com/2011/04/
+ 135. javascript:void(0)
+ 136. https://ptspts.blogspot.com/2011/03/
+ 137. javascript:void(0)
+ 138. https://ptspts.blogspot.com/2011/02/
+ 139. javascript:void(0)
+ 140. https://ptspts.blogspot.com/2011/01/
+ 141. javascript:void(0)
+ 142. https://ptspts.blogspot.com/2010/
+ 143. javascript:void(0)
+ 144. https://ptspts.blogspot.com/2010/12/
+ 145. javascript:void(0)
+ 146. https://ptspts.blogspot.com/2010/11/
+ 147. javascript:void(0)
+ 148. https://ptspts.blogspot.com/2010/10/
+ 149. javascript:void(0)
+ 150. https://ptspts.blogspot.com/2010/09/
+ 151. javascript:void(0)
+ 152. https://ptspts.blogspot.com/2010/08/
+ 153. javascript:void(0)
+ 154. https://ptspts.blogspot.com/2010/07/
+ 155. javascript:void(0)
+ 156. https://ptspts.blogspot.com/2010/06/
+ 157. javascript:void(0)
+ 158. https://ptspts.blogspot.com/2010/05/
+ 159. javascript:void(0)
+ 160. https://ptspts.blogspot.com/2010/04/
+ 161. javascript:void(0)
+ 162. https://ptspts.blogspot.com/2010/03/
+ 163. javascript:void(0)
+ 164. https://ptspts.blogspot.com/2010/02/
+ 165. javascript:void(0)
+ 166. https://ptspts.blogspot.com/2010/01/
+ 167. javascript:void(0)
+ 168. https://ptspts.blogspot.com/2009/
+ 169. javascript:void(0)
+ 170. https://ptspts.blogspot.com/2009/12/
+ 171. javascript:void(0)
+ 172. https://ptspts.blogspot.com/2009/11/
+ 173. https://ptspts.blogspot.com/2009/11/how-fast-does-8g-in-google-go-compile.html
+ 174. https://ptspts.blogspot.com/2009/11/how-to-write-program-with-multiple.html
+ 175. https://ptspts.blogspot.com/2009/11/fuse-protocol-tutorial-for-linux-26.html
+ 176. https://ptspts.blogspot.com/2009/11/buffered-io-speed-test-of-google-go.html
+ 177. https://ptspts.blogspot.com/2009/11/how-to-read-whole-file-to-string-in.html
+ 178. https://ptspts.blogspot.com/2009/11/how-to-convert-unix-timestamp-to-civil.html
+ 179. https://ptspts.blogspot.com/2009/11/aes-encpytion-in-python-using-c.html
+ 180. https://ptspts.blogspot.com/2009/11/how-to-use-showhyphens-with-beamer.html
+ 181. https://ptspts.blogspot.com/2009/11/tiny-self-contained-c-compiler-using.html
+ 182. javascript:void(0)
+ 183. https://ptspts.blogspot.com/2009/10/
+ 184. javascript:void(0)
+ 185. https://ptspts.blogspot.com/2009/09/
+ 186. javascript:void(0)
+ 187. https://ptspts.blogspot.com/2009/08/
+ 188. javascript:void(0)
+ 189. https://ptspts.blogspot.com/2009/07/
+ 190. javascript:void(0)
+ 191. https://ptspts.blogspot.com/2009/06/
+ 192. javascript:void(0)
+ 193. https://ptspts.blogspot.com/2009/05/
+ 194. javascript:void(0)
+ 195. https://ptspts.blogspot.com/2009/04/
+ 196. javascript:void(0)
+ 197. https://ptspts.blogspot.com/2009/03/
+ 198. javascript:void(0)
+ 199. https://ptspts.blogspot.com/2008/
+ 200. javascript:void(0)
+ 201. https://ptspts.blogspot.com/2008/09/
+ 202. https://iodigitalsec.com/
+ 203. http://bellard.org/tcc/
+ 204. http://www.uclibc.org/
+ 205. http://upx.sourceforge.net/
+ 206. https://github.com/pts/pts-tcc/blob/master/pts-tcc-0.9.26-compile.sh
+ 207. https://ptspts.blogspot.com/2009/11/tiny-self-contained-c-compiler-using.html
+ 208. https://www.blogger.com/profile/13523835355464525279
+ 209. https://ptspts.blogspot.com/2009/11/tiny-self-contained-c-compiler-using.html?showComment=1270216996272#c1780721860826453864
+ 210. https://www.blogger.com/delete-comment.g?blogID=8821846818714029393&postID=1780721860826453864
+ 211. https://www.blogger.com/profile/14344647540020869827
+ 212. https://ptspts.blogspot.com/2009/11/tiny-self-contained-c-compiler-using.html?showComment=1281090567095#c6665460077644589152
+ 213. https://www.blogger.com/delete-comment.g?blogID=8821846818714029393&postID=6665460077644589152
+ 214. https://www.blogger.com/profile/16368219482343702957
+ 215. https://ptspts.blogspot.com/2009/11/tiny-self-contained-c-compiler-using.html?showComment=1288323202749#c5065061273223465540
+ 216. https://www.blogger.com/delete-comment.g?blogID=8821846818714029393&postID=5065061273223465540
+ 217. https://www.blogger.com/profile/16368219482343702957
+ 218. https://ptspts.blogspot.com/2009/11/tiny-self-contained-c-compiler-using.html?showComment=1288323742923#c8312086593726964224
+ 219. https://www.blogger.com/delete-comment.g?blogID=8821846818714029393&postID=8312086593726964224
+ 220. https://www.blogger.com/profile/15410121341266501317
+ 221. https://ptspts.blogspot.com/2009/11/tiny-self-contained-c-compiler-using.html?showComment=1365332400683#c2984614004162073806
+ 222. https://www.blogger.com/delete-comment.g?blogID=8821846818714029393&postID=2984614004162073806
+ 223. https://www.blogger.com/profile/00909092426117039110
+ 224. https://ptspts.blogspot.com/2009/11/tiny-self-contained-c-compiler-using.html?showComment=1365433441521#c8060845628300786053
+ 225. https://www.blogger.com/delete-comment.g?blogID=8821846818714029393&postID=8060845628300786053
+ 226. https://www.blogger.com/comment.g?blogID=8821846818714029393&postID=6808943651025396418
+ 227. https://ptspts.blogspot.com/2009/11/how-to-use-showhyphens-with-beamer.html
+ 228. https://ptspts.blogspot.com/2009/10/how-to-enable-autologin-in-ubuntu.html
+ 229. https://ptspts.blogspot.com/
+ 230. https://ptspts.blogspot.com/feeds/6808943651025396418/comments/default
+
+   Hidden links:
+ 232. https://www.blogger.com/post-edit.g?blogID=8821846818714029393&postID=6808943651025396418&from=pencil

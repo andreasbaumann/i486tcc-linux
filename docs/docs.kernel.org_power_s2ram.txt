@@ -1,0 +1,202 @@
+   #[1]Index [2]Search [3]Interaction of Suspend code (S3) with the CPU
+   hotplug infrastructure [4]Runtime Power Management Framework for I/O
+   Devices
+
+[5]The Linux Kernel
+
+   6.7.0
+
+Quick search
+
+   ____________________ Go
+
+Contents
+
+   [X]
+     * [6]A guide to the Kernel Development Process
+     * [7]Submitting patches: the essential guide to getting your code
+       into the kernel
+     * [8]Code of conduct
+     * [9]Kernel Maintainer Handbook
+     * [10]All development-process docs
+
+     * [11]Core API Documentation
+     * [12]Driver implementer's API guide
+     * [13]Kernel subsystem documentation
+          + [14]Core subsystems
+               o [15]Core API Documentation
+               o [16]Driver implementer's API guide
+               o [17]Memory Management Documentation
+               o [18]Power Management
+               o [19]Scheduler
+               o [20]Timers
+               o [21]Locking
+          + [22]Human interfaces
+          + [23]Networking interfaces
+          + [24]Storage interfaces
+     * [25]Locking in the kernel
+
+     * [26]Linux kernel licensing rules
+     * [27]How to write kernel documentation
+     * [28]Development tools for the kernel
+     * [29]Kernel Testing Guide
+     * [30]Kernel Hacking Guides
+     * [31]Linux Tracing Technologies
+     * [32]fault-injection
+     * [33]Kernel Livepatching
+     * [34]Rust
+
+     * [35]The Linux kernel user's and administrator's guide
+     * [36]The kernel build system
+     * [37]Reporting issues
+     * [38]User-space tools
+     * [39]The Linux kernel user-space API guide
+
+     * [40]The Linux kernel firmware guide
+     * [41]Open Firmware and Devicetree
+
+     * [42]CPU Architectures
+
+     * [43]Unsorted Documentation
+
+     * [44]Translations
+
+This Page
+
+     * [45]Show Source
+
+How to get s2ram working[46]¶
+
+   2006 Linus Torvalds 2006 Pavel Machek
+    1. Check suspend.sf.net, program s2ram there has long whitelist of
+       "known ok" machines, along with tricks to use on each one.
+    2. If that does not help, try reading [47]swsusp/S3 tricks and
+       [48]Video issues with S3 resume. Perhaps problem is as simple as
+       broken module, and simple module unload can fix it.
+    3. You can use Linus' TRACE_RESUME infrastructure, described below.
+
+Using TRACE_RESUME[49]¶
+
+   I've been working at making the machines I have able to STR, and almost
+   always it's a driver that is buggy. Thank God for the suspend/resume
+   debugging - the thing that Chuck tried to disable. That's often the
+   _only_ way to debug these things, and it's actually pretty powerful
+   (but time-consuming - having to insert TRACE_RESUME() markers into the
+   device driver that doesn't resume and recompile and reboot).
+
+   Anyway, the way to debug this for people who are interested (have a
+   machine that doesn't boot) is:
+
+     * enable PM_DEBUG, and PM_TRACE
+     * use a script like this:
+#!/bin/sh
+sync
+echo 1 > /sys/power/pm_trace
+echo mem > /sys/power/state
+
+       to suspend
+     * if it doesn't come back up (which is usually the problem), reboot
+       by holding the power button down, and look at the dmesg output for
+       things like:
+Magic number: 4:156:725
+hash matches drivers/base/power/resume.c:28
+hash matches device 0000:01:00.0
+
+       which means that the last trace event was just before trying to
+       resume device 0000:01:00.0. Then figure out what driver is
+       controlling that device (lspci and /sys/devices/pci* is your
+       friend), and see if you can fix it, disable it, or trace into its
+       resume function.
+       If no device matches the hash (or any matches appear to be false
+       positives), the culprit may be a device from a loadable kernel
+       module that is not loaded until after the hash is checked. You can
+       check the hash against the current devices again after more modules
+       are loaded using sysfs:
+cat /sys/power/pm_trace_dev_match
+
+   For example, the above happens to be the VGA device on my EVO, which I
+   used to run with "radeonfb" (it's an ATI Radeon mobility). It turns out
+   that "radeonfb" simply cannot resume that device - it tries to set the
+   PLL's, and it just _hangs_. Using the regular VGA console and letting X
+   resume it instead works fine.
+
+NOTE[50]¶
+
+   pm_trace uses the system's Real Time Clock (RTC) to save the magic
+   number. Reason for this is that the RTC is the only reliably available
+   piece of hardware during resume operations where a value can be set
+   that will survive a reboot.
+
+   pm_trace is not compatible with asynchronous suspend, so it turns
+   asynchronous suspend off (which may work around timing or
+   ordering-sensitive bugs).
+
+   Consequence is that after a resume (even if it is successful) your
+   system clock will have a value corresponding to the magic number
+   instead of the correct date/time! It is therefore advisable to use a
+   program like ntp-date or rdate to reset the correct date/time from an
+   external time source when using this trace option.
+
+   As the clock keeps ticking it is also essential that the reboot is done
+   quickly after the resume failure. The trace option does not use the
+   seconds or the low order bits of the minutes of the RTC, but a too long
+   delay will corrupt the magic value.
+
+   ©The kernel development community. | Powered by [51]Sphinx 5.0.1 &
+   [52]Alabaster 0.7.12 | [53]Page source
+
+References
+
+   1. https://docs.kernel.org/genindex.html
+   2. https://docs.kernel.org/search.html
+   3. https://docs.kernel.org/power/suspend-and-cpuhotplug.html
+   4. https://docs.kernel.org/power/runtime_pm.html
+   5. https://docs.kernel.org/index.html
+   6. https://docs.kernel.org/process/development-process.html
+   7. https://docs.kernel.org/process/submitting-patches.html
+   8. https://docs.kernel.org/process/code-of-conduct.html
+   9. https://docs.kernel.org/maintainer/index.html
+  10. https://docs.kernel.org/process/index.html
+  11. https://docs.kernel.org/core-api/index.html
+  12. https://docs.kernel.org/driver-api/index.html
+  13. https://docs.kernel.org/subsystem-apis.html
+  14. https://docs.kernel.org/subsystem-apis.html#core-subsystems
+  15. https://docs.kernel.org/core-api/index.html
+  16. https://docs.kernel.org/driver-api/index.html
+  17. https://docs.kernel.org/mm/index.html
+  18. https://docs.kernel.org/power/index.html
+  19. https://docs.kernel.org/scheduler/index.html
+  20. https://docs.kernel.org/timers/index.html
+  21. https://docs.kernel.org/locking/index.html
+  22. https://docs.kernel.org/subsystem-apis.html#human-interfaces
+  23. https://docs.kernel.org/subsystem-apis.html#networking-interfaces
+  24. https://docs.kernel.org/subsystem-apis.html#storage-interfaces
+  25. https://docs.kernel.org/locking/index.html
+  26. https://docs.kernel.org/process/license-rules.html
+  27. https://docs.kernel.org/doc-guide/index.html
+  28. https://docs.kernel.org/dev-tools/index.html
+  29. https://docs.kernel.org/dev-tools/testing-overview.html
+  30. https://docs.kernel.org/kernel-hacking/index.html
+  31. https://docs.kernel.org/trace/index.html
+  32. https://docs.kernel.org/fault-injection/index.html
+  33. https://docs.kernel.org/livepatch/index.html
+  34. https://docs.kernel.org/rust/index.html
+  35. https://docs.kernel.org/admin-guide/index.html
+  36. https://docs.kernel.org/kbuild/index.html
+  37. https://docs.kernel.org/admin-guide/reporting-issues.html
+  38. https://docs.kernel.org/tools/index.html
+  39. https://docs.kernel.org/userspace-api/index.html
+  40. https://docs.kernel.org/firmware-guide/index.html
+  41. https://docs.kernel.org/devicetree/index.html
+  42. https://docs.kernel.org/arch/index.html
+  43. https://docs.kernel.org/staging/index.html
+  44. https://docs.kernel.org/translations/index.html
+  45. https://docs.kernel.org/_sources/power/s2ram.rst.txt
+  46. https://docs.kernel.org/power/s2ram.html#how-to-get-s2ram-working
+  47. https://docs.kernel.org/power/tricks.html
+  48. https://docs.kernel.org/power/video.html
+  49. https://docs.kernel.org/power/s2ram.html#using-trace-resume
+  50. https://docs.kernel.org/power/s2ram.html#note
+  51. http://sphinx-doc.org/
+  52. https://github.com/bitprophet/alabaster
+  53. https://docs.kernel.org/_sources/power/s2ram.rst.txt

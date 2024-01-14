@@ -1,0 +1,157 @@
+   #[1]Stephen Cleary (the blog) [2]Cleary Search
+
+   (BUTTON) Toggle navigation
+   [3]Stephen Cleary
+
+     * [4]Blog
+     * [5]Book
+     * [6]Projects
+     * [7]Publications
+     * [8]Contact
+     * [9]Hire Me
+     *
+     *
+
+Implementing GCC's Builtin Functions
+
+   Oct 18, 2010 o [10]Comments
+
+   GCC has a number of [11]useful builtin functions, which translate
+   directly to the appropriate assembly instruction if the processor
+   supports it. A certain algorithm I was coding made use of a few of
+   these: __builtin_ffs (find first set bit), __builtin_clz (count leading
+   zero bits), and __builtin_ctz (count trailing zero bits).
+
+   In theory, if the target processor does not support these instructions
+   (like mine), then the gcc library for that target should implement them
+   in software. Unfortunately, mine did not.
+
+   The solution was surprisingly simple: I just had to implement the
+   [12]expected functions myself. The mapping is fairly obvious (e.g.,
+   __builtin_clz is implemented by __clzsi2).
+
+   By adding the following code to the project, I was able to build the
+   algorithm using __builtin_clz, __builtin_ctz, and __builtin_ffs:
+// Returns the number of leading 0-bits in x, starting at the most significant b
+it position.
+// If x is zero, the result is undefined.
+int __clzsi2(unsigned x);
+int __clzsi2(unsigned x)
+{
+  // This uses a binary search (counting down) algorithm from Hacker's Delight.
+   unsigned y;
+   int n = 32;
+   y = x >>16;  if (y != 0) {n = n -16;  x = y;}
+   y = x >> 8;  if (y != 0) {n = n - 8;  x = y;}
+   y = x >> 4;  if (y != 0) {n = n - 4;  x = y;}
+   y = x >> 2;  if (y != 0) {n = n - 2;  x = y;}
+   y = x >> 1;  if (y != 0) return n - 2;
+   return n - x;
+}
+
+// Returns the number of trailing 0-bits in x, starting at the least significant
+ bit position.
+// If x is zero, the result is undefined.
+int __ctzsi2(unsigned x);
+int __ctzsi2(unsigned x)
+{
+  // This uses a binary search algorithm from Hacker's Delight.
+  int n = 1;
+  if ((x & 0x0000FFFF) == 0) {n = n +16; x = x >>16;}
+  if ((x & 0x000000FF) == 0) {n = n + 8; x = x >> 8;}
+  if ((x & 0x0000000F) == 0) {n = n + 4; x = x >> 4;}
+  if ((x & 0x00000003) == 0) {n = n + 2; x = x >> 2;}
+  return n - (x & 1);
+}
+
+// Returns the index of the least significant 1-bit in x, or the value zero if x
+ is zero.
+// The least significant bit is index one.
+int __ffsdi2 (unsigned x);
+int __ffsdi2 (unsigned x)
+{
+  return (x == 0) ? 0 : __builtin_ctz(x) + 1;
+}
+
+   Presumably, this same approach would work for the many other GCC
+   builtins.
+
+   Has this been helpful? You can show your appreciation by [13]leaving a
+   "coffee" tip. Thanks!
+     * [14]<- Previous Post
+     * [15]Next Post ->
+
+   About Stephen Cleary
+   [Me-large.jpg]
+   Stephen Cleary is a [16]Christian, husband, father, and programmer
+   living in Northern Michigan.
+   [17][MVP.png]
+   My book
+   [18][Book-2nd-small.jpg]
+   Available from [19]Amazon (print/Kindle), [20]O'Reilly (Safari), or
+   [21]eBooks.com (PDF/epub).
+   Also available in [22]Russian, [23]Chinese, and [24]Korean.
+   Advertisement
+   [25]Hire me if you need in-depth assistance!
+   [INS: :INS]
+   This page may contain affiliate links.
+   Popular Posts
+     * [26]Async/await Intro
+     * [27]There Is No Thread
+     * [28]Don't Block on Async Code
+
+   Series
+     * [29]React/Redux TodoMVC
+     * [30]A Tour of Task
+     * [31]Task.Run Etiquette
+     * [32]Task.Run vs. BackgroundWorker
+     * [33]Async OOP
+     * [34]TCP/IP .NET Sockets FAQ
+     * [35]Managed Services
+     * [36]IDisposable and Finalizers
+     * [37]Option Parsing
+
+References
+
+   Visible links:
+   1. https://feeds.feedburner.com/NitoPrograms
+   2. https://stephencleary.com/opensearch.xml
+   3. https://stephencleary.com/
+   4. https://blog.stephencleary.com/
+   5. https://stephencleary.com/book/
+   6. https://stephencleary.com/projects/
+   7. https://stephencleary.com/publications/
+   8. https://stephencleary.com/contact/
+   9. https://stephencleary.com/contract/
+  10. https://blog.stephencleary.com/2010/10/implementing-gccs-builtin-functions.html#comments
+  11. http://gcc.gnu.org/onlinedocs/gcc-4.3.2/gcc/Other-Builtins.html
+  12. http://gcc.gnu.org/onlinedocs/gccint/Integer-library-routines.html
+  13. https://github.com/sponsors/StephenCleary?frequency=one-time&amount=5
+  14. https://blog.stephencleary.com/2010/10/firmware.html
+  15. https://blog.stephencleary.com/2010/10/grand-rapids-day-of-dotnet-slides.html
+  16. https://stephencleary.com/god/
+  17. http://mvp.microsoft.com/en-us/mvp/Stephen%20Cleary-5000058
+  18. https://stephencleary.com/book/
+  19. https://www.amazon.com/dp/149205450x/ref=as_li_ss_tl?&ref=pd_sl_a04BABB1D18C7F2658168FF785&linkCode=sl1&tag=stepheclearys-20&linkId=fb22bb126d6e60f305fecddf3d4ecbd8
+  20. https://learning.oreilly.com/library/view/concurrency-in-c/9781492054498/
+  21. https://www.ebooks.com/cj.asp?IID=209766469&cjsku=209766469
+  22. https://www.labirint.ru/books/745595/
+  23. https://item.jd.com/12769567.html
+  24. https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=270818316
+  25. https://stephencleary.com/contract/
+  26. https://blog.stephencleary.com/2012/02/async-and-await.html
+  27. https://blog.stephencleary.com/2013/11/there-is-no-thread.html
+  28. https://blog.stephencleary.com/2012/07/dont-block-on-async-code.html
+  29. https://blog.stephencleary.com/2016/02/react-redux-todomvc.html
+  30. https://blog.stephencleary.com/2014/04/a-tour-of-task-part-0-overview.html
+  31. https://blog.stephencleary.com/2013/10/taskrun-etiquette-and-proper-usage.html
+  32. https://blog.stephencleary.com/2013/05/taskrun-vs-backgroundworker-intro.html
+  33. https://blog.stephencleary.com/2013/01/async-oop-0-introduction.html
+  34. https://blog.stephencleary.com/2009/04/tcpip-net-sockets-faq.html
+  35. https://blog.stephencleary.com/2013/10/managed-services-roundup.html
+  36. https://blog.stephencleary.com/2009/08/how-to-implement-idisposable-and.html
+  37. https://blog.stephencleary.com/2011/02/option-parsing-introduction.html
+
+   Hidden links:
+  39. http://feeds.feedburner.com/NitoPrograms
+  40. https://stephencleary.com/search/

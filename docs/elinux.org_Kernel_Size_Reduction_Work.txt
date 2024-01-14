@@ -1,0 +1,292 @@
+   #[1]eLinux.org (en) [2]eLinux.org Atom feed
+
+Kernel Size Reduction Work
+
+   From eLinux.org
+   Jump to: [3]navigation, [4]search
+
+   This page has a list of of recent (as of 2014) ideas and projects for
+   Linux kernel size reduction.
+
+   As of June, 2014, [5]Linux Tiny was no longer maintained. However, new
+   efforts to support Linux as a viable option on micro-controllers and
+   deeply embedded systems have led to renewed interest in extreme size
+   reduction of the kernel. Some good projects were described at ELC 2014.
+
+Contents
+
+     * [6]1 Recent work
+     * [7]2 List of recently used techniques
+          + [8]2.1 Vitaly Wool's project
+          + [9]2.2 micro-yocto project
+               o [10]2.2.1 instrumentation
+          + [11]2.3 auto-reduce
+          + [12]2.4 Kernel string refactorization
+     * [13]3 Ideas for new reductions
+     * [14]4 People or groups interested in size reductions
+          + [15]4.1 individuals
+          + [16]4.2 companies
+     * [17]5 Meetings and Discussions
+          + [18]5.1 Kernel Summit 2014
+          + [19]5.2 Size/IOT summit at ELC Europe 2014
+
+Recent work
+
+     * Tom Zanussi and the Micro-yocto project (2014)
+          + Micro-Yocto is an effort in the Yocto Project to produce a
+            minimal kernel for very small embedded systems
+          + [20]microYocto and the Internet of Tiny (PDF) - Presentation
+            by Tom Zanussi at ELC 2014
+          + See
+            [21]https://github.com/tzanussi/meta-galileo/raw/daisy/meta-ga
+            lileo/README for more information
+     * Vitaly Wool described running 2.6.33 on an ST microcontroler with
+       2MB flash and 256K ram (2014)
+          + [22]Linux for Microcontrollers: Spreading the Disease (PDF) -
+            presented at ELC in April 2014
+
+List of recently used techniques
+
+Vitaly Wool's project
+
+     * kernel XIP
+     * dietnet
+     * ARM thumb mode
+     * application XIP on squashfs
+
+micro-yocto project
+
+     * net-diet
+     * LTO
+     * SYSFS_SYSCALL
+     * USELIB
+     * BUG_ON
+     * X86_IOPORT
+     * CONFIG_PTRACE
+     * CONFIG_SIGNALS
+     * no sys_sendfile
+
+     * network reductions:
+          + replace kernel stack with user-space stack (LWIP)
+          + TCP/UDP echo (requires app changes)
+
+instrumentation
+
+   microYocto tracing hash triggers
+
+auto-reduce
+
+     * LTO
+     * syscall filtering
+     * command line filtering
+     * global constraints
+     * kernel stack size
+
+Kernel string refactorization
+
+     * refactor strings in the kernel so that they are more efficiently
+       used
+     * here is a [23]report on this work getting started
+
+Ideas for new reductions
+
+     * trace-guided optimization
+     * cold code compression
+          + use U of Gent code to re-try cold code compression
+
+People or groups interested in size reductions
+
+individuals
+
+     * Josh Triplett - e-mail:josh at joshtriplett dot org
+          + new linux tiny patches
+     * Tom Zanussi - e-mail: tom dot zanussi at linux dot intel dot com
+          + microYocto
+     * Andi Kleen - e-mail: ak at linux dot intel dot com
+          + netdiet patches
+     * Alan Cox - email: alan dot cox at linux dot intel dot com
+     * Shinsuke Kato - e-mail: kato dot shinsuke at jp dot panasonic dot
+       com
+     * Tim Bird - e-mail: tim dot bird at sonymobile dot com
+          + auto-reduce stuff
+     * Vitaly Wool - e-mail: vitaly dot wool at softprise dot net
+          + extreme microcontroller Linux (<256K RAM)
+     * Phil Blundell - e-mail:
+          + meta-micro (OE-based small distro - last work in 2012)
+
+companies
+
+     * [24]Emcraft Systems sells a variety of microcontroller-based boards
+       and products
+
+Meetings and Discussions
+
+Kernel Summit 2014
+
+   Josh Triplett has proposed a session discussing size issues at the 2014
+   Kernel Summit. His draft list of proposed topics was the following:
+   Topics:
+     * An overview of why the kernel's size still matters today ("but
+       don't we all have tons of memory and storage?")
+     * Tiny in RAM versus tiny on storage.
+     * How much the kernel has grown over time.
+     * How size regressions happen and how to avoid them
+     * Size measurement, bloat-o-meter, allnoconfig, and other tools
+     * Compression and the decompression stub
+     * Kconfig, and avoiding excessive configurability in the pursuit of
+       tiny
+     * Optimizing a kernel for its exact target userspace.
+     * Examples of shrinking the kernel
+     * Discussion on proposed ways to make the kernel tiny, how much they
+       might save, how much work they'd require, and how to implement them
+       with minimal impact to the un-shrunken common case.
+
+   (see
+   [25]http://lists.linuxfoundation.org/pipermail/ksummit-discuss/2014-May
+   /000001.html for the discussion thread)
+
+Size/IOT summit at ELC Europe 2014
+
+   We are considering holding a Size/IOT meeting at ELC Europe. Details
+   will be placed here should this meeting end up being organized.
+   Retrieved from
+   "[26]https://elinux.org/index.php?title=Kernel_Size_Reduction_Work&oldi
+   d=415441"
+   [27]Category:
+     * [28]System Size
+
+Navigation menu
+
+Personal tools
+
+     * [29]Log in
+     * [30]Request account
+
+Namespaces
+
+     * [31]Page
+     * [32]Discussion
+
+   [ ]
+
+Variants
+
+Views
+
+     * [33]Read
+     * [34]View source
+     * [35]View history
+
+   [ ]
+
+More
+
+Search
+
+   ____________________ Search Go
+
+Navigation
+
+     * [36]Main Page
+     * [37]Community portal
+     * [38]Current events
+     * [39]Recent changes
+     * [40]Help
+     * [41]Volunteering
+
+Where else to find us
+
+     * [42]Mastodon
+     * [43]Discord
+     * [44]Twitter (@elinux)
+     * [45]#elinux on Libera.Chat
+     * [46]Facebook (@elinux.org)
+     * [47]Mailing Lists
+     * [48]Matrix
+
+Tools
+
+     * [49]What links here
+     * [50]Related changes
+     * [51]Special pages
+     * [52]Printable version
+     * [53]Permanent link
+     * [54]Page information
+
+     * This page was last edited on 26 July 2016, at 08:54.
+     * Content is available under [55]a Creative Commons
+       Attribution-ShareAlike 3.0 Unported License unless otherwise noted.
+
+     * [56]Privacy policy
+     * [57]About eLinux.org
+     * [58]Disclaimers
+
+     * [59]a Creative Commons Attribution-ShareAlike 3.0 Unported License
+     * [60]Powered by MediaWiki
+
+References
+
+   Visible links:
+   1. https://elinux.org/opensearch_desc.php
+   2. https://elinux.org/index.php?title=Special:RecentChanges&feed=atom
+   3. https://elinux.org/Kernel_Size_Reduction_Work#mw-head
+   4. https://elinux.org/Kernel_Size_Reduction_Work#p-search
+   5. https://elinux.org/Linux_Tiny
+   6. https://elinux.org/Kernel_Size_Reduction_Work#Recent_work
+   7. https://elinux.org/Kernel_Size_Reduction_Work#List_of_recently_used_techniques
+   8. https://elinux.org/Kernel_Size_Reduction_Work#Vitaly_Wool.27s_project
+   9. https://elinux.org/Kernel_Size_Reduction_Work#micro-yocto_project
+  10. https://elinux.org/Kernel_Size_Reduction_Work#instrumentation
+  11. https://elinux.org/Kernel_Size_Reduction_Work#auto-reduce
+  12. https://elinux.org/Kernel_Size_Reduction_Work#Kernel_string_refactorization
+  13. https://elinux.org/Kernel_Size_Reduction_Work#Ideas_for_new_reductions
+  14. https://elinux.org/Kernel_Size_Reduction_Work#People_or_groups_interested_in_size_reductions
+  15. https://elinux.org/Kernel_Size_Reduction_Work#individuals
+  16. https://elinux.org/Kernel_Size_Reduction_Work#companies
+  17. https://elinux.org/Kernel_Size_Reduction_Work#Meetings_and_Discussions
+  18. https://elinux.org/Kernel_Size_Reduction_Work#Kernel_Summit_2014
+  19. https://elinux.org/Kernel_Size_Reduction_Work#Size.2FIOT_summit_at_ELC_Europe_2014
+  20. https://elinux.org/images/5/54/Tom.zanussi-elc2014.pdf
+  21. https://github.com/tzanussi/meta-galileo/raw/daisy/meta-galileo/README
+  22. https://elinux.org/images/c/ca/Spreading.pdf
+  23. https://elinux.org/Refactor_kernel_strings_-_Results
+  24. http://www.emcraft.com/
+  25. http://lists.linuxfoundation.org/pipermail/ksummit-discuss/2014-May/000001.html
+  26. https://elinux.org/index.php?title=Kernel_Size_Reduction_Work&oldid=415441
+  27. https://elinux.org/Special:Categories
+  28. https://elinux.org/Category:System_Size
+  29. https://elinux.org/index.php?title=Special:UserLogin&returnto=Kernel+Size+Reduction+Work
+  30. https://elinux.org/Special:RequestAccount
+  31. https://elinux.org/Kernel_Size_Reduction_Work
+  32. https://elinux.org/index.php?title=Talk:Kernel_Size_Reduction_Work&action=edit&redlink=1
+  33. https://elinux.org/Kernel_Size_Reduction_Work
+  34. https://elinux.org/index.php?title=Kernel_Size_Reduction_Work&action=edit
+  35. https://elinux.org/index.php?title=Kernel_Size_Reduction_Work&action=history
+  36. https://elinux.org/Main_Page
+  37. https://elinux.org/eLinux.org:Community_portal
+  38. https://elinux.org/eLinux.org:Current_events
+  39. https://elinux.org/Special:RecentChanges
+  40. https://www.mediawiki.org/wiki/Special:MyLanguage/Help:Contents
+  41. https://elinux.org/Sitesupport-url
+  42. https://fosstodon.org/@elinux
+  43. https://discord.com/channels/910986089798447144/910986089798447147
+  44. https://twitter.com/elinux
+  45. irc:///#elinux@irc.libera.chat
+  46. https://www.facebook.com/elinuxorg-750739005020534/
+  47. http://www.elinux.org/ELinuxWiki:Mailing_List
+  48. https://matrix.to/#/#elinux:matrix.org
+  49. https://elinux.org/Special:WhatLinksHere/Kernel_Size_Reduction_Work
+  50. https://elinux.org/Special:RecentChangesLinked/Kernel_Size_Reduction_Work
+  51. https://elinux.org/Special:SpecialPages
+  52. https://elinux.org/index.php?title=Kernel_Size_Reduction_Work&printable=yes
+  53. https://elinux.org/index.php?title=Kernel_Size_Reduction_Work&oldid=415441
+  54. https://elinux.org/index.php?title=Kernel_Size_Reduction_Work&action=info
+  55. https://creativecommons.org/licenses/by-sa/3.0/
+  56. https://elinux.org/eLinux.org:Privacy_policy
+  57. https://elinux.org/eLinux.org:About
+  58. https://elinux.org/eLinux.org:General_disclaimer
+  59. https://creativecommons.org/licenses/by-sa/3.0/
+  60. https://www.mediawiki.org/
+
+   Hidden links:
+  62. https://elinux.org/Main_Page

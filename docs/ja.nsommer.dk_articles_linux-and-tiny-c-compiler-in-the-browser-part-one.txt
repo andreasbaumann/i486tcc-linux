@@ -1,0 +1,777 @@
+   [1]< Table of contents
+
+               Linux and Tiny C Compiler in the browser, part one
+
+   2022-05-22
+
+Introduction
+
+   Current C compilers running in the browser are experimental, though
+   [2]Clang In Browser is pretty impressive. Instead of porting a compiler
+   to WASM, I'm going to take a different approach and use my favourite
+   method for a lot of things: virtual machines. It's slower, especially
+   since I'm using a JavaScript cpu emulator, but decent performance is
+   possible with a fast compiler like Tiny C Compiler and a custom Linux.
+   Demo
+
+   Try cat /opt/test.c and tcc -run /opt/test.c
+
+Motivation
+
+   I could sit for hours back in the days and tweak the Linux kernel on my
+   Pentium-something, in an attempt to make the system boot faster. Most
+   of the time I just broke things and had to recompile Gentoo. But
+   there's rarely a need today to compile Linux; if you need something
+   barebone, you probably use Docker with Alpine Linux. Compiling Linux is
+   still useful in the embedded space, and with a c compiler in the mix
+   you get to learn the basics of how programs work.
+
+   In the mean time, unikernels such as MirageOS and Unikraft have
+   surfaced as a supplement or even alternative to Docker. One of the ways
+   they differ is that your code is compiled into an operating system
+   instead of running on top of Linux. Imagine you could compile Linux
+   into your code, having dead code elimination on every feature you don't
+   use! The sales pitch is this: reduced attack surface, fast boot times
+   and better performance. Building a custom Linux then becomes even more
+   exciting because unikernels borrow many concepts from Linux, eg.
+   Unikraft is configured in the same tui as the Linux kernel (and
+   Buildroot), make and gcc are used to a great extent, and you can choose
+   between multiple libc implementations, but what exactly is that?
+
+   So...
+
+What to expect
+
+   This tutorial teaches you how to compile a small Linux image for
+   running in the browser via v86; a 32-bit x86 cpu emulator in
+   javascript. You get insights into cross compilation with a modern
+   implementation of the c standard library, and c internals when we add a
+   fast compiler to the image. Remote debugging via gdb is described in
+   the end using gdbserver, virtual serial ports and qemu.
+
+Prerequisites
+
+   Linux that is not wsl, at least an hour to spare for compilation and
+   the following packages needed by Buildroot:
+
+   sudo apt install make gcc g++ libncurses-dev libssl-dev_____
+
+   I've built this on Ubuntu 20.04 and 22.04 using bash, but most modern
+   distro's should be fine.
+
+   Before you start, create a directory for the project, perhaps
+   ~/my-v86-linux, then cd into that and run all commands from there. All
+   commands will assume you are in that directory. Name it whatever you
+   like, and it doesn't have to be in ~/.
+
+The v86 CPU emulator
+
+   v86 runs in the browser and emulates an x86-compatible cpu and hardware
+   where machine code is translated to WebAssembly modules at runtime. The
+   list of emulated hardware is impressive:
+     * x86 instruction set similar to Pentium III
+     * Keyboard and mouse support
+     * VGA card
+     * IDE disk controller
+     * Network card
+     * virtio filesystem
+     * Sound card
+
+   View the full list of emulated hardware in [3]v86's readme.
+
+   You're not limited to Linux on this emulator. It runs Windows (1.01,
+   3.1, 95, 98, 2000), ReactOS, FreeBSD, OpenBSD and various hobby
+   operating systems.
+
+   v86 is a hobby project written by an anonymous developer under the
+   pseudonym "copy". Previous work according to [4]copy's webpage includes
+   an impossible game, Game of Life and a brainfuck interpreter written in
+   javascript.
+
+Buildroot
+
+   Buildroot is a tool to generate embedded Linux systems through cross
+   compilation. It's a huge work effort of cross compilation scripts and
+   configuration files put together in a nice terminal ui, and you can
+   tweak just about anything. It also acts as customizable toolchain, that
+   provides us with all the necessary tools to cross compile applications
+   that doesn't come in Buildroot packages. Read more on
+   [5]https://buildroot.org.
+
+   Let's get started.
+
+   cd into your project directory, then download and extract Buildroot:
+
+   Hint: Tab through commands and copy instead of using your mouse.
+
+   mkdir buildroot_____________________________________________
+   wget https://github.com/buildroot/buildroot/archive/refs/tag
+       --output-document -  \__________________________________
+   | tar -xz --strip-components 1 --directory buildroot________
+
+   Instead of building Linux from the default Buildroot configuration, we
+   use a template that sets the right cpu and architecture among other
+   things:
+
+   wget https://github.com/humphd/browser-vm/archive/refs/tags/
+       --output-document -  \__________________________________
+   | tar -xz --strip-components 1 browser-vm-1.0.2/buildroot-v8
+
+   Remove commands that compress licenses. We'll get to that later.
+
+   echo "" > buildroot-v86/board/v86/post-image.sh_____________
+
+   Tell Buildroot to create a new .config file with preloaded settings
+   from the template
+
+   make --directory buildroot BR2_EXTERNAL=../buildroot-v86 v86
+
+   You're almost ready to build the initial image. Execute:
+
+   make --directory buildroot menuconfig_______________________
+
+   Go to Toolchain -> C library and pick musl, exit and save. Then build
+   everything
+
+   make --directory buildroot__________________________________
+
+   This is going to take a while, but the good thing is that caching is
+   enabled, so next time will be substantially faster.
+
+   About musl... It's an implementation of the c standard library, like
+   uclibc and glibc. Your distro is probably using glibc, the GNU C
+   Library, which is big in size and not well suited for embedded Linux
+   where size matters. uclibc is better suited here, and so is musl which
+   seems to be the clear winner in [6]this (biased) comparison. I prefer
+   musl's MIT license over (L)GPL, which makes it interesting for
+   proprietary applications running in unikernels. It's developed and
+   maintained by Rich Felker, with a long list of contributors, and the
+   source code is said to be a reference code to look into for systems
+   programming in [7]this podcast (at 01:01:17).
+
+Preparing the website
+
+   While waiting for Buildroot to compile, let's create the website that
+   will host the emulator and run Buildroot Linux:
+
+   mkdir web___________________________________________________
+   wget https://github.com/copy/v86/releases/download/latest/li
+       --directory-prefix web__________________________________
+   wget https://github.com/copy/v86/releases/download/latest/v8
+       --directory-prefix web__________________________________
+   wget https://github.com/copy/v86/releases/download/latest/v8
+       --directory-prefix web__________________________________
+   wget https://github.com/copy/v86/archive/refs/tags/latest.ta
+       --output-document -  \__________________________________
+   | tar -xz --strip-components 2 --directory web  \___________
+       v86-latest/bios/seabios.bin  \__________________________
+       v86-latest/bios/vgabios.bin_____________________________
+   ____________________________________________________________
+   cat >web/index.html <<EOF___________________________________
+   ____________________________________________________________
+   <meta charset="utf8">_______________________________________
+   <title>Emulator</title>_____________________________________
+   <body bgcolor="#101010">____________________________________
+   ____________________________________________________________
+   <div id="screen_container">_________________________________
+       <div style="white-space: pre; font: 14px monospace; line
+       <canvas hidden></canvas>________________________________
+   </div>______________________________________________________
+   ____________________________________________________________
+   <script src="/libv86.js"></script>__________________________
+   <script>____________________________________________________
+   var emulator = new V86Starter({_____________________________
+       wasm_path        : "/v86.wasm",_________________________
+       memory_size      : 64 * 1024 * 1024,  // 64 MB memory ou
+       vga_memory_size  : 2 * 1024 * 1024,_____________________
+       screen_container : screen_container,____________________
+       bios             : {url: "/seabios.bin"},_______________
+       vga_bios         : {url: "/vgabios.bin"},_______________
+       cdrom            : {url: "/linux.iso"},_________________
+       filesystem       : {},__________________________________
+       autostart        : true_________________________________
+   })__________________________________________________________
+   </script>___________________________________________________
+   EOF_________________________________________________________
+
+   When Buildroot is done compiling, run
+
+   cp buildroot/output/images/rootfs.iso9660 web/linux.iso_____
+
+   Then open a new terminal and start a simple webserver pointing to the
+   web directory, eg.
+
+   python3 -m http.server 8000 --directory web_________________
+
+   and open [8]http://localhost:8000 to see v86 in action. Log in as root,
+   no password needed.
+
+Customize your image
+
+   Buildroot is all about customization. Try the following commands:
+
+   make --directory buildroot menuconfig_______________________
+
+   make --directory buildroot busybox-menuconfig_______________
+
+   make --directory buildroot linux-menuconfig_________________
+
+   There's a lot to explore.
+
+  menuconfig
+
+   menuconfig is where you configure Buildroot with things such as Linux
+   kernel version, what bootloader to use (grub2, syslinux etc.), the libc
+   library you want to use like when you chose musl and which architecture
+   to compile for. There are multiple packages to choose from, ranging
+   from small libraries and utilities to X11 and Qt.
+
+  busybox-menuconfig
+
+   Busybox combines hundreds of Linux utilities into one binary and is
+   also highly configurable with busybox-menuconfig. It provides you with
+   ls, grep, diff and many other utilities you're used to on Linux, and
+   I'd encourage you to remove all the tools you don't use to create a
+   smaller image. Ideally Busybox would come with the bare minimum instead
+   of having to manually remove unnecessary things. This is where
+   unikernels shine, because they take the opposite approach, where you
+   start with almost nothing and add what you need.
+
+  linux-menuconfig
+
+   linux-menuconfig is where you configure the Linux kernel. There's a
+   million things to configure, and you can easily break something unless
+   you know what you're doing. In one of the following tutorials for this
+   series, I'll show you how to tweak the kernel by trial and error, since
+   that's how I do it: Remove one feature, test the system, rinse and
+   repeat.
+
+   Resist the temptation to make changes for now.
+
+  rootfs_overlay
+
+   Located in buildroot-v86/board/v86/rootfs_overlay, this is where you
+   place files that you want to add to the image. Our template includes
+   two files: etc/fstab and etc/inittab.
+
+  Disable kernel messages after login
+
+   Some things are not critical for booting the system, but is run as part
+   of the boot process anyway. They can be slow to start and clutter the
+   terminal after login, potentially adding log messages in the middle of
+   writing a command. To disable kernel messages after login, create the
+   following file
+
+   mkdir buildroot-v86/board/v86/rootfs_overlay/etc/profile.d__
+   echo "echo 0 >/proc/sys/kernel/printk"  \___________________
+       >buildroot-v86/board/v86/rootfs_overlay/etc/profile.d/no
+
+   All .sh files in etc/profile.d are run on login.
+
+  Auto login
+
+   etc/inittab prepares the file system and mounts etc/fstab, runs init
+   scripts and "spawn" applications after boot. One of the commands for
+   spawning ends with the comment "# GENERIC_SERIAL" and that line needs
+   to be changed to not prompt for login and just start /bin/sh.
+
+   (F=buildroot-v86/board/v86/rootfs_overlay/etc/inittab && cp 
+    && sed --in-place "28d" $F  \______________________________
+    && sed --in-place "s/.*# GENERIC_SERIAL/console::respawn:-\
+    && diff /tmp/oldf $F)______________________________________
+
+   Notice that the command starts with console::respawn. Respawn means
+   that if sh crashes, Busybox will keep restarting it until it succeeds.
+
+   getty is replaced here because it's the application that prompts for
+   login. It also prevents us from sending messages between tty's, which
+   only makes sense in a multi user system: If user A is logged into tty1
+   and user B is in tty2, then A shouldn't be able to bother B with `echo
+   "Hi B!" >/dev/tty2`. Instead we spawn -/bin/sh, where the hyphen
+   instructs Busybox to treat the shell as a login shell. Without it,
+   /etc/profile and scripts in /etc/profile.d are ignored.
+
+   To add the new files to your image, you simply compile again
+
+   make --directory buildroot__________________________________
+   cp buildroot/output/images/rootfs.iso9660 web/linux.iso_____
+
+Add Tiny C Compiler
+
+   Tiny C Compiler, or tcc, is:
+     * ANSI C compliant, with most [9]C99 extensions.
+     * Small, roughly ~300 KB.
+     * Fast according to [10]the homepage, specifically 9 times faster
+       than gcc.
+
+   I've used tcc to compile win32 applications with opengl and gdi+, and a
+   pdf library that we'll use later to benchmark performance. There are
+   limitations to what can be compiled, I haven't managed to compile
+   libpng for instance, but you can use gcc to provide a shared library
+   that tcc can link with.
+
+   The compiler is written by Fabrice Bellard, author of qemu, ffmpeg,
+   quickjs, jslinux and the list goes on. You've likely used his software
+   in one way or another. I will use the last version he released before
+   abondoning tcc, but it's alive and well in [11]this fork.
+
+   To get tcc working we have to compile it twice: The first time is to
+   compile libtcc1.a. The way this happens according to the Makefile is
+   that gcc is used to compile tcc, and then tcc builds and outputs
+   libtcc1.a. If we start by compiling with musl, it's not going to run on
+   the host, and thus libtcc1.a cannot be built. So first step is to
+   configure the build with --enable-cross, which builds a cross compiler
+   that compiles the right libtcc1.a. After that, we can compile for a
+   single architecture and libc: x86 musl.
+
+   mkdir tcc___________________________________________________
+   wget http://download.savannah.gnu.org/releases/tinycc/tcc-0.
+       --output-document -  \__________________________________
+   | tar -xj --strip-components 1 --directory tcc  \___________
+       --exclude tests --exclude examples______________________
+   ____________________________________________________________
+   mkdir libtcc________________________________________________
+   cp --recursive tcc/* libtcc_________________________________
+
+   Configure tcc cross compilers for current cpu architecture to get
+   i386-version of libtcc1.a
+
+   (cd libtcc && ./configure --prefix=./output --enable-cross)_
+
+   Malloc hooks have been removed in glibc 2.34 and Ubuntu 22.04 ships
+   with glibc 2.35. The next two commands are unnecessary on Ubuntu 20.04,
+   but harmless.
+
+   (F=libtcc/lib/bcheck.c && cp $F /tmp/oldf  \________________
+    && sed --in-place "s/#define CONFIG_TCC_MALLOC_HOOKS//" $F 
+    && sed --in-place "s/#define HAVE_MEMALIGN//" $F  \________
+    && diff /tmp/oldf $F)______________________________________
+
+   Then build libtcc on the host and copy to the file system overlay.
+
+   make --directory libtcc_____________________________________
+   make --directory libtcc install_____________________________
+   mkdir -p buildroot-v86/board/v86/rootfs_overlay/lib/tcc_____
+   cp libtcc/output/lib/tcc/i386-libtcc1.a  \__________________
+       buildroot-v86/board/v86/rootfs_overlay/lib/tcc/libtcc1.a
+
+   Next step is to configure and build the compiler for x86 musl.
+
+   (cd tcc && ./configure  \___________________________________
+       --cpu=x86  \____________________________________________
+       --config-musl  \________________________________________
+       --cross-prefix=${PWD}/../buildroot/output/host/bin/i686-
+       --elfinterp=/lib/ld-musl-i386.so.1  \___________________
+       --crtprefix=/lib  \_____________________________________
+       --libdir=/lib  \________________________________________
+       --tccdir=/lib/tcc  \____________________________________
+       --bindir=/bin  \________________________________________
+       --includedir=/include  \________________________________
+       --sysincludepaths=/lib/tcc/include:/include  \__________
+       --sharedir=-unused  \___________________________________
+       `# We need debug symbols for later, but uncomment this i
+       `# The difference is ~70% file size reduction.`  \______
+       `# --strip-binaries`)___________________________________
+   make --directory tcc  \_____________________________________
+       --assume-old libtcc1.a  \_______________________________
+       --assume-old tcc-doc.html  \____________________________
+       --assume-old tcc-doc.info_______________________________
+   DESTDIR=$PWD/tcc/output make --directory tcc install________
+   cp --recursive tcc/output/* buildroot-v86/board/v86/rootfs_o
+
+   --assume-old makes make skip libtcc1.a. Also skip steps that require
+   makeinfo since documentation will end up in the directory
+   "output-unused" as specified a bit hacky with --sharedir=-unused.
+   DESTDIR is set when installing because configuring with
+   --prefix=./output compiles tcc with search paths beginning with that
+   prefix.
+
+   --elfinterp points to the dynamic linker in the image, responsible for
+   locating shared libraries needed by an application, prepare it to run
+   and then execute it. Because we use musl, this file is called
+   ld-musl-i386.so.1, but on your glibc-based distro it's (likely)
+   ld-linux-x86-64.so.2. Without it, the system won't know how to start
+   applications and you'll get `/bin/sh: {your command}: not found`
+
+   For tcc to create executables, it needs startup routines that are
+   linked into the executable. Those files start with crt, short for c
+   runtime, and we have configured tcc to search for them in /lib. Since
+   tcc supports running c without creating an executable via `tcc -run
+   file.c`, you only need these files if you want to build executables
+   (and if you plan on continuing this tutorial). Here's a quick summary
+   of crt files from [12]https://dev.gentoo.org/~vapier/crt.txt:
+
+   crt1.o
+          Contains the _start symbol which sets up the env with
+          argc/argv/libc _init/libc _fini before jumping to the libc main.
+
+   crti.o
+          Defines the function prolog; _init in the .init section and
+          _fini in the .fini section.
+
+   crtn.o
+          Defines the function epilog.
+
+
+   cp buildroot/output/host/i686-buildroot-linux-musl/sysroot/l
+       buildroot-v86/board/v86/rootfs_overlay/lib______________
+
+   That is what's needed for running tcc in v86, but it doesn't do much
+   without musl's standard c headers. We pick only the bare minimum,
+   because all headers are ~5 mb uncompressed.
+
+   printf "buildroot/output/host/i686-buildroot-linux-musl/sysr
+       bits alloca.h assert.h complex.h ctype.h errno.h fenv.h 
+       inttypes.h iso646.h limits.h locale.h math.h memory.h ma
+       signal.h stdalign.h stdarg.h stdbool.h stddef.h stdint.h
+       stdnoreturn.h string.h strings.h tgmath.h threads.h time
+       wchar.h wctype.h  \_____________________________________
+   | xargs -0 cp --recursive --target buildroot-v86/board/v86/r
+
+  Hello world
+
+   With tcc compiled and installed into our image, it's time to prepare
+   some code to test if the compiler works.
+
+   mkdir buildroot-v86/board/v86/rootfs_overlay/opt____________
+   cat >buildroot-v86/board/v86/rootfs_overlay/opt/test.c <<EOF
+   #include <stdio.h>__________________________________________
+   #include <string.h>_________________________________________
+   ____________________________________________________________
+   int main(int argc, char **argv)_____________________________
+   {___________________________________________________________
+       char *name = "stranger";________________________________
+       if (argc > 1 && strlen(argv[1]) > 0)____________________
+           name = argv[1];_____________________________________
+       printf("Hello, %s\n", name);____________________________
+       return 0;_______________________________________________
+   }___________________________________________________________
+   EOF_________________________________________________________
+
+   Rebuild image with the new files:
+
+   make --directory buildroot__________________________________
+   cp buildroot/output/images/rootfs.iso9660 web/linux.iso_____
+
+   If you've closed your server, open a new terminal and run
+
+   python3 -m http.server 8000 --directory web_________________
+
+   Go to [13]http://localhost:8000 and try this in the emulator:
+
+   # Compile and run without producing a binary________________
+   tcc -run /opt/test.c________________________________________
+   ____________________________________________________________
+   # Create binary_____________________________________________
+   tcc /opt/test.c -o hello____________________________________
+   ./hello world_______________________________________________
+
+Benchmarking
+
+   Time for a quick benchmark to see what performance we can expect. We'll
+   use the excellent pdf writer library, libharu.
+
+   mkdir libharu_______________________________________________
+   wget https://github.com/libharu/libharu/archive/refs/tags/RE
+       --output-document -  \__________________________________
+   | tar -xz --strip-components 1 --wildcards --directory libha
+         "libharu-RELEASE_2_3_0/include/*.h"  \________________
+         "libharu-RELEASE_2_3_0/src/*.c"  \____________________
+         libharu-RELEASE_2_3_0/src/t4.h  \_____________________
+         libharu-RELEASE_2_3_0/demo/line_demo.c________________
+   ____________________________________________________________
+   cat >libharu/include/hpdf_config.h <<EOF____________________
+   #define LIBHPDF_HAVE_NOPNGLIB_______________________________
+   #define HPDF_NOPNGLIB_______________________________________
+   #define LIBHPDF_HAVE_NOZLIB_________________________________
+   EOF_________________________________________________________
+
+   Doing `sudo apt install sloccount` and then `sloccount libharu` tells
+   us that the library consists of 128394 physical source lines of code.
+   That's because of surprisingly big files with arrays containing
+   encoding data, but let's see how long it'll take to compile that by
+   creating a quick and dirty benchmark that works for both gcc and tcc.
+
+   cat >libharu/benchmark <<EOF________________________________
+   LIBHARUDIR=\$(dirname \$(readlink -f "\$0"))________________
+   CC=\$1______________________________________________________
+   [[ \$CC = gcc ]] && LIBMATH=-lm_____________________________
+   time \$CC -I\$LIBHARUDIR/include "\$LIBHARUDIR/src/*.c"  \\_
+       \$LIBHARUDIR/demo/line_demo.c \$LIBMATH -o /dev/null____
+   EOF_________________________________________________________
+   chmod +x libharu/benchmark__________________________________
+   ____________________________________________________________
+   # Build a shared library for another benchmark______________
+   buildroot/output/host/bin/i686-buildroot-linux-musl-gcc -sha
+       -Ilibharu/include libharu/src/*.c -lm  \________________
+       -o buildroot-v86/board/v86/rootfs_overlay/lib/libharu.so
+   ____________________________________________________________
+   # Make it easy to run a benchmark where tcc links with libha
+   # compiling from scratch.___________________________________
+   cat >libharu/benchmark-link <<EOF___________________________
+   time tcc -Ilibharu/include -lharu libharu/demo/line_demo.c -
+   EOF_________________________________________________________
+   chmod +x libharu/benchmark-link_____________________________
+   ____________________________________________________________
+   cp --recursive libharu buildroot-v86/board/v86/rootfs_overla
+   ____________________________________________________________
+   make --directory buildroot__________________________________
+   cp buildroot/output/images/rootfs.iso9660 web/linux.iso_____
+
+  Run the benchmarks
+
+   Run this locally
+
+   libharu/benchmark gcc_______________________________________
+
+   Run this in the emulator
+
+   libharu/benchmark tcc  # Patience required__________________
+
+   libharu/benchmark-link______________________________________
+
+   As the benchmark unsurprisingly shows us, linking to a precompiled
+   shared library is faster than compiling from scratch. On my machine,
+   benchmark-link is 60 ms in v86. Not bad! Take a look at
+   libharu/demo/line_demo.c, it's not the tinyest c file out there.
+
+   I didn't show you how to compile a shared library with tcc on purpose
+   (only how to link with one). There's a bug somewhere, and we'll
+   investigate that in the next section.
+
+Debugging
+
+   If you've followed the steps so far, you can open your emulator and
+   execute
+
+   tcc -shared -fPIC -Ilibharu/include libharu/src/*.c_________
+
+   This command tells tcc to compile a shared library instead of an
+   executable and will take approximately 30 seconds, then it'll exit with
+   a segmentation fault.
+
+   I won't tell you how to fix this problem, because I have no need to
+   compile shared libraries with tcc on a custom x86 system, nor do I have
+   the intellect to fix the bug. But I didn't know (the latter) at the
+   time, so I wanted to figure out what was wrong, which required...
+
+  Remote debugging
+
+   The gnu debugger, gdb, supports remote debugging via gdbserver, which
+   is a small application you run on the target and connect to from gdb.
+   Running gdbserver inside v86, inside a browser, and connecting to that
+   from gdb would be cool, but since gdb doesn't work in v86 (you'll find
+   out why later), gdbserver is not going to either. So to debug
+   something, we need to reproduce the bug in qemu, and use socat to
+   create a virtual serial port for gdb/gdbserver communication. And to
+   compile gdb we need musl-cross-make via git.
+
+   sudo apt install qemu-system-i386 socat git_________________
+
+   With qemu installed, it's easy to boot your image
+
+   qemu-system-i386 -serial stdio -cdrom web/linux.iso -cpu Wes
+
+   And you even get a nice serial console for copy pasting! That was the
+   good news, now for the bad...
+
+   Buildroot, gdb and musl doesn't go well together and results in
+   configure errors if you select the gdb package. So we have to compile
+   gdb on our own, using a different toolchain. This could have been
+   avoided with uclibc instead of musl, but in the name of MIT licenses,
+   here we are. Hopefully you won't mind another huge compilation step.
+
+   The following will clone musl-cross-make, configure and compile it.
+
+   git clone https://github.com/richfelker/musl-cross-make.git_
+   ____________________________________________________________
+   cat >musl-cross-make/config.mak <<EOF_______________________
+   TARGET=i686-linux-musl______________________________________
+   MUSL_VER=git-v1.2.2_________________________________________
+   GCC_VER=10.3.0______________________________________________
+   # Not needed libs___________________________________________
+   COMMON_CONFIG += --disable-nls______________________________
+   EOF_________________________________________________________
+   ____________________________________________________________
+   make --directory musl-cross-make -j$(nproc)_________________
+   make --directory musl-cross-make install____________________
+
+   Now is the time to grab a coffee.
+
+   Welcome back, we're now ready to build gdb/gdbserver with the toolchain
+   installed into musl-cross-make/output/bin. Compiling gdb 10.2 is ideal
+   here because it doesn't require gmp (GNU Multiple Precision Arithmetic
+   Library), which later versions does.
+
+   mkdir gdb___________________________________________________
+   wget https://ftp.gnu.org/gnu/gdb/gdb-10.2.tar.gz --output-do
+   | tar -xz --strip-components 1 --directory gdb______________
+   (cd gdb &&  \_______________________________________________
+    PATH=$PATH:$PWD/../musl-cross-make/output/bin   \__________
+    ./configure  \_____________________________________________
+        --prefix=$PWD/output  \________________________________
+        --host=i686-linux-musl  \______________________________
+        --disable-nls  \_______________________________________
+        --with-curses)_________________________________________
+   PATH=$PATH:$PWD/musl-cross-make/output/bin make --directory 
+   PATH=$PATH:$PWD/musl-cross-make/output/bin make --directory 
+
+   The new toolchain in `musl-cross-make/output/bin` follows a naming
+   convention for cross compilers, so every program starts with
+   i686-linux-musl as specified in musl-cross-make/config.mak by TARGET.
+   gdb follows the same convention, and by specifying i686-linux-musl in
+   `--host` and adding the toolchain to PATH, gdb is able to locate the
+   right tools without having to install them on your system. We also
+   --disable-nls (localization) and compile --with-curses instead of a
+   default ancient alternative that we'd have to compile separately.
+
+   Clean gdbserver by strip'ing it of debug symbols and non-essential
+   data, and copy to the target. This reduces gdbserver file size from 8
+   mb to 500 kb. For gdbserver to run, the c++ standard library is
+   required as well.
+
+   musl-cross-make/output/bin/i686-linux-musl-strip gdb/output/
+   cp gdb/output/bin/gdbserver buildroot-v86/board/v86/rootfs_o
+   musl-cross-make/output/bin/i686-linux-musl-strip  \_________
+       musl-cross-make/output/i686-linux-musl/lib/libstdc++.so.
+   cp musl-cross-make/output/i686-linux-musl/lib/libstdc++.so.6
+       buildroot-v86/board/v86/rootfs_overlay/lib______________
+
+   These files are ~2500 kb in total, so you want to remove them again
+   after debugging.
+
+   gdb must then be compiled for the host with i686 target support, which
+   is easy in Buildroot:
+
+   make --directory buildroot menuconfig_______________________
+
+   then select Toolchain -> Build cross gdb for the host and compile
+
+   make --directory buildroot__________________________________
+   cp buildroot/output/images/rootfs.iso9660 web/linux.iso_____
+
+  Qemu and virtual serial ports
+
+   While compiling, we create a pseudo terminal (pty) acting as a virtual
+   serial port. Since socat uses random id's for the terminals like
+   /dev/pty/2 and /dev/pty/18, we tell socat to create symbolic links for
+   the random id's with id's we know in advance.
+
+   Open a new terminal and run the following:
+
+   socat pty,rawer,link=/tmp/vserial-host pty,rawer,link=/tmp/v
+
+   When compilation is done, start qemu in a new terminal and connect with
+   the virtual serial port on the host
+
+   qemu-system-i386 -serial stdio -cdrom web/linux.iso -cpu Wes
+       -chardev serial,id=gdbserial,path=/tmp/vserial-host  \__
+       -device isa-serial,chardev=gdbserial____________________
+
+   if you write `dmesg | grep tty` in the serial console you'll see two
+   connected ports: ttyS0 which is connected to your terminal via `-serial
+   stdio` and ttyS1 is connected to the virtual socat serial port.
+
+   Start gdbserver in your qemu serial console for tcc debugging
+
+   gdbserver /dev/ttyS1 tcc -shared -fPIC -Ilibharu/include lib
+
+   then start gdb on the host, pointing to the cross compiled version of
+   tcc
+
+   buildroot/output/host/bin/i686-buildroot-linux-musl-gdb  \__
+       -ix buildroot/output/staging/usr/share/buildroot/gdbinit
+       tcc/output/bin/tcc______________________________________
+
+   -ix means: Before the "inferior", which is gdb's name for a process
+   (simply put), execute the file buildroot/.../gdbinit. `gdbinit` is
+   provided by Buildroot and contains the following:
+add-auto-load-safe-path {...}/buildroot/output/host/i686-buildroot-linux-musl/sy
+sroot
+set sysroot {...}/buildroot/output/host/i686-buildroot-linux-musl/sysroot
+
+   which specify the directory that contains copies of libraries on the
+   target, in corresponding subdirectories.
+
+   Let's connect to qemu and run tcc:
+
+   (gdb)
+   target remote /tmp/vserial-target___________________________
+   (gdb)
+   continue____________________________________________________
+
+   You'll get a few warnings that I believe is due to shared libraries
+   being stripped of debugging symbols by Buildroot. Then the following
+   error appears:
+0x004f9c1f in fill_local_got_entries (s1=0xb7e99020) at tccelf.c:1362
+1362        for_each_elem(s1->got->reloc, 0, rel, ElfW_Rel) {
+
+   Looking into tcc's source, we see that this code is only run when
+   compiling shared libraries. Perhaps recompiling for uclibc makes a
+   difference, or upgrading to the tcc fork (which requires additional
+   work in regards to compilation). Let me know if you fix the error and
+   I'll add it to the tutorial.
+
+   We could have added gdb to rootfs_overlay and run that in qemu instead,
+   but then we lose code snippets of the error due to missing source
+   files. Feel free to use gdb on the target if you're okay with just line
+   numbers.
+
+  Debugging in v86
+
+   I've not been able to get gdb working in v86. Everything segfaults
+   whenever I attempt to debug. Changing toolchain to uclibc will make
+   Buildroot compile gdb, but it doesn't fix the issue, and downgrading
+   gdb from 11.2 to 10.2 or 8 makes no difference. gdb works when running
+   in qemu, so it must have something to do with v86. It would have been
+   great to have gdb tell what crashed at runtime, but a c compiler will
+   have to do for now.
+
+Licenses
+
+   To get all licenses from Buildroot, you write
+
+   make --directory buildroot legal-info_______________________
+
+   They're then found in buildroot/output/legal-info. Getting a complete
+   list of licenses for everything used here is left as an exercise for
+   the reader.
+
+What's next
+
+   In the next tutorial(s) I'll show you how to:
+     * Interact with v86 from JavaScript via serial and 9P.
+     * Create a simple interface for dmesg diffing to better optimize the
+       image.
+     * Compile and run c applications in the browser with a small ui.
+     * Build a streaming parser for Linux kernel calls to create a basic
+       but highly stylable console with unicode support; to display stdout
+       (printf/puts/putchar/...) and ask for input on stdin
+       (scanf/gets/getchar/...).
+
+   If you got this far, perhaps you want to subscribe to new tutorials?
+   Then [14]subscribetoj@nsommer.dk and I'll add you to the list. The mail
+   can be empty, but if not I promise I'll read it. You can always
+   [15]unsubscribetoj@nsommer.dk.
+
+   Tipping: I'm writing tutorials for as long as there's money in the
+   bank. Help me write more by tipping via bank transfer (IBAN) to DK81
+   2000 6277 7121 54. Any amount is highly appreciated!
+
+References
+
+   1. https://ja.nsommer.dk/
+   2. https://tbfleming.github.io/cib
+   3. https://github.com/copy/v86/blob/master/Readme.md#readme
+   4. https://copy.sh/
+   5. https://buildroot.org/
+   6. http://www.etalabs.net/compare_libcs.html
+   7. https://www.se-radio.net/2020/06/episode-414-jens-gustedt-on-modern-c
+   8. http://localhost:8000/
+   9. https://bellard.org/tcc/tcc-doc.html#ISOC99-extensions
+  10. https://bellard.org/tcc/
+  11. https://repo.or.cz/tinycc.git
+  12. https://dev.gentoo.org/~vapier/crt.txt
+  13. http://localhost:8000/
+  14. mailto:subscribetoj@nsommer.dk
+  15. mailto:unsubscribetoj@nsommer.dk

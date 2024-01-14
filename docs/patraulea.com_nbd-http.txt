@@ -1,0 +1,22 @@
+   If you have NBD support enabled in your kernel, you can use this
+   to read a file over HTTP as a block device. The most obvious use
+   for me was (is) to mount ISO images without having to download
+   them entirely. If your linux distribution installer allows early
+   console access, you should be able to even install the OS from
+   a CD ISO over HTTP.
+   Sources are available [1]here.
+   To use it, compile (you need kernel headers and pthreads
+   installed), load the kernel module and run nbd-http:
+   make
+   modprobe nbd
+   ./nbd-http /dev/nbd0 http://mirror.org/file.iso
+   (and in another console:)
+   mount /dev/nbd0 /mnt/cdrom
+   Due to the nbd driver using the userland process to make block
+   requests, there is apparently no other way to stop the nbd
+   userland helper other than ``killlal -9 nbd-http''.
+   Feedback is welcome at reverse(moc.liamg@cojrah) - Harjoc Bogdan.
+
+References
+
+   1. https://patraulea.com/nbd-http/src/

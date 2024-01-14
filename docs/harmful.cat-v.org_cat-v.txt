@@ -1,0 +1,97 @@
+   [1]quotes | [2]docs | [3]repo | [4]golang | [5]sam | [6]man | [7]acme |
+   [8]Glenda | [9]9times | [10]harmful | [11]9P | [12]cat-v.org
+
+   Related sites: | [13]site updates | [14]site map |
+
+                            [15]cat -v harmful stuff
+
+     * [16]> Blog/
+     * [17]» cat v/
+     * [18]> economics/
+     * [19]> films/
+     * [20]> journalism/
+     * [21]> people/
+     * [22]> science/
+     * [23]> security theater/
+     * [24]> society/
+     * [25]> software/
+     * [26]> standards/
+     * [27]> words/
+
+                    UNIX Style, or cat -v Considered Harmful
+
+   At the USENIX Summer Conference of 1983 [28]Rob Pike made a
+   presentation titled `[29]UNIX Style, or cat -v Considered Harmful' and
+   together with [30]Brian Kernighan wrote the paper `Program Design in
+   the UNIX Environment' ([31]pdf version, [32]ps version), published as
+   an article in [33]AT&T Bell Laboratories Technical Journal, October
+   1984, Vol. 63 No. 8 Part 2.
+
+   This was a prelude for their famous book [34]The Unix Programming
+   Environment (Prentice-Hall Software Series) that today is considered
+   the bible of Unix.
+
+   Unfortunately their advice has been completely ignored, and today Unix
+   has become overcome by exactly the kind of mistakes they warned
+   against.
+Bell Laboratories
+
+Murray Hill, NJ (dec!ucb)wav!research!rob
+
+It seems that UNIX has become the victim of cancerous growth at the hands of
+organizations such as UCB. 4.2BSD is an order of magnitude larger than Version
+5, but, Pike claims, not ten times better.
+
+The talk reviews reasons for UNIX's popularity and shows, using UCB cat as a
+primary example, how UNIX has grown fat. cat isn't for printing files with line
+numbers, it isn't for compressing multiple blank lines, it's not for looking at
+non-printing ASCII characters, it's for concatenating files.
+
+We are reminded that ls isn't the place for code to break a single column into
+multiple ones, and that mailnews shouldn't have its own more processing or joke
+encryption code.
+
+Rob carried the standard well for the "spirit of UNIX," and you can look
+forward to a deeper look at the philosophy of UNIX in his forthcoming book.
+
+   [35]Powered by werc
+
+   ____________________ Search
+
+References
+
+   1. http://quotes.cat-v.org/
+   2. http://doc.cat-v.org/
+   3. http://repo.cat-v.org/
+   4. http://go-lang.cat-v.org/
+   5. http://sam.cat-v.org/
+   6. http://man.cat-v.org/
+   7. http://acme.cat-v.org/
+   8. http://glenda.cat-v.org/
+   9. http://ninetimes.cat-v.org/
+  10. http://harmful.cat-v.org/
+  11. http://9p.cat-v.org/
+  12. http://cat-v.org/
+  13. http://cat-v.org/update_log
+  14. http://harmful.cat-v.org/sitemap
+  15. http://harmful.cat-v.org/
+  16. http://harmful.cat-v.org/Blog/
+  17. http://harmful.cat-v.org/cat-v/
+  18. http://harmful.cat-v.org/economics/
+  19. http://harmful.cat-v.org/films/
+  20. http://harmful.cat-v.org/journalism/
+  21. http://harmful.cat-v.org/people/
+  22. http://harmful.cat-v.org/science/
+  23. http://harmful.cat-v.org/security-theater/
+  24. http://harmful.cat-v.org/society/
+  25. http://harmful.cat-v.org/software/
+  26. http://harmful.cat-v.org/standards/
+  27. http://harmful.cat-v.org/words/
+  28. http://genius.cat-v.org/rob-pike/
+  29. http://doc.cat-v.org/unix/
+  30. http://genius.cat-v.org/brian-kernighan/
+  31. http://harmful.cat-v.org/cat-v/unix_prog_design.pdf
+  32. http://harmful.cat-v.org/cat-v/unix_prog_design.ps
+  33. http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=at%26t%20bell%20laboratories%20technical%20journal
+  34. http://www.amazon.com/gp/product/013937681X?ie=UTF8&tag=catv-20&linkCode=as2&camp=1789&creative=9325&creativeASIN=013937681X
+  35. http://werc.cat-v.org/

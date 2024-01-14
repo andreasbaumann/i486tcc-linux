@@ -1,0 +1,668 @@
+   #[1]Stack Overflow [2]Feed for question 'What is the minimum amount of
+   RAM required to run Linux kernel on an Embedded device?'
+
+   [3]Stack Overflow
+    1. [4]About
+    2. [5]Products
+    3. [6]For Teams
+
+    1. [7]Stack Overflow Public questions & answers
+    2. [8]Stack Overflow for Teams Where developers & technologists share
+       private knowledge with coworkers
+    3. [9]Talent Build your employer brand
+    4. [10]Advertising Reach developers & technologists worldwide
+    5. [11]Labs The future of collective knowledge sharing
+    6. [12]About the company
+
+   ____________________
+   Loading...
+
+    1.
+
+[13]current community
+       (BUTTON)
+          + Stack Overflow
+            [14]help [15]chat
+          + Meta Stack Overflow
+
+your communities
+       [16]Sign up or [17]log in to customize your list.
+
+[18]more stack exchange communities
+       [19]company blog
+    2. (BUTTON)
+    3. [20]Log in
+    4. [21]Sign up
+
+    1.
+         1. [22]Home
+         2. [23]Questions
+         3. [24]Tags
+         4.
+         5. [25]Users
+         6. [26]Companies
+         7. Collectives
+         8. [27]Explore Collectives
+         9. Labs
+        10. [28]Discussions
+    2. Teams
+       Stack Overflow for Teams - Start collaborating and sharing
+       organizational knowledge. [29]Create a free Team [30]Why Teams?
+    3. Teams
+    4. Create free Team
+
+Collectives(TM) on Stack Overflow
+
+   Find centralized, trusted content and collaborate around the
+   technologies you use most.
+   [31]Learn more about Collectives
+
+   Teams
+
+   Q&A for work
+
+   Connect and share knowledge within a single location that is structured
+   and easy to search.
+   [32]Learn more about Teams
+
+   Get early access and see previews of new features.
+   [33]Learn more about Labs
+
+[34]What is the minimum amount of RAM required to run Linux kernel on an
+Embedded device?
+
+   [35]Ask Question
+   Asked 9 years ago
+   Modified [36]12 months ago
+   Viewed 23k times
+   (BUTTON)
+   14
+   (BUTTON) (BUTTON)
+
+   What is the minimum amount of RAM required to run Linux kernel on an
+   Embedded device? In Linux-0.11 for 80x86, the minimum RAM required was
+   2MB to load the kernel data structures and interrupt vectors.
+
+   How much is the minimum needed RAM for present Linux-3.18 kernel? Does
+   different architectures like x86 and ARM have different requirements
+   for minimum RAM required for booting? How does one calculates the same?
+     * [37]linux-kernel
+     * [38]embedded
+     * [39]kernel
+     * [40]linux-device-driver
+     * [41]embedded-linux
+
+   [42]Share
+   [43]Improve this question
+   (BUTTON) Follow
+   asked Jan 14, 2015 at 11:24
+   manav m-n's user avatar
+   [44]manav m-nmanav m-n
+   11.2k2323 gold badges7575 silver badges9898 bronze badges
+   5
+     * What are you trying to achieve? Depending on the device you're
+       trying to squeeze Linux onto I'd imagine you might be able to shunt
+       most of it off into (FLASH) ROM.
+       - [45]doynax
+       Jan 14, 2015 at 11:37
+     * @doynax: i am trying to port linux on an embedded device with
+       limited RAM. The flash is read-only.
+       - [46]manav m-n
+       Jan 14, 2015 at 12:00
+     * 1
+       Your question is too vague. Many Linux kernel features can be
+       omitted if not needed, and consequently reduce the memory
+       footprint. The types of daemons required and the applications will
+       also dictate memory requirements. The processor architecture and
+       instruction set impact memory requirements (e.g. for ARM the kernel
+       can be compiled in Thumb mode, 16-bit, instructions to reduce
+       kernel size).
+       - [47]sawdust
+       Jan 14, 2015 at 18:51
+     * Not only is it rather subjective; it is also temporal. The values
+       will change over time; no one will care about 3.18 eventually.
+       Also, a minimal configuration may not do what you want. <1MB is
+       definitely possible with some Linux versions and configurations.
+       For instance, you can remove procfs and/or sysfs, but most Linux
+       user space programs may not work. Minimal might be no network, no
+       sound, no mm, only initramfs and a console driver (maybe).
+       - [48]artless noise
+       Jan 15, 2015 at 20:13
+     * QEMU + buildroot 2017.02 x86_64 goes down to about 32MiB. Likely
+       anything smaller will require patches / be insane.
+       - [49]Ciro Santilli OurBigBook.com
+       Jun 11, 2017 at 14:42
+
+   [50]Add a comment  |
+
+3 Answers 3
+
+   Sorted by: [51]Reset to default
+   [Highest score (default)___________]
+   (BUTTON)
+   13
+   (BUTTON) (BUTTON)
+
+   It's possible to shrink it down to ~600 KiB. Check the work done by Tom
+   Zanussi from Intel. [52]Presentation from Tom and [53]Wiki page about
+   the topic.
+
+   UPDATE. Tom published interesting [54]statistics about memory use by
+   different subsystems in the kernel. He did research during that time
+   when he was working on the project.
+
+   Yet another interesting project is [55]Gray486linux.
+   [56]Share
+   [57]Improve this answer
+   (BUTTON) Follow
+   [58]edited Jan 16, 2023 at 13:31
+   answered Jan 14, 2015 at 18:58
+   0andriy's user avatar
+   [59]0andriy0andriy
+   4,31622 gold badges2424 silver badges3838 bronze badges
+   4
+     * 1
+       I cannot see in either of those links anything to suggest 600KiB.
+       Can you be more specific? Is that kernel image size of run-time RAM
+       footprint? [60]This presentation shows stages to decreasing a
+       distribution each increasingly smaller down to 1.6Mb, but at which
+       point it is probably so crippled that it hardly becomes worth it -
+       so it boots then what can you do with it!?
+       - [61]Clifford
+       Jan 14, 2015 at 21:36
+     * 1.6M is a RAM size of the system, besides kernel you have to have
+       RAM for other stuff, like init and / or shell. So, 600KiB is a RAM
+       footprint of the kernel. But be aware that some stuff you have to
+       compile in into user space programs like TCP/IP, IIRC.
+       - [62]0andriy
+       Jan 15, 2015 at 17:32
+     * [63]Linux on 8-bit uC
+       - [64]manav m-n
+       Jan 19, 2015 at 7:40
+     * 1
+       @Manav, yes, I know that one, but it doesn't sound like a
+       production-ready solution :-)
+       - [65]0andriy
+       Jan 19, 2015 at 8:34
+
+   [66]Add a comment  |
+   (BUTTON)
+   4
+   (BUTTON) (BUTTON)
+
+   [67]This site suggests:
+
+     A minimal uClinux configuration could be run from 4MB RAM, although
+     the recommendation we are giving to our customers is that they
+     should design in at least 16 MB's worth of RAM.
+
+   If you are using SDRAM, the problem would be getting a part any smaller
+   than 16Mb at reasonable volume cost and availability, so maybe it is a
+   non-problem? For SRAM however, that is a large and relatively expensive
+   part.
+
+   eLinux.org has a [68]lot of information on embedded kernel size, how to
+   determine it, and how to minimise it.
+   [69]Share
+   [70]Improve this answer
+   (BUTTON) Follow
+   answered Jan 14, 2015 at 21:21
+   Clifford's user avatar
+   [71]CliffordClifford
+   90.1k1313 gold badges8888 silver badges165165 bronze badges
+   1
+     * From the above provided link: The size of a bootable uClinux image,
+       with integrated initramfs, worthy of the functionality capable of
+       running from 16 MB of RAM would be in the 2-3 MB ballpark. What is
+       the size of the uClinux kernel when it is uncompressed?
+       - [72]manav m-n
+       Jan 15, 2015 at 6:46
+
+   [73]Add a comment  |
+   (BUTTON)
+   2
+   (BUTTON) (BUTTON)
+
+   It depends how you define Linux. If you ask for current operating
+   systems then we are talking about way above 100MByte, better 1000MByte
+   of memory.
+
+   If we are talking about "Linux from Scratch" then we are also talking
+   about how much pain you are willing to suffer. In the mid-1990 I build
+   a Linux system by compiling every binary myself and made it run on a
+   386sx16, 1,5MByte of memory. While it had a 40MByte harddrive it was
+   mostly empty. I compiled my own Kernel 1.0.9, my own libc5, my own base
+   tools, SVGAlib. That system was somewhat useable for using textmode and
+   SVGAlib applications. Increasing the memory to 2MByte did help a lot.
+   And believe me, the system was extremely bare. Today all components
+   need at least twice the memory but then there is also ulibc instead of
+   libc and busybox.
+
+   At 8MByte of memory I can create a very basic system today from
+   scratch. At 512MByte of memory you might have a somewhat modern looking
+   but slow desktop system.
+   [74]Share
+   [75]Improve this answer
+   (BUTTON) Follow
+   answered Jun 26, 2021 at 19:57
+   Crass Spektakel's user avatar
+   [76]Crass SpektakelCrass Spektakel
+   3111 bronze badge
+
+   [77]Add a comment  |
+
+Your Answer
+
+   Reminder: Answers generated by artificial intelligence tools are not
+   allowed on Stack Overflow. [78]Learn more
+   (BUTTON)
+
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+
+   Thanks for contributing an answer to Stack Overflow!
+     * Please be sure to answer the question. Provide details and share
+       your research!
+
+   But avoid ...
+     * Asking for help, clarification, or responding to other answers.
+     * Making statements based on opinion; back them up with references or
+       personal experience.
+
+   To learn more, see our [79]tips on writing great answers.
+   (BUTTON)
+   Draft saved
+   Draft discarded
+   ____________________
+
+Sign up or [80]log in
+
+   Sign up using Google
+   Sign up using Facebook
+   Sign up using Email and Password
+   (BUTTON) Submit
+
+Post as a guest
+
+   Name
+   ____________________
+   Email
+
+   Required, but never shown
+   ________________________________________
+
+Post as a guest
+
+   Name
+   ____________________
+   Email
+
+   Required, but never shown
+   ________________________________________
+   (BUTTON) Post Your Answer (BUTTON) Discard
+
+   By clicking "Post Your Answer", you agree to our [81]terms of service
+   and acknowledge you have read our [82]privacy policy.
+
+   Not the answer you're looking for? Browse other questions tagged
+     * [83]linux-kernel
+     * [84]embedded
+     * [85]kernel
+     * [86]linux-device-driver
+     * [87]embedded-linux
+
+   or [88]ask your own question.
+     * The Overflow Blog
+     * [89]Maximum Glitch: How to break Tetris
+     * [90]How to build a role-playing video game in 24 hours
+     * Featured on Meta
+     * [91]Sites can now request to enable a banner to warn about their
+       policy on...
+     * [92]Temporary policy: Generative AI (e.g., ChatGPT) is banned
+
+Linked
+
+   2
+   [93]Is it a good embedded programming practice to disable an interrupt
+   in an interrupt?
+
+Related
+
+   11
+   [94]Minimum configuration to run embedded Linux on an ARM processor?
+   1
+   [95]Are there any memory restrictions on Linux Kernel Modules?
+   52
+   [96]How does the linux kernel manage less than 1GB physical memory?
+   1
+   [97]android 2.2 minimum hardware requirement
+   80
+   [98]How much memory could vm use
+   5
+   [99]Linux driver for embedded Linux
+   0
+   [100]What are the minimum system requirements of Windows Embedded OSs?
+   4
+   [101]Theoretical embedded linux requirements
+   0
+   [102]RAM access on linux
+   1
+   [103]On 32-bit ARM Linux, how 2 GB RAM is addressed
+
+[104]Hot Network Questions
+
+     * [105]Including an old publication in a CV for a PhD
+     * [106]Drawing radius for minimal_circle and diagonal for
+       oriented_bbox in QGIS
+     * [107]Forgotten Book Title - space sci-fi within solar system
+     * [108]What was the standard time in the Principality of Lippe?
+     * [109]Scoot airlines in European Union-Schengen
+     * [110]Planet orbiting a star orbiting a black hole - can there be
+       life?
+     * [111]Cybernetic AIs get hacked, while sentient AGIs are immune?
+     * [112]Is it insider trading if I bought Boeing puts while I am
+       inside the wrecked airplane?
+     * [113]How to justify a racist empire's use of other sentient species
+       as shock troops?
+     * [114]I overstayed in Ukraine during Covid. What does this stamp
+       mean and will it affect getting a Schengen visa?
+     * [115]Why is it possible to keep an object, say a book, horizontal
+       while holding its corner?
+     * [116]How to draw a polygon
+     * [117]Definition of 'uncle-in-law'
+     * [118]The 50 moves game
+     * [119]Is it bad practice to have a "most_recent" boolean column in
+       addition to a "create_at" timestamp column to track the latest
+       version of a record?
+     * [120]Why did my coworker see a "painting-ified" version of my
+       background image on a Zoom call?
+     * [121]Why is E(th / (1 - th)) different than E(th) / (1 - E(th))?
+     * [122]Do Western governments or organizations control the media and
+       newspapers to censor some news?
+     * [123]Algorithm needed to find optimum area of 2-dimensional data
+       set
+     * [124]I realized I made a huge mistake grading a student's thesis.
+       Panicking and unsure what to do
+     * [125]LaTeX tables lines are not connected
+     * [126]What is exactly the issue with Russia using North Korean
+       missiles?
+     * [127]Does this kind of simile have a more precise/specific name?
+     * [128]How to report the interaction effect in the paper?
+
+   [129]more hot questions
+   [130]Question feed
+
+Subscribe to RSS
+
+   Question feed
+
+   To subscribe to this RSS feed, copy and paste this URL into your RSS
+   reader.
+   https://stackoverflo
+
+[131]Stack Overflow
+
+     * [132]Questions
+     * [133]Help
+
+[134]Products
+
+     * [135]Teams
+     * [136]Advertising
+     * [137]Collectives
+     * [138]Talent
+
+[139]Company
+
+     * [140]About
+     * [141]Press
+     * [142]Work Here
+     * [143]Legal
+     * [144]Privacy Policy
+     * [145]Terms of Service
+     * [146]Contact Us
+     * [147]Cookie Settings
+     * [148]Cookie Policy
+
+[149]Stack Exchange Network
+
+     * [150]Technology
+     * [151]Culture & recreation
+     * [152]Life & arts
+     * [153]Science
+     * [154]Professional
+     * [155]Business
+     * [156]API
+     * [157]Data
+
+     * [158]Blog
+     * [159]Facebook
+     * [160]Twitter
+     * [161]LinkedIn
+     * [162]Instagram
+
+   Site design / logo © 2024 Stack Exchange Inc; user contributions
+   licensed under [163]CC BY-SA. rev 2024.1.10.3270
+
+   Your privacy
+
+   By clicking "Accept all cookies", you agree Stack Exchange can store
+   cookies on your device and disclose information in accordance with our
+   [164]Cookie Policy.
+   (BUTTON) Accept all cookies (BUTTON) Necessary cookies only
+   (BUTTON) Customize settings
+
+References
+
+   Visible links:
+   1. https://stackoverflow.com/opensearch.xml
+   2. https://stackoverflow.com/feeds/question/27941775
+   3. https://stackoverflow.com/
+   4. https://stackoverflow.co/
+   5. https://stackoverflow.com/questions/27941775/what-is-the-minimum-amount-of-ram-required-to-run-linux-kernel-on-an-embedded-de
+   6. https://stackoverflow.co/teams/
+   7. https://stackoverflow.com/questions
+   8. https://stackoverflow.co/teams/
+   9. https://stackoverflow.co/talent/
+  10. https://stackoverflow.co/advertising/
+  11. https://stackoverflow.co/labs/
+  12. https://stackoverflow.co/
+  13. https://stackoverflow.com/
+  14. https://stackoverflow.com/help
+  15. https://chat.stackoverflow.com/?tab=site&host=stackoverflow.com
+  16. https://stackoverflow.com/users/signup?ssrc=site_switcher&returnurl=https%3a%2f%2fstackoverflow.com%2fquestions%2f27941775%2fwhat-is-the-minimum-amount-of-ram-required-to-run-linux-kernel-on-an-embedded-de
+  17. https://stackoverflow.com/users/login?ssrc=site_switcher&returnurl=https%3a%2f%2fstackoverflow.com%2fquestions%2f27941775%2fwhat-is-the-minimum-amount-of-ram-required-to-run-linux-kernel-on-an-embedded-de
+  18. https://stackexchange.com/sites
+  19. https://stackoverflow.blog/
+  20. https://stackoverflow.com/users/login?ssrc=head&returnurl=https%3a%2f%2fstackoverflow.com%2fquestions%2f27941775%2fwhat-is-the-minimum-amount-of-ram-required-to-run-linux-kernel-on-an-embedded-de
+  21. https://stackoverflow.com/users/signup?ssrc=head&returnurl=https%3a%2f%2fstackoverflow.com%2fquestions%2f27941775%2fwhat-is-the-minimum-amount-of-ram-required-to-run-linux-kernel-on-an-embedded-de
+  22. https://stackoverflow.com/
+  23. https://stackoverflow.com/questions
+  24. https://stackoverflow.com/tags
+  25. https://stackoverflow.com/users
+  26. https://stackoverflow.com/jobs/companies?so_medium=stackoverflow&so_source=SiteNav
+  27. https://stackoverflow.com/collectives
+  28. https://stackoverflow.com/collectives/beta/discussions
+  29. https://try.stackoverflow.co/why-teams/?utm_source=so-owned&utm_medium=side-bar&utm_campaign=campaign-38&utm_content=cta
+  30. https://stackoverflow.co/teams/
+  31. https://stackoverflow.com/collectives
+  32. https://stackoverflow.co/teams/
+  33. https://stackoverflow.co/labs/
+  34. https://stackoverflow.com/questions/27941775/what-is-the-minimum-amount-of-ram-required-to-run-linux-kernel-on-an-embedded-de
+  35. https://stackoverflow.com/questions/ask
+  36. https://stackoverflow.com/questions/27941775/what-is-the-minimum-amount-of-ram-required-to-run-linux-kernel-on-an-embedded-de?lastactivity
+  37. https://stackoverflow.com/questions/tagged/linux-kernel
+  38. https://stackoverflow.com/questions/tagged/embedded
+  39. https://stackoverflow.com/questions/tagged/kernel
+  40. https://stackoverflow.com/questions/tagged/linux-device-driver
+  41. https://stackoverflow.com/questions/tagged/embedded-linux
+  42. https://stackoverflow.com/q/27941775
+  43. https://stackoverflow.com/posts/27941775/edit
+  44. https://stackoverflow.com/users/220386/manav-m-n
+  45. https://stackoverflow.com/users/247643/doynax
+  46. https://stackoverflow.com/users/220386/manav-m-n
+  47. https://stackoverflow.com/users/1599004/sawdust
+  48. https://stackoverflow.com/users/1880339/artless-noise
+  49. https://stackoverflow.com/users/895245/ciro-santilli-ourbigbook-com
+  50. https://stackoverflow.com/questions/27941775/what-is-the-minimum-amount-of-ram-required-to-run-linux-kernel-on-an-embedded-de
+  51. https://stackoverflow.com/questions/27941775/what-is-the-minimum-amount-of-ram-required-to-run-linux-kernel-on-an-embedded-de?answertab=scoredesc#tab-top
+  52. http://events.linuxfoundation.org/sites/events/files/slides/tom.zanussi-elc2014.pdf
+  53. http://elinux.org/Kernel_Size_Reduction_Work
+  54. https://lore.kernel.org/linux-serial/1491325150.7125.62.camel@tzanussi-mobl.amr.corp.intel.com/
+  55. https://github.com/marmolak/gray486linux
+  56. https://stackoverflow.com/a/27950451
+  57. https://stackoverflow.com/posts/27950451/edit
+  58. https://stackoverflow.com/posts/27950451/revisions
+  59. https://stackoverflow.com/users/2511795/0andriy
+  60. http://elinux.org/images/2/2b/Elce11_hart.pdf
+  61. https://stackoverflow.com/users/168986/clifford
+  62. https://stackoverflow.com/users/2511795/0andriy
+  63. http://dmitry.gr/index.php?r=05.Projects&proj=07.%20Linux%20on%208bit
+  64. https://stackoverflow.com/users/220386/manav-m-n
+  65. https://stackoverflow.com/users/2511795/0andriy
+  66. https://stackoverflow.com/questions/27941775/what-is-the-minimum-amount-of-ram-required-to-run-linux-kernel-on-an-embedded-de
+  67. http://electronicdesign.com/embedded/practical-advice-running-uclinux-cortex-m3m4
+  68. http://elinux.org/System_Size#Runtime_size_of_kernel
+  69. https://stackoverflow.com/a/27952688
+  70. https://stackoverflow.com/posts/27952688/edit
+  71. https://stackoverflow.com/users/168986/clifford
+  72. https://stackoverflow.com/users/220386/manav-m-n
+  73. https://stackoverflow.com/questions/27941775/what-is-the-minimum-amount-of-ram-required-to-run-linux-kernel-on-an-embedded-de
+  74. https://stackoverflow.com/a/68145842
+  75. https://stackoverflow.com/posts/68145842/edit
+  76. https://stackoverflow.com/users/14661062/crass-spektakel
+  77. https://stackoverflow.com/questions/27941775/what-is-the-minimum-amount-of-ram-required-to-run-linux-kernel-on-an-embedded-de
+  78. https://stackoverflow.com/help/ai-policy
+  79. https://stackoverflow.com/help/how-to-answer
+  80. https://stackoverflow.com/users/login?ssrc=question_page&returnurl=https%3a%2f%2fstackoverflow.com%2fquestions%2f27941775%2fwhat-is-the-minimum-amount-of-ram-required-to-run-linux-kernel-on-an-embedded-de%23new-answer
+  81. https://stackoverflow.com/legal/terms-of-service/public
+  82. https://stackoverflow.com/legal/privacy-policy
+  83. https://stackoverflow.com/questions/tagged/linux-kernel
+  84. https://stackoverflow.com/questions/tagged/embedded
+  85. https://stackoverflow.com/questions/tagged/kernel
+  86. https://stackoverflow.com/questions/tagged/linux-device-driver
+  87. https://stackoverflow.com/questions/tagged/embedded-linux
+  88. https://stackoverflow.com/questions/ask
+  89. https://stackoverflow.blog/2024/01/09/maximum-glitch-how-to-break-tetris/
+  90. https://stackoverflow.blog/2024/01/11/how-to-build-a-role-playing-video-game-in-24-hours/
+  91. https://meta.stackexchange.com/questions/395881/sites-can-now-request-to-enable-a-banner-to-warn-about-their-policy-on-ai-genera
+  92. https://meta.stackoverflow.com/questions/421831/temporary-policy-generative-ai-e-g-chatgpt-is-banned
+  93. https://stackoverflow.com/questions/34992058/is-it-a-good-embedded-programming-practice-to-disable-an-interrupt-in-an-interru?noredirect=1
+  94. https://stackoverflow.com/questions/1522146/minimum-configuration-to-run-embedded-linux-on-an-arm-processor
+  95. https://stackoverflow.com/questions/3394386/are-there-any-memory-restrictions-on-linux-kernel-modules
+  96. https://stackoverflow.com/questions/4528568/how-does-the-linux-kernel-manage-less-than-1gb-physical-memory
+  97. https://stackoverflow.com/questions/4622052/android-2-2-minimum-hardware-requirement
+  98. https://stackoverflow.com/questions/11683850/how-much-memory-could-vm-use
+  99. https://stackoverflow.com/questions/15911807/linux-driver-for-embedded-linux
+ 100. https://stackoverflow.com/questions/31805670/what-are-the-minimum-system-requirements-of-windows-embedded-oss
+ 101. https://stackoverflow.com/questions/33236375/theoretical-embedded-linux-requirements
+ 102. https://stackoverflow.com/questions/35307264/ram-access-on-linux
+ 103. https://stackoverflow.com/questions/71075394/on-32-bit-arm-linux-how-2-gb-ram-is-addressed
+ 104. https://stackexchange.com/questions?tab=hot
+ 105. https://academia.stackexchange.com/questions/205791/including-an-old-publication-in-a-cv-for-a-phd
+ 106. https://gis.stackexchange.com/questions/474151/drawing-radius-for-minimal-circle-and-diagonal-for-oriented-bbox-in-qgis
+ 107. https://scifi.stackexchange.com/questions/283497/forgotten-book-title-space-sci-fi-within-solar-system
+ 108. https://history.stackexchange.com/questions/74165/what-was-the-standard-time-in-the-principality-of-lippe
+ 109. https://travel.stackexchange.com/questions/185631/scoot-airlines-in-european-union-schengen
+ 110. https://worldbuilding.stackexchange.com/questions/253544/planet-orbiting-a-star-orbiting-a-black-hole-can-there-be-life
+ 111. https://worldbuilding.stackexchange.com/questions/253485/cybernetic-ais-get-hacked-while-sentient-agis-are-immune
+ 112. https://law.stackexchange.com/questions/98706/is-it-insider-trading-if-i-bought-boeing-puts-while-i-am-inside-the-wrecked-airp
+ 113. https://worldbuilding.stackexchange.com/questions/253451/how-to-justify-a-racist-empires-use-of-other-sentient-species-as-shock-troops
+ 114. https://travel.stackexchange.com/questions/185636/i-overstayed-in-ukraine-during-covid-what-does-this-stamp-mean-and-will-it-affe
+ 115. https://physics.stackexchange.com/questions/796748/why-is-it-possible-to-keep-an-object-say-a-book-horizontal-while-holding-its-c
+ 116. https://blender.stackexchange.com/questions/309698/how-to-draw-a-polygon
+ 117. https://english.stackexchange.com/questions/617717/definition-of-uncle-in-law
+ 118. https://chess.stackexchange.com/questions/43529/the-50-moves-game
+ 119. https://dba.stackexchange.com/questions/334770/is-it-bad-practice-to-have-a-most-recent-boolean-column-in-addition-to-a-crea
+ 120. https://superuser.com/questions/1825387/why-did-my-coworker-see-a-painting-ified-version-of-my-background-image-on-a-z
+ 121. https://stats.stackexchange.com/questions/636701/why-is-e%ce%b8-1-%ce%b8-different-than-e%ce%b8-1-e%ce%b8
+ 122. https://politics.stackexchange.com/questions/83937/do-western-governments-or-organizations-control-the-media-and-newspapers-to-cens
+ 123. https://or.stackexchange.com/questions/11506/algorithm-needed-to-find-optimum-area-of-2-dimensional-data-set
+ 124. https://academia.stackexchange.com/questions/205787/i-realized-i-made-a-huge-mistake-grading-a-students-thesis-panicking-and-unsur
+ 125. https://tex.stackexchange.com/questions/706908/latex-tables-lines-are-not-connected
+ 126. https://politics.stackexchange.com/questions/83893/what-is-exactly-the-issue-with-russia-using-north-korean-missiles
+ 127. https://linguistics.stackexchange.com/questions/48163/does-this-kind-of-simile-have-a-more-precise-specific-name
+ 128. https://stats.stackexchange.com/questions/636712/how-to-report-the-interaction-effect-in-the-paper
+ 129. https://stackoverflow.com/questions/27941775/what-is-the-minimum-amount-of-ram-required-to-run-linux-kernel-on-an-embedded-de
+ 130. https://stackoverflow.com/feeds/question/27941775
+ 131. https://stackoverflow.com/
+ 132. https://stackoverflow.com/questions
+ 133. https://stackoverflow.com/help
+ 134. https://stackoverflow.co/
+ 135. https://stackoverflow.co/teams/
+ 136. https://stackoverflow.co/advertising/
+ 137. https://stackoverflow.co/collectives/
+ 138. https://stackoverflow.co/talent/
+ 139. https://stackoverflow.co/
+ 140. https://stackoverflow.co/
+ 141. https://stackoverflow.co/company/press/
+ 142. https://stackoverflow.co/company/work-here/
+ 143. https://stackoverflow.com/legal
+ 144. https://stackoverflow.com/legal/privacy-policy
+ 145. https://stackoverflow.com/legal/terms-of-service/public
+ 146. https://stackoverflow.co/company/contact/
+ 147. https://stackoverflow.com/questions/27941775/what-is-the-minimum-amount-of-ram-required-to-run-linux-kernel-on-an-embedded-de
+ 148. https://stackoverflow.com/legal/cookie-policy
+ 149. https://stackexchange.com/
+ 150. https://stackexchange.com/sites#technology
+ 151. https://stackexchange.com/sites#culturerecreation
+ 152. https://stackexchange.com/sites#lifearts
+ 153. https://stackexchange.com/sites#science
+ 154. https://stackexchange.com/sites#professional
+ 155. https://stackexchange.com/sites#business
+ 156. https://api.stackexchange.com/
+ 157. https://data.stackexchange.com/
+ 158. https://stackoverflow.blog/?blb=1
+ 159. https://www.facebook.com/officialstackoverflow/
+ 160. https://twitter.com/stackoverflow
+ 161. https://linkedin.com/company/stack-overflow
+ 162. https://www.instagram.com/thestackoverflow
+ 163. https://stackoverflow.com/help/licensing
+ 164. https://stackoverflow.com/legal/cookie-policy
+
+   Hidden links:
+ 166. https://stackoverflow.com/questions/27941775/what-is-the-minimum-amount-of-ram-required-to-run-linux-kernel-on-an-embedded-de
+ 167. https://stackoverflow.com/
+ 168. https://meta.stackoverflow.com/
+ 169. javascript:void(0)
+ 170. javascript:void(0)
+ 171. javascript:void(0)
+ 172. https://stackoverflowteams.com/teams/create/free/?utm_source=so-owned&utm_medium=side-bar&utm_campaign=campaign-38&utm_content=cta
+ 173. https://stackoverflow.com/posts/27941775/timeline
+ 174. https://stackoverflow.com/users/220386/manav-m-n
+ 175. https://stackoverflow.com/questions/27941775/what-is-the-minimum-amount-of-ram-required-to-run-linux-kernel-on-an-embedded-de
+ 176. https://stackoverflow.com/posts/27950451/timeline
+ 177. https://stackoverflow.com/users/2511795/0andriy
+ 178. https://stackoverflow.com/questions/27941775/what-is-the-minimum-amount-of-ram-required-to-run-linux-kernel-on-an-embedded-de
+ 179. https://stackoverflow.com/posts/27952688/timeline
+ 180. https://stackoverflow.com/users/168986/clifford
+ 181. https://stackoverflow.com/questions/27941775/what-is-the-minimum-amount-of-ram-required-to-run-linux-kernel-on-an-embedded-de
+ 182. https://stackoverflow.com/posts/68145842/timeline
+ 183. https://stackoverflow.com/users/14661062/crass-spektakel
+ 184. https://stackoverflow.com/questions/27941775/what-is-the-minimum-amount-of-ram-required-to-run-linux-kernel-on-an-embedded-de
+ 185. https://stackoverflow.com/q/34992058
+ 186. https://stackoverflow.com/q/1522146
+ 187. https://stackoverflow.com/q/3394386
+ 188. https://stackoverflow.com/q/4528568
+ 189. https://stackoverflow.com/q/4622052
+ 190. https://stackoverflow.com/q/11683850
+ 191. https://stackoverflow.com/q/15911807
+ 192. https://stackoverflow.com/q/31805670
+ 193. https://stackoverflow.com/q/33236375
+ 194. https://stackoverflow.com/q/35307264
+ 195. https://stackoverflow.com/q/71075394
+ 196. https://stackoverflow.com/questions/27941775/what-is-the-minimum-amount-of-ram-required-to-run-linux-kernel-on-an-embedded-de
+ 197. https://stackoverflow.com/

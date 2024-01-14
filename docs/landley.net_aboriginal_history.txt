@@ -1,0 +1,1229 @@
+Aboriginal Linux
+
+     * New to the project? Read [1]About Aboriginal Linux.
+     * Current release: (version 1.4.4, November 11, 2015): [2]build
+       scripts, [3]prebuilt binaries.
+     * Development version: [4]git repository, [5]rss commit feed,
+       [6]snapshot tarball, [7]mailing list.
+
+   News
+     * [8]News
+
+   Documentation
+     * [9]About
+     * [10]README
+     * [11]Build Stages
+     * [12]Prebuilt Binaries
+     * [13]Screenshots
+     * [14]FAQ
+     * Presentation ([15]html [16]PDF [17]text)
+
+   Download
+     * [18]Source Tarballs
+     * Prebuilt Binaries [19]Current [20]Older
+
+   Development
+     * [21]Mailing List
+     * [22]Maintainer's Blog
+     * [23]Git Repository
+     * [24]Snapshot Tarball
+     * [25]Commits RSS
+     * [26]Releases RSS
+     * IRC #toybox on freenode.net
+
+   Control Images
+     * [27]Build Control Images
+
+Where did "Aboriginal Linux" come from? Our story so far...
+
+   My name is Rob Landley, and I've been working on Aboriginal Linux on
+   and off since the late 90's. It's what got me into BusyBox and uClibc,
+   embedded development, compiler internals, and so on. Now it's where I
+   put together everything else I'm doing (like toybox, tinycc, and the
+   relocatable gcc wrapper) to see what actually works and give it a good
+   stress-test. "Eating your own dogfood", and all that.
+
+   The following may not be interesting to anybody but me. (It's as much
+   autobiography as technical history of the project. A big blog entry,
+   really.) But just for the record:
+
+Prehistory
+
+   Back in the late 90's, before linksys routers came out, I installed
+   several masquerading gateways by putting Red Hat on old leftover 386
+   machines. This involved removing as many packages as possible from the
+   base install, both to get the size down (to fit it on old hard drives)
+   and to reduce the security exposure of all the daemons Red Hat ran by
+   default (including a print server and an NFS server exposed to the
+   world, for no readily apparent reason).
+
+   Back around Red Hat 6, the smallest base install was still hundreds of
+   megabytes, and needed dozens of packages removed to get a reasonably
+   stripped down system. (You couldn't choose _not_ to install things like
+   ghostscript, or printer support, only remove them after the fact.)
+   Package dependencies often forced me to delete stuff by hand: some
+   packages' uninstall scripts outright failed, others had circular
+   dependencies in long chains through dozens of packages, and there was
+   no distinction between "this package provides optional functionality"
+   and "it won't run without this", a dependency was a dependency as far
+   as RPM was concerned.
+
+   Stripping down Linux installs was a time-consuming process that still
+   left behind mountains of junk doing who knows what, which I didn't
+   understand well enough to safely remove.
+
+   Stripping down a full distribution seemed like the long way around to
+   get a minimal system. What I wanted was to build _up_ from an empty
+   hard drive, adding only what I needed. I knew how to build packages
+   from source to add them to a working system, but not how to _get_ a
+   working system in the first place. When I went to the the third Atlanta
+   Linux Showcase (in 1999), I pestered everyone I met to tell me how to
+   build a complete Linux system from source code. Lots of people thought
+   it was a great idea, but nobody could point me to the appropriate
+   HOWTO. A few months later, one of the people I'd asked emailed me about
+   the launch of the Linux From Scratch project, and from that I finally
+   learned what I needed to know.
+
+   The LFS book linked to the [28]Linux Bootdisk HOWTO, and for a while I
+   got no further than that immensely educational resource. It explained
+   exactly what you needed to copy from an existing root filesystem in
+   order to run an arbitrary app from a bootable floppy. It explained the
+   directory layout, which configuration files were actually necessary and
+   what they did, the early boot process, and introduced me to the ldd
+   command with which I could track down the shared libraries a given
+   executable needed.
+
+   Around this time I also encountered [29]tomsrtbt, which used the old
+   "format a 1.44 megabyte floppy to to 1.7 megabytes" trick to fit an
+   enormous amount of Linux system onto a single bootable floppy disk.
+   (This was also my introduction to the BusyBox project, and later to the
+   programming language LUA.)
+
+   The above approach of cherry-picking your own boot environment using
+   prebuilt binaries didn't scale very well, and didn't let me mix and
+   match components (such as substituting busybox for Red Hat's command
+   line utilities), so when Linux From Scratch's 3.0 release came out I
+   cleared a month to sit down and properly work through it, understanding
+   what each step was doing. I turned their instructions into a bash
+   script as part of the learning process, because I kept screwing up
+   steps and having to start over, only to typo an earlier step as I
+   repeated it by hand and have to start over _again_. I joined the
+   Automated Linux From Scratch mailing list in hopes I could find (or
+   help create) an official script to use, but they were all talk and no
+   code. (Everybody had their own automation script, but the project
+   wanted to create something big like Gentoo and seemed to think that
+   publishing a simple script implementing the existing Linux From Scratch
+   instructions was beneath them. So everybody had their own script, none
+   of which were "official".)
+
+   My own script quickly evolved to remove packages like gettext and
+   tcl/expect, things the masquerading servers I'd been assembling didn't
+   actually need. I poked at adding X11 (something I'd installed myself by
+   hand back under OS/2) and pondered running the system on my laptop
+   someday, but the hundreds of packages I'd need to build and the
+   constant maintenance of keeping it up to date kept that idea way down
+   on my to-do list.
+
+Version 0: The WebOffice version ("Yellowbox")
+
+   Towards the end of 2000 I met the founders of a local start-up through
+   the Austin Linux Users Group (two Taiwanese guys named Lan and Lon),
+   and at the end of the year joined their start-up company "WebOffice" as
+   employee #4. The two founders were ex-AMD hardware guys who didn't
+   really program, who had already hired a recently retired professional
+   tennis player to do marketing for them. They had a prototype firewall
+   product they'd demonstrated to get venture capital funding: a small
+   yellow box running stock Red Hat 7. (When they first demonstrated it to
+   me, I diagnosed and removed the "code red" virus from it.)
+
+   The money wasn't great, but the project was interesting, challenging,
+   and full of learning opportunities. Full-time Linux positions were
+   still somewhat rare back then, and to make up for the low salary (and
+   the fact they weren't offering stock options; yes I asked, they were
+   saving it for themselves and the VCs), I was promised that I could GPL
+   most of the code I was working on as soon as it shipped. Back in 2000,
+   that sounded like a pretty good deal.
+
+   For a the first few months I was their only programmer, doing
+   everything from architecture to implementation (OS, applications, web
+   interface, the works). I became lead developer and architect when they
+   got a second round of VC funding they hired more developers.
+
+   Alas, mostly bad ones. The founders didn't know enough about
+   programming to choose wisely, and I wasn't consulted on most hiring
+   decisions because I wasn't "management". Only one actual IDIOT in the
+   bunch, thank goodness, but they made me share an office with him. He
+   was another Taiwanese guy (this one named "Luan") who the founders felt
+   sorry for because his previous dot-com had gone under and he'd be
+   deported if he didn't stay employed to maintain his H1B visa. (Yes,
+   they admitted this to me when I complained about him.) Unfortunately,
+   not only did he not know anything of use to the company, but he never
+   showed any ability to learn, and after the third time "show me how to
+   do this" turned into him handing in my example code verbatim as his
+   work, our working relationship deteriorated somewhat. He literally
+   could not work out how to write a "hello world" program by himself, and
+   when I spent an hour explaining things to him rather than writing
+   example code he could turn in he got frustrated and accused me of being
+   obstructionist because I wouldn't do his job for him. (Of course he had
+   an MCSE.)
+
+   And thus began my habit of taking my laptop to places other than my
+   office, so I could get work done without interruption...
+
+   There are reasons this company didn't survive to the present day.
+
+Yellowbox technobabble.
+
+   WebOffice's proposed product was an early multi-function embedded Linux
+   device. It was a masquerading fireball which provided dhcp and DNS for
+   its private subnet. It also provided a VPN bridging multiple such
+   subnets (possibly from behind other existing firewalls, by bouncing
+   connections off a public "star server"; an idea the founders of
+   WebOffice tried to patent over my objections). It also provided network
+   attached storage (samba) with a web-based user account management GUI.
+   It also provided scheduled actions, such as automated backup. It also
+   acted as a video server. And it did a dozen other things I don't even
+   remember. (Their marketing material called the project the "iLand
+   gateway 2000". I had no say in this.)
+
+   I called it "yellowbox" (because it was), and described it as a "swiss
+   army server". The hardware was a standard PC motherboard and an 8 port
+   ethernet switch in a small custom-designed bright yellow metal case
+   with pretty decals on it. Inside was a 266mhz celeron, 128 megs of ram,
+   a 2 gig hard drive, two network cards, and the aforementioned 8 port
+   100baseT ethernet switch removed from its case and screwed into a metal
+   frame. The back of the box exposed a lot of ethernet ports (one
+   "uplink" port and 8 switch ports, although only 7 of the switch's ports
+   worked because the eighth was soldered to the second internal ethernet
+   card; they labeled it "service" or some such because if the hole in the
+   back of the case didn't let them expose it to the outside world it
+   wouldn't fit right). The only other port was a place to plug in the
+   power cable. The front had many blinky lights (one of which was a blue
+   LED, which they were very proud of and considered a big selling point).
+
+   Most importantly, the motherboard's video/keyboard/mouse ports weren't
+   exposed to the outside world: it was supposed to run as a headless box
+   administered through the network via a web server with clever CGI. We
+   could plug a keyboard and monitor into it during development, but only
+   by taking the case off. Out in the field, it had to "just work", and
+   would be a useless brick if it didn't boot all the way into the OS and
+   run our applications.
+
+   This was my first exposure to embedded development. The hardware was
+   standard PC/x86, it wasn't too badly underpowered for what it did (at
+   least by the standards of the day), and it used wall current instead of
+   battery power... But it was a headless self-administering box meant to
+   function as an appliance to end users, which was new to me. It was also
+   a challenge to strip down the whole OS into a small enough package that
+   they could download entire new OS images using the internet speeds of
+   2001, and then update the new OS image without losing data or turning
+   it into a brick.
+
+   WebOffice's original prototype device ran a stock Red Hat 7 install
+   (the one that had the Code Red virus when they first demoed it to me
+   after a LUG meeting). The whole OS image took up almost a gigabyte, and
+   that's before they'd implemented any applications or web UI. I rebased
+   the system on Linux From Scratch, using my LFS 3.0 script to build the
+   base OS and creating a new script to build the additional packages
+   (apache, postscript, ssh, and so on) the project used. I got the OS
+   down under 100 megs (but not by much, it still used glibc and gnu
+   coreutils and so on). I then spent the next year and a half learning
+   how to properly strip down and secure an embedded system. I brushed
+   against both busybox and uClibc during this period, but couldn't get
+   either one to work in our project at the time. We needed more
+   functionality than either provided back then.
+
+   I implemented all the web CGI stuff in Python; a part-time web designer
+   would come in once a week to mock up pages using Dreamweaver, and I'd
+   take the result and make my Python code spit heavily cleaned up
+   versions, plus actual content and minus most of the &nbsp; and similar
+   lunacy. Getting the stylesheets to work was interesting. (Working
+   around the way Internet Explorer treated the end-form tag as a break
+   tag and inserted extra vertical whitespace that didn't show up in
+   Netscape or Konqueror was also fun, although it _didn't_ do this if
+   your start form tag and end form tags were at different table levels.
+   Yes, to make it display right I had to make tags cross, so IE didn't
+   think it understood the data and thus get confused and do the wrong
+   thing. I'm not proud of this, but it was IE.)
+
+   I learned how to configure and administer (and automate the
+   administration of) apache, samba, postfix, ssh, bind, dhcpd... I
+   created [30]a scalable vpn (which freeswan _wasn't_, nor was the
+   out-of-tree patch of the day remotely reliable) by combining iptables
+   port forwarding with ssh and a wrapper daemon. (Again the founders
+   tried to patent this; I objected strenuously that it was A) obvious, B)
+   they'd said I could GPL it when it shipped. This went on for a while).
+
+   I also made an automated production process for WebOffice: my scripts
+   built a CD-rom image which, when booted (with the case off there was a
+   spare IDE port you could hook a cd-rom drive to), would partition and
+   format /dev/hda and install the final OS image on it, eject the CD,
+   play "charge" through the PC speaker, and power down the machine. (If
+   something went wrong, it played "taps" instead.) Yes, these CDs were
+   dangerous things to leave lying around, and I made sure to label 'em as
+   such.
+
+   WebOffice wanted to be able to remotely upgrade the firmware, which
+   meant sending a new OS image as a single file. The install had to be
+   fairly atomic, if something went wrong during the upgrade (including a
+   power failure, including the user switching it off because it was
+   taking too long) the thing could easily become a brick. Obviously a
+   traditional "extract tarball into partition" approach was unacceptable,
+   even before "fsck" issues came up. (The only journaling filesystem in
+   the stock kernel at the time was reiserfs, and that was way too fiddly
+   and overcomplicated for me to trust my data to it. I moved the data
+   partition to ext3 when that got merged, but wanted to make the base OS
+   partition read-only for security reasons.)
+
+   I wound up creating a gpg-signed tarball with several files, one of
+   which was the new kernel to boot, one of which was the initrd
+   (remember: this was back before initramfs), and one of which was a
+   filesystem image to read-only loopback mount as the new root
+   filesystem. (For security reasons I wanted root mounted read only,
+   which also suggested a compressed filesystem to save space. Squashfs
+   didn't exist yet and the ext2 compression patches had already
+   bit-rotted, so I used zisofs.) The tarball also contained a file with a
+   version string, and a file with an sha1sum of the concatenation of the
+   other four files.
+
+   Extracting a firmware tarball wrote these files into a new subdirectory
+   (The tar invocation extracted those specific names, so an attacker
+   couldn't write to arbitrary locations in the filesystem with a
+   carefully crafted tarball; yes I was paranoid while learning about
+   security), and made use of the "lilo -R" option to switch to the new
+   firmware. That sets the LILO command line for the next boot only, so we
+   left the default pointing to the old firmware but told LILO that on the
+   next boot it should use the new firmware. If the new firmware came up
+   and its self-diagnostic checked out, it would change the LILO default.
+   If it didn't work, power cycle the box and the old firmware would come
+   up. (This greatly reduced the chances of turning the headless box into
+   a brick, and you couldn't do that with grub.)
+
+   At a technical level, there was a chicken and egg problem here: the
+   root filesystem was a loopback mount, but the file to loopback mount
+   has to live somewhere. So the system needed a writeable partition for
+   logging and such anyway, so I made /dev/hda1 be ext3 and mounted it on
+   /var, and put the firmware in that. So during the boot process the
+   initrd needed to mount /dev/hda1 onto a /temp directory, loopback mount
+   the /temp/image file onto a /sub directory, and before doing the
+   pivot_root into /sub it needed to move the /temp mount into /sub/var.
+   This turned out to be nontrivial.
+
+   Back under the 2.2 kernel you couldn't mount a partition in two places
+   at once, so mounting the same /dev/hda1 on both /tmp and /sub/var
+   wasn't an option. I had to use early (and buggy) 2.4 kernels to have
+   any chance to make this work (and also to make the VPN work, which
+   required the undocumented SO_ORIGINAL_DST getsockopt() existing in 2.4
+   but not 2.2).
+
+   The early 2.4 kernels sucked mightily. The memory management problems
+   that resulted in the rik->andrea switch in 2.4.10 hit the yellowbox
+   project kind of hard. I once drove the 2.4.7 kernel into a swap
+   thrashing state, went to lunch (instead of rebooting, just to see if it
+   would recover), and it was still swap thrashing and mostly paralyzed
+   when I came back over an hour later. The disk cache (especially the
+   dentry cache) could get unbalanced until it grew to evict all the
+   anonymous pages and froze the system hard. (A big rsync would do that
+   fairly reliably. Trying to avoid this I studied the md4 algorithm and
+   the rsync description file and spent a week writing most of my own
+   rsync implementation in python, but A) it maxed out at about
+   300k/second on the processor we were using, B) it also caused the hang
+   because it was really a kernel issue and not an application issue.) It
+   was frustrating, but we persevered.
+
+   Mounting a partition twice and leaking one of the mount points (the old
+   /temp was inaccessible after the pivot_root) was kind of unclean
+   anyway, the clean thing for the boot to do was actually move the /tmp
+   mount to /sub/var after mounting /sub but before the pivot_root into
+   /sub. But when I asked on linux-kernel how to do that, I was told that
+   "mount --move" didn't exist yet. A couple releases later Al Viro added
+   it, and I was one of the first happy users.
+
+   I also wanted to put the kernel, initrd, and loopback mountable root
+   filesystem image together into a single file, so we didn't have to
+   extract a tarball during a firmware upgrade but could actually _boot_
+   into the actual file we'd downloaded, after verifying its signature.
+   (This avoided the problem of successfully downloading the tarball but
+   not having enough space left to extract it. Since zisofs, zImage, and
+   initrd were already gzipped, compressing the firmware image for
+   transport wasn't a priority. Keep in mind: headless box,
+   self-administering. Even little things like this could turn into a big
+   problem in the field if you didn't handle them.)
+
+   You could already use "losetup -o" to loopback mount a file at an
+   offset, and I made a "length" patch to LILO that let its config file
+   tell it to boot only the _start_ of the kernel file you fed it. But
+   dealing with the initrd in between was a pain, which is why I
+   eventually became an early avid follower of initramfs, and wound up
+   writing documentation for it when I couldn't find any and had to answer
+   so many questions myself.
+
+The end at WebOffice
+
+   The original promise that I could GPL the code I was working on
+   (everything except the python CGI) once it shipped never came true.
+   Partly the founders were ambivalent about this whole "open source"
+   thing, wanting every competitive advantage they could get. (They kept
+   trying to patent obvious things I did. Their patent lawyer was a really
+   cool dude when he flew in from California.)
+
+   Another contributing factor was that the founders were from Taiwan and
+   had no idea how to address the US market. Their marketer employee #3
+   hadn't stayed very long (not much endorsement value for a tennis player
+   trying to sell servers), and they themselves only ever tried to sell
+   the device overseas (which made demonstrating the thing somewhat
+   difficult, and this also meant they were shipping a VPN with
+   cryptographic checks on firmware upgrades to places like Turkey, back
+   in the days of cryptographic export regulations).
+
+   But the biggest problem was unending feature creep: every time the
+   founders saw or heard of a product that did something, we had to do
+   that too. I had a shippable product ready a few months after I started,
+   but they wouldn't ship it. I designed the firmware upgrade mechanism so
+   we could ship what we had and add more later, but they felt that doing
+   so would take focus away from developing more features. (For about a
+   while there they were trying to turn it into a video server. I made a
+   python CGI script for apache to cache large files, by downloading them
+   from an upstream server and sending them out as they came in as if it
+   had been a local file all along, while simultaneously writing them to
+   the hard drive for other users. Of course, they tried to patent this
+   too...)
+
+   The tendency towards feature creep left them vulnerable to their
+   venture capitalist changing their business model. Another of the VC's
+   start-ups was paying lots of money to license the RealVideo streaming
+   server, so the VC convinced WebOffice to waste six months trying to
+   reverse engineer it. (After all, our idea of offering mp4 files though
+   Samba or Apache made us a video server, right? This was just another
+   kind of video server...) I wasn't interested in this direction and left
+   Austin for a while to spend time with my mother (who was suffering from
+   cancer and New Jersey) while they got this out of their system. They
+   hired over a half-dozen programmers to replace me during this period,
+   but progress on the yellow box ground to a halt anyway (and even went
+   backwards a bit with numerous regressions) until I came back. The
+   quality of the new hires varied ("erratic", "mediocre", and "suck" were
+   all represented).
+
+   WebOffice ballooned to a dozen employees (over half of whom reported to
+   me when I came back, although I still had little say in hire/fire
+   decisions). The company bought itself back from the first VC by
+   mortgaging itself to a second VC, and refocused on the original
+   do-everything "swiss army server" idea. But they still wouldn't just
+   ship what they had as long as there were more features we could add,
+   and ultimately they burned through their venture capital without ever
+   sending more than a few prototypes to actual customers.
+
+   WebOffice ran out of money in 2002, and instituted a round of layoffs.
+   I continued on half-time (at half-pay) for several more months, hoping
+   that necessity would make them focus on shipping units and bringing in
+   revenue, but it didn't happen. I left in November and spent the last
+   couple months of that year in Florida watching my mother die of cancer,
+   then driving around the country distributing her possessions to various
+   relatives, and finally crashing on Eric Raymond's couch for a few
+   months doing an "editing pass" on The Art of Unix Programming that
+   expanded the book from 9 chapters to 20.
+
+Version 1: Relaunch based on BusyBox and uClibc ("Firmware Linux")
+
+   The code discussed here is [31]still online (if abandoned since 2005).
+
+   When I returned to Austin in August 2003, I bought a condo near the
+   University of Texas (and near Metro, my favorite 24 hour coffee shop
+   with wireless internet access), enrolled in grad school, and [32]got
+   back into poking at Linux From Scratch.
+
+   Linux From Scratch had reorganized itself. My old weboffice scripts had
+   been based on LFS 3, which involved building enough of a system to
+   chroot into and complete the build under that. The potential downside
+   was that bits of the host system could leak into the final target
+   system, such as copied headers or tools build by the host's compiler.
+
+   In 2002 LFS 4 introduced an intermediate set of statically linked tools
+   in a "static" directory, which were deleted after the intermediate
+   system was built. In November 2003 LFS 5 renamed this temporary
+   directory to "tools". This new approach added the temporary directory
+   to the end of the $PATH during the chroot, rebuilt itself using the
+   temporary system, and then discarded the entire directory to eliminate
+   leaks of host files. This was a big enough change that it was less work
+   to start over from scratch than try to adapt my existing scripts.
+
+   Starting over also seemed like a good idea because I was unsure of the
+   IP status of my old scripts. Although I'd been promised repeatedly I
+   could GPL everything but the python CGI when the yellowbox shipped,
+   actual shipping had never quite happened, and I didn't have that
+   promise in writing. (I don't remember if I lost it or if I'd been
+   without a contract all along. You could make an argument I owned all
+   the code I'd done outright in the second case, certainly that's what
+   the copyright notices on the individual files said, and I'd been
+   working on early versions of those scripts before I brought them to
+   weboffice in the first place and had never signed over those
+   preexisting copyrights. But I just didn't want to go there.)
+
+New Goals
+
+   I also wanted to take the project in new directions, further into the
+   embedded space. WebOffice had focused on adding more and more features
+   to a bigger and bigger image, while I personally had focused on
+   trimming it down and streamlining it (for example replacing the
+   Postgresql database with a few flat text files to store configuration
+   and user information, thus replacing 200 megabytes of disk usage with
+   about 90k and speeding up the relevant code considerably).
+
+   For the new project I had two main goals: make the bootable single file
+   idea work, and make the result much smaller and simpler. (I also wanted
+   to clean up the build so it didn't require root access, package and
+   document it all so anyone could use it, other similar tidying steps.)
+
+   The firmware tarball I'd implemented for WebOffice had always been a
+   stopgap, something they could ship with quickly while I got a better
+   solution ready. What I really wanted was a single bootable file
+   containing kernel, initial ram disk, and root filesystem all in one.
+   (Putting an entire large root filesystem into a ramdisk consumed too
+   much memory, the root filesystem needed a backing store it could page
+   files in from.)
+
+   The name Firmware Linux came from the goal of packaging an entire OS
+   image in a single bootable file, which could run directly and be used
+   to atomically upgrade embedded systems.
+
+   My other goal for Firmware Linux started with the desire to replace as
+   much of the gnu tools as possible with something smaller and simpler.
+   The old yellowbox images from WebOffice had weighed in at almost 100
+   megabytes, most of which was glibc, coreutils, diffutils, and so on.
+   This was clearly crazy, my first hard drive back in 1990 was only 120
+   megabytes, and back under DOS that was enormous (and a huge step up
+   from my friend Chip's system with a 32 megabyte hard drive, which I
+   learned to program C on). When I looked at the gnu implementation of
+   the "cat" command and found out its source file was 833 lines of C code
+   (just to implement _cat_), I decided the FSF sucked at this whole
+   "software" thing. (Ok, I discovered that reading the gcc source at
+   Rutgers back in 1993, but at the time I thought only GCC was a horrible
+   bloated mass of conflicting #ifdefs, not everything the FSF had ever
+   touched. Back then I didn't know that the "Cathedral" in the original
+   Cathedral and the Bazaar paper was specifically referring to the GNU
+   project.)
+
+   Searching for alternatives, I went back to take a closer look at
+   busybox and uClibc. I was familiar with both from Tom's Root Boot
+   (tomsrtbt), a popular single floppy Linux system that packed an amazing
+   amount of functionality into a single specially formatted (1.7
+   megabyte) 3.5" floppy disk. I'd been using tomsrtbt for years, I just
+   hadn't tried to build anything like it myself. Compared to the tens of
+   megabytes of gnu bloat the LFS project produced, busybox and uClibc
+   seemed worth a look.
+
+   [33]This old message was my first attempt at sniffing around at uClibc.
+   I didn't get time to seriously play with it (or BusyBox) until much
+   later.
+
+   It also occurred to me that if the newly introduced /tools directory
+   was enough to build the final system, then all I needed for the system
+   to be self-hosting was enough extra packages to rebuild /tools. If the
+   prehistory stage had been about starting from a full distro and cutting
+   it down, and the WebOffice version had been about starting from ground
+   zero and piling up lots of functionality into a 100 megabyte tarball,
+   this new stage was about starting from an empty directory and adding as
+   little as possible to do what I wanted while staying small and simple.
+
+   So the real questions were:
+     * How small could I get /tools and still build the rest of LFS under
+       it?
+     * What was the minimum functionality /tools needed in order to
+       rebuild itself from source _without_ first building a larger
+       system?
+
+Implementation
+
+   I started by writing new scripts based on Linux From Scratch 4 (quickly
+   switching to LFS 5) to build a stock LFS system. I wrote a script to
+   build /tools, and another script run under a chroot to build a final
+   LFS system within tools. The second script acted as a test that the
+   /tools created by the first script was good enough. And once I had a
+   known working system, I started doing a number of different things to
+   it.
+
+Stripping down LFS 5.0
+
+   The full list of Linux From Scratch 5.0 packages were: autoconf,
+   automake, bash, binutils, bison, bzip2, coreutils, dejagnu, diffutils,
+   e2fsprogs, ed, expect, file, findutils, flex, gawk, several fragments
+   of gcc, gettext, glibc, grep, groff, grub, gzip, inetutils, kbd, less,
+   libtool, the linux kernel, m4, make, MAKEDEV, man, man-pages, modutils,
+   ncurses, net-tools, patch, perl, procinfo, procps, psmisc, sed, shadow,
+   sysklogd, sysvinit, tar, tcl, texinfo, util-linux, vim, and zlib. There
+   were also two LFS-specific packages, providing boot scripts, config
+   files, and miscellaneous utilities.
+
+   I started by removing packages I didn't actually need. Tcl, expect, and
+   dejagnu hadn't been in LFS 4, so obviously it was possible to do
+   without them. (I was already starting to view newer versions of Linux
+   From Scratch as "bloated" compared to old versions. I could always
+   build and run test suites later, and rebuilding the system under itself
+   to produce a working result was already a fairly extensive test.)
+
+   I could also eliminate ed (which patch can use for obsolete patch
+   formats, but who cares?), gettext (only needed for
+   internationalization, which is best done at the X11 level and not at
+   the command line), libtool (which is a NOP on ELF Linux systems and
+   always has been, blame the FSF for trying to get us to use it at all),
+   and man (and man-pages, groff, and texinfo, which are used to
+   build/display documentation).
+
+   A bunch of development tools (autoconf, automake, binutils, bison,
+   flex, gcc, make, and m4) wouldn't be needed on a stripped down system
+   (such as a router) that never needed to compile anything. (Perl might
+   be in this group as well, since it was only included because glibc
+   needed it to build. The linux kernel and glibc both supplied files used
+   by the compiler, such as the headers in /usr/include, so this group
+   depended on them even if they had other more direct uses.) Similarly,
+   the e2fsprogs package was used to create a filesystem, but mkisofs and
+   such could substitute for it.
+
+   The kernel and grub were basic infrastructure, not really part of the
+   root filesystem and easy to build separately. (I was still using my
+   modified LILO anyway.) The C library (glibc) was the next layer past
+   that, every userspace program had to link against it either statically
+   or dynamically. The boot scripts, MAKEDEV, sysvinit, and modutils were
+   all similarly low-level infrastructure pieces to boot the system or
+   talk to hardware. The shadow package provided login and /etc/passwd
+   support. The ncurses and zlib packages were shared libraries I
+   understood, but were both largely optional (and gzip/zlib seemed
+   somehow redundant). Bash was a command shell, bzip2 and gzip were
+   compression programs, tar an archiver, vim a text editor, and sysklogd
+   a logging daemon that wrote stuff to /var/messages.
+
+   That left coreutils, diffutils, file, findutils, gawk, grep, inetutils,
+   kbd, less, net-tools, patch, procinfo, procps, psmisc, sed, and
+   util-linux as "other stuff in the $PATH" which were only really needed
+   if some application (such as a package build) used them. After enough
+   study, I felt comfortable I understood what they all did.
+
+   That's what chapter 6, which built the final Linux From Scratch system,
+   contained. Chapter 5 had a much shorter list: binutils, gcc, linux
+   (used just for headers), glibc, tcl, expect, dejagnu, gawk, coreutils,
+   bzip2, gzip, diffutils, findutils, make, grep, sed, gettext, ncurses,
+   patch, tar, texinfo, bash, util-linux, and perl. And chapter 5 _had_ to
+   contain enough to build chapter 6, and thus rebuild the entire system
+   from source.
+
+   Again, tcl, expect, dejagnu, gettext, and texinfo could be discarded.
+   (Most of those weren't even present in the earlier versions of Linux
+   From Scratch I'd used, they had to be optional.) That left just 19
+   packages. The compiler toolchain was just binutils, gcc, make, glibc,
+   and the Linux headers (all that autoconf, automake, lex, and bison
+   stuff was obviously optional and could be added later from within a
+   working system). Perl was only used to build glibc, if that was
+   replaced or fixed then the need for perl (at least at this stage) could
+   go away. Busybox claimed to provide replacements for gawk, coreutils,
+   bzip2, gzip, findutils, grep, sed, tar, bash, and util-linux. Since
+   busybox didn't use ncurses, it should be possible to build that at the
+   start of chapter 6. And what was diffutils doing here at all? It turns
+   out that the perl configure stage uses "cmp" (which it provides), so if
+   you didn't need perl you didn't need this.
+
+   Since Linux From Scratch's "chapter 6" started by rebuilding binutils
+   and gcc (which were the big, complicated, tough packages), those
+   obviously didn't need any more than was in chapter 5 to rebuild
+   themselves.
+
+   All this analysis reduced Linux From Scratch's chapter 5 to four
+   functional groups:
+     * Compiler - binutils, gcc, make, and the linux headers copied into
+       /usr/include/linux.
+     * C library - glibc or similar
+     * Lots of posix command line utilities - everything else
+     * Bootloader and kernel - Linux, Lilo, etc (not necessarily part of
+       the root filesystem at all).
+
+Replacing packages with BusyBox and uClibc
+
+   Once I ran out of obvious packages to remove, I experimented with
+   package substitutions, swapping out the stock Linux From Scratch
+   packages for other (smaller) implementations of the same functionality.
+   The two obvious goals (again, pursued in parallel) were to swap glibc
+   for uClibc, and to use busybox in place of as many other commands it
+   could replace.
+
+   In theory, a self-hosting LFS chapter 5 root filesystem that could
+   rebuild itself directly from source could be reduced to binutils, gcc,
+   make, uClibc, linux-headers, and an _extensively_ upgraded busybox. (Of
+   course such a modified chapter 5 should still be able to build the
+   unmodified chapter 6. If it couldn't, there was something wrong with
+   it, so that was a good test.)
+
+   Both BusyBox and uClibc were maintained by a guy named Erik Andersen,
+   who had started them while working for a company called Lineo and
+   continued them after he left (a little like the way I was continuing
+   Firmware Linux). In both cases he'd found a long-stalled existing
+   project to salvage and relaunch instead of starting from scratch, but
+   in reality he'd taken dead projects, replaced all their existing code,
+   and built a community around them.
+
+BusyBox
+
+   Busybox was nice because I could introduce it piecemeal. I could
+   replace commands one at a time, swap an existing /tools/bin binary with
+   its busybox equivalent and run the build to see if it worked. If it
+   didn't, I could compare the two versions of the build against each
+   other to see what had changed, or try to replace a different (simpler)
+   command.
+
+   The Linux From Scratch installation instructions also listed the files
+   installed by each package, so I could look through the lists ( [34]sed
+   had just one, [35]gzip installed a little over a dozen,
+   http://archive.linuxfromscratch.org/lfs-museum/5.0/LFS-BOOK-5.0-HTML/ch
+   apter06/util-linux.html>util-linux
+   installed over 60) to see what was actually needed ("sed" yes, "cal"
+   not so much) and what busybox did and didn't provide already and what
+   would need to be added or upgraded.
+
+   I focused on eliminating packages, which meant I started by tackling
+   fairly complicated commands like "bunzip" and "sed", because getting
+   those to work would let me drop an entire package. I quickly sent in so
+   many bugfixes to sed I wound up maintaining the applet, and got
+   distracted rewriting bunzip entirely (but my new implementation
+   compiled to only 7k).
+
+   Eventually, I wound up getting busybox to replace bzip2, coreutils,
+   e2fsprogs, file, findutils, gawk, grep, inetutils, less, modutils,
+   net-tools, patch, procps, sed, shadow, sysklogd, sysvinit, tar,
+   util-linux, and vim.
+
+   To do that, I wound up extensively upgrading (or rewriting from
+   scratch) dozens of different busybox commands and adding several new
+   ones from scratch.
+
+   One new command was switch_root, for initramfs support. I wrote an
+   initramfs file for the kernel's Documentation directory because I
+   investigated it for Firmware Linux. (And later gave my first OLS
+   presentation on the topic, and write an article series about it when I
+   worked at TimeSys.)
+
+   Another new command was mdev, which was a rewrite of [36]a shell script
+   I used to populate /dev, which Frank Sorenson [37]ported to C and I
+   extended (adding a config file based on irc conversations with Gentoo's
+   Solar).
+
+uClibc
+
+   Replacing glibc with uClibc took some doing, but at the time the uClibc
+   project was quite heavily developed and rapidly improving (coming out
+   with 8 releases in 2002 and 8 more in 2003) so there was always
+   something new to try. If something didn't work, they were happy to fix
+   it.
+
+   uClibc version 0.9.26 (January 2004) was the breakthrough version that
+   went from "here are the packages known to work, anything else probably
+   won't" to "any package you try to build against this will most likely
+   work, please let us know about anything that doesn't". When uClibc did
+   finally work, it allowed me to remove perl from /tools (which was only
+   need to build glibc, but not required by anything else in LFS).
+
+   I also experimented with dynamically linking /tools, as another way to
+   get the size down. Linux From Scratch statically linked chapter 5 for
+   simplicity sake, I tried to get the existing compiler to link against
+   the C library I just built. This was quite a learning experience.
+   Everything from changing the library loader path to making sure gcc
+   could find crt0.o at a nonstandard location was all new, and fiddly,
+   and cryptic, and didn't work. And thus began the long war between me
+   and gcc's path logic. (Since I had static linking to fall back on, I
+   could poke at this in parallel with my other work on the project, and
+   didn't get it to actually _work_ for quite some time.)
+
+   At the time, programs were normally built against uClibc by using a
+   wrapper around gcc that rewrote its command line arguments to link
+   against a different C library. Of course I [38]took the wrapper apart
+   to [39]see how it worked and [40]how to make gcc link against uClibc
+   without it. What I wanted was a compiler that naturally linked against
+   uClibc, not an existing glibc compiler repurposed to do so.
+
+   Based on what the wrapper was doing and a lot of tweaking and questions
+   on the mailing list (which Erik graciously answered), [41]I got it
+   working around the middle of 2003.
+
+User Mode Linux
+
+   The Linux From Scratch build assumed you had root access, in order to
+   mknod devices, chroot into the temporary system (chapter 5) directory
+   to build the final system (the chapter 6 packages), and to loopback
+   mount files to create system images.
+
+   Asking people to download random code and run it as root seemed kind of
+   impolite at best, and actively dangerous at worst. (When buildroot
+   first came out I ran "make uninstall" in it. The resulting host/target
+   confusion it suffered deleted things like gzip off my host. Back then I
+   was still using a Red Hat system which meant "pam", and when the
+   security theatre modules suffered an auto-immune response to my
+   attempts to patch the system back together with busybox, I had to
+   reinstall the OS in order to be able to launch X11 again.)
+
+   Since the end result of my system builds was just a file (a tarball or
+   a filesystem image), there was no real excuse for requiring root
+   access. The packages built as a normal user already, in theory that was
+   the hard part.
+
+   My solution was User Mode Linux. (Of course I wrote a quick [42]User
+   Mode Linux HOWTO containing everything I needed to know to do what I
+   was doing with it.)
+
+   User Mode Linux was an early virtual machine, which could give me
+   simulated root access (enough for my needs), but without extensive
+   setup thanks to the "hostfs" (a bit like qemu's virtfs), and without
+   requiring a new source package (I already had the Linux kernel sources,
+   this was just another way of building them).
+
+   I [43]first got UML working in a patched 2.6.9 kernel, and later
+   integrated it into the build when I got [44]unpatched 2.6.11 to build a
+   usable User Mode Linux image (although I had to [45]patch it a bit
+   myself later). I could then use that to chroot (via UML's "hostfs") and
+   loopback mount as a normal user, and then mknod within that loopback
+   mount, and run the chapter 5 environment within UML to build chapter 6.
+   Of course I wrote a quick [46]User Mode Linux HOWTO.
+
+   Using UML was optional, and the scripts autodetected if you were
+   running as root and would chroot directly instead of firing up what
+   amounted to an emulator, but running as root was not recommended.
+
+Why 2006 was a lost year
+
+The rise of buildroot
+
+   Shortly after I figured out how the uClibc wrapper (and gcc in general)
+   worked under the covers, the uClibc developers abandoned the wrapper in
+   favor of a new project called "buildroot".
+
+   The buildroot project was the response to fresh gcc bloat: around gcc
+   3.0 a new shared library called libgcc_s.so showed up, more or less a
+   dynamic version of the old libgcc.a. It contained various gcc internal
+   functions (such as 64 bit division on 32 bit platforms), which most
+   nontrivial programs wound up linking against. Unfortunately, shared
+   libraries can link against other shared libraries, and libgcc_s.so
+   linked against libc.so.6. So any program that linked against this
+   library snuck in a reference to glibc and wouldn't load without it,
+   even if it was otherwise linked against uClibc.
+
+   This meant the gcc wrapper was no longer sufficient, but since
+   libgcc_s.so was part of gcc, the only way to get a new version of
+   libgcc_s.so that linked against uClibc (instead of glibc) was to
+   download the gcc source code and build gcc itself against uClibc.
+
+   And that's exactly what buildroot did: built uClibc and a new compiler
+   out of the four source packages uClibc, binutils, gcc, and the linux
+   kernel for the kernel headers, hooking the whole mess together with
+   several ./configure options and source patches. Then it used the new
+   uClibc compiler to build Erik's other project, BusyBox, as a test case
+   that it was all working correctly.
+
+   In order to test both static and dynamic linking, buildroot created a
+   new uClibc root filesystem directory containing the uClibc shared
+   libraries, and a second instance of busybox dynamically linked against
+   those, which you could chroot and test out the uClibc version of
+   busybox. Since he already had the kernel source lying around, Eric even
+   taught it to build a User Mode Linux binary that could do the chroot
+   for you.
+
+Problems with buildroot
+
+   Of course I took buildroot apart to see how it worked, [47]wrote the
+   first buildroot HOWTO (because I tend to document everything I didn't
+   initially understand), made a number of [48]design suggestions, and
+   even [49]offered patches.
+
+   But I didn't really like the design of buildroot (nested makefiles
+   aren't the most straightforward approach to anything, its need to run
+   as root meant that early versions [50]ate my laptop ([51]twice,
+   contributing strongly to my conviction that builds should never run as
+   root), and it [52]couldn't rebuild itself under itself, and in general
+   was a [53]constantly broken moving target with no stable releases.
+
+   So I continued to work on my existing build project instead (which was
+   several years old by that point). Buildroot was an instructive
+   counterexample on many fronts: my project should not require root
+   access to build, shell scripts were more readable than nested
+   makefiles, releases were important, and it's vital to have boundaries
+   so you can clearly state what your project DOESN'T do.
+
+   I also checked in with buildroot from time to time to see what it was
+   doing (several patches to make various packages work with uClibc were
+   only ever documented by being checked into the buildroot repository,
+   and then the uClibc developers acted shocked I hadn't heard of them).
+
+   The biggest problem with buildroot was the impact it had on BusyBox and
+   uClibc development. Although buildroot started out as just a test
+   harness for uClibc and busybox, it quickly grew out of hand. Since the
+   easy way to regression test that a package worked against uClibc was to
+   add it to the test suite and build it as part of the test root
+   filesystem, lots of packages got added fairly quickly. People packaged
+   up and shipped the root filesystem created by buildroot when they
+   wanted a simple uClibc+busybox root filesystem, and then complained
+   when it didn't build some package they needed.
+
+   Within a few months, buildroot had exploded from a simple test harness
+   into a half-assed Linux distribution. Erik [54]tried to avoid this
+   (he'd previously built a [55]uClibc-native version of Debian Woody and
+   knew perfectly well what a real distro looked like), but buildroot
+   turned into a distro anyway because the project had no clear boundaries
+   that allowed him to say "no, this new feature is not within the
+   project's scope". He never drew a line in the sand that allowed him to
+   say "no", and thus over time steady feature creep buried him.
+
+   As a distro, buildroot was a deeply flawed. It had no package
+   management tools (such as rpm or deb or portage), nor did it have the
+   tens of thousands of packages build descriptions in the large and
+   carefully maintained repository of Red Hat, Ubuntu, Gentoo, or even
+   Slackware. For the project's first five years, buildroot never even had
+   a release, instead insisting users grab a random source control
+   snapshot du jour and hope for the best. Despite this, buildroot was the
+   focus of the development efforts of the BusyBox and uClibc communities,
+   and became their standard repository of knowledge about how to build
+   packages for all sorts of embedded environments.
+
+Buildroot derails uClibc and BusyBox development
+
+   With no clear dividing line between "how to build" and "what to build",
+   buildroot's scope and complexity exploded, and despite its limitations
+   as a distro what buildroot could do was suck away an endless amount of
+   development time from the BusyBox and uClibc developers. By 2005, both
+   uClibc and BusyBox development were clearly suffering.
+
+   Erik started by abandoning busybox after the 1.0 release, both because
+   1.0 seemed like a good stopping point (since it was "done" now), and
+   because he just didn't have time for it anymore. Other developers
+   (including myself) still did new development, found bugs and fixed
+   them, but there was no prospect of a new release.
+
+   Over on the uClibc side of things, Erik held on longer but the release
+   frequency slowed, from seven releases in 2003 (0.9.17 through 0.9.24)
+   to two in 2004, one in 2005, and none at all in the whole year 2006.
+
+   The uClibc 0.9.26 release (in January 2004) was the point at which Erik
+   stopped maintaining a supported application list, because most things
+   just worked now. That was the point at which uClibc became generally
+   useful, and could have been the basis for a 1.0 release similar to
+   BusyBox's. But due to buildroot diverting the development community, a
+   uClibc 1.0 release became a more and more distant possibility as
+   development lost focus: by the end of the decade, uClibc still had no
+   clear plan to produce a 1.0 release.
+
+BusyBox takes over my life
+
+   By 2005, Firmware Linux built a system that could rebuild itself, but
+   it still used a lot of gnu packages. I continued to replace more of
+   these executables with busybox, making BusyBox supply more of my
+   development environment and submitting numerous patches, everything
+   from minor bugfixes and complete ground-up applet rewrites. I also
+   pestered other people (such as the awk maintainer) into repeatedly
+   fixing their parts of the code when some package build failed and I
+   narrowed it down to a reproducible test case.At this point, Firmware
+   Linux wasn't held back by my build infrastructure (which was just a
+   pile of shell scripts anyway), but by deficiencies in BusyBox. I became
+   one of the most active BusyBox developers, using Firmware Linux as a
+   test environment for my busybox changes, and gradually began spending
+   more time working on BusyBox than the rest of Firmware Linux combined.
+
+   After the BusyBox 1.0 release gave Erik an excuse to step back, I
+   continued to work intensely on the project, and the bugfixes I needed
+   (and that other developers supplied) kept accumulating. I eventually
+   collected enough together to make a bugfix-only release, which became
+   the official 1.01 when Erik approved it. And it turns out "he who cuts
+   releases is the maintainer". Erik officially handed over maintainership
+   a few months later, when I cut my first new development release
+   (busybox 1.1.0).
+
+Tinycc, QEMU, and TimeSys.
+
+   I was introduced to Fabrice Bellard's "tinycc" by the October 27, 2004
+   slashdot story about [56]tccboot, an ISO image that booted Linux
+   _from_source_code_, booting into a compiler that compiled the linux
+   kernel and a simple userspace in a matter of seconds, and then ran the
+   resulting kernel.
+
+   Afterwards I kept track of tinycc with an eye towards replacing gcc and
+   binutils, thus producing a gnu-free development environment. (And then
+   I'd ask Richard Stallman if a system without a line of gnu code
+   anywhere in it was still Gnu/Linux/Dammit and mock him when he said
+   yes.)
+
+   Tinycc was a small and simple C compiler, fitting a complete combined
+   compiler and linker into a single 100k executable. It compiled code so
+   quickly that its most common use was turning C into a scripting
+   language: by starting C source files with "#!/usr/bin/tinycc -run" and
+   setting the executable bit on the source file, tcc could compile and
+   launch it in a small fraction of a second.
+
+   When I encountered it, tinycc couldn't build an unmodified Linux kernel
+   (the tccboot kernel was a hacked up subset of Linux 2.4), but was only
+   the third compiler ever (after gcc and Intel's x86-only closed source
+   icc) that had ever built a working Linux kernel, and the tinycc
+   developers were working towards full C99 compliance and the ability to
+   build Linux 2.6.
+
+   Alas Tinycc got derailed the same way uClibc did: it spawned a side
+   project that sucked its developers away. In this case, the side project
+   was the emulator QEMU. Inspired by the speed of tinycc, Fabrice came up
+   with another compiler that took pages of foriegn binary code as its
+   input, [57]translating them on the fly a page at a time into equivalent
+   binary code the current machine could run. As he explained in the
+   [58]QEMU 0.1 announcement, the purpose was to allow Wine to run on
+   non-x86 machines, but QEMU quickly turned into a very fast general
+   purpose emulator.
+
+   Towards the end of 2005 I [59]started playing with QEMU, as a potential
+   replacement for User Mode Linux. When I [60]got it to work I decided
+   that Firmware Linux should support every target QEMU did, meaning I had
+   to learn cross compiling.
+
+   When I mentioned this on the #uClibc channel on Freenode, one of the
+   regulars asked if I wanted to come work at his company, TimeSys.
+
+My time at TimeSys
+
+   TimeSys did embedded development, via extensive cross compiling. They
+   had a couple dozen extremely talented engineers and masses of
+   accumulated expertise. It was such an interesting job and a great group
+   of guys I was willing to move to Pittsburgh (with my fiancee). I
+   started there January 15, 2006.
+
+   At TimeSys I worked on BusyBox (having become the project's official
+   maintainer with the 1.1.0 release). I also poked at uClibc a bit and
+   [61]encouraged its [62]development however [63]I could. (There was
+   another cake for the next release, that one made and delivered by
+   Howard Tayler of Schlock Mercenary. I asked him on the theory that if
+   he's truly mercenary, and lives in the same town as Erik, I just have
+   to pay him enough. I note his price has probably gone up since then.)
+
+   But the reason I took the job was to learn stuff I didn't already know.
+   There were a bunch of guys doing cross compiling, and I learned
+   everything I could from them. What were the various hardware targets,
+   and what was each good for? How do you make a cross compiler, and how
+   do you use it? I spent the whole of 2006 learning stuff from a bunch of
+   great guys. (I've never worked with a better team of engineers than
+   TimeSys had in mid-2006.)
+
+   Unfortunately, it couldn't last. Shortly before I arrived at TimeSys
+   they completed a cross compiling build system (based on "TSRPM", a
+   giant Rube Goldberg set of Perl wrappers and LD_PRELOAD library
+   intercepts that cross compiled RPM source packages), and used it to
+   cross compile the whole of Fedora Core 2 to several different hardware
+   platforms. This was a popular product that sold well, and the CEO of
+   the company decided that engineering had completed its task and the
+   company's emphasis would now shift to marketing. This decision
+   destroyed the engineering department.
+
+   Engineering's task was NOT done. New Fedora releases came out every 6
+   months, and Red Hat only supported 3 releases back (18 months). The
+   TSRPM build system was extremely brittle and only ran on a specific set
+   of carefully crafted servers in our build room: machines running 32-bit
+   Red Hat 9 (already obsolete even then). Timesys was selling other
+   companies access to these machines ("TimeSys LinuxLink"), so their
+   engineers could log into them through the network and run their builds
+   on them. This didn't scale.
+
+   Nevertheless, the CEO froze the engineering budget transferred the
+   resources to sales and marketing. Laurie, the head of marketing, took
+   this as her cue to try to take over the company, diverting engineers to
+   report to her (starting with the webmaster, who quit, and then the
+   system administrator, who quit...)
+
+   We discovered an interesting Corrolary to Brooks' Law (adding more
+   manpower to a late project makes it later, because your existing
+   productive people get distracted training the new ones). The corollary
+   is that shrinking teams get paralyzed by knowledge transfers: everybody
+   spends all their time trying to learn what the departing engineers
+   know, as you try to preserve a minimal level of necessary expertise
+   within the team.
+
+   Through heroic effort the understaffed engineers managed to rebase
+   LinuxLink to Fedora Core 5 just as Fedora Core 2 was end-of-lifed by
+   Red Hat (since everything was cross compiled, this was an enormous
+   undertaking requiring almost as much work as porting Fedora Core 2 had
+   in the first place). And this burned them all out. A few people had
+   quit during this: the ones transferred to report to Marketing, and a
+   few instances of natural attrition as their friends launched start-ups
+   they wanted in on. But those people weren't replaced. The engineers
+   realized that senior management did not value them, and that they'd
+   never get the resources to turn their prototype build farm into a real
+   sustainable production system, not when those dollars could go to
+   cold-call salesman selling shares in the prototype.
+
+   Timesys had been expanding engineering when I came onboard, but a few
+   months later it had a reorg where the boss who'd hired me (Manas
+   Saksena) was "promoted into a closet" with nobody reporting to him
+   anymore. He quit and went to work at Red Hat, where he launched the
+   Fedora for Arm project (thus eliminating a significant part of TimeSys'
+   customer base for their ported Fedora versions). His successor (and the
+   last new hire before the freeze, when Manas was attempting to expand
+   engineering to keep up with the success of the LinuxLink subscriptions)
+   was David Mandala. David struggled mightily to keep the department
+   together and shield us from the insanity of the CEO and marketing head,
+   but he eventually confronted the CEO with a "do this or the company is
+   doomed" presentation that the CEO didn't even listen to the first page
+   of. David resigned and went to work for Ubuntu, where he became the
+   head of Ubuntu Mobile and Embedded (and later Ubuntu for Arm).
+
+   David's resignation was like a bomb going off in engineering, and
+   everybody started sending out their resumes. Perhaps a fifth of
+   engineering had already left (and not been replaced), but now the
+   floodgates opened and the team of two dozen engineers I'd been hired
+   into, with a sattelite office in california and telecommuters in New
+   England and Germany, rapidly collapsed down to a dozen, then a
+   half-dozen engineers.
+
+   We stopped doing knowledge transfers, and began speculating about a
+   replacement build system given the now absolute necessity of throwing
+   the old one out, since we could no longer reproduce it, let alone
+   maintain it.
+
+The design of Aboriginal LInux
+
+   I returned to my Firmware Linux
+
+UNFINISHED AFTER THIS POINT.
+--------
+
+Buildroot traffic
+[64]slowly
+[65]strangled uClibc development discussion on the uClibc list until I gave up
+and [66]created
+a new list and politely kicked the buildroot traffic over there.
+
+
+
+
+Cake
+
+Me suggesting new buildroot list:
+  http://lists.uclibc.org/pipermail/uclibc/2003-November/028342.html
+
+  Instead buildroot set off to reinvent the
+wheel, maintaining their repository in
+
+  Debian's repository contained over 45,000
+packages
+
+BusyBox
+
+
+Mention of FWL relaunch in 2004
+  http://landley.livejournal.com/766.html
+
+----------------------------
+
+- tcc spawns qemu
+- Busybox maintainership, timesys, relaunch to current version.
+
+
+Busybox maintainership
+
+     When the Firmware Linux project started, busybox applets like sed
+     and sort weren't powerful enough to handle the "./configure; make;
+     make install" of packages like binutils or gcc. Busybox was usable
+     in an embedded router or rescue floppy, but trying to get real work
+     done with it revealed numerous bugs and limitations. (It hung, it
+     segfaulted, produced the wrong output, refused to run due to
+     unrecognized command line options... You name it.)
+
+     So I spent about 3 years improving Busybox (and pestering other
+     people into improving their bits), and along the way accidentally
+     become the BusyBox maintainer (at least until the project's
+     crazy-uncle founder showed up and [67]drove me away again). The
+     result is that in Firmware Linux, Busybox now functions as an
+     effective replacement for bzip2, coreutils, diffutils, e2fsprogs,
+     file, findutils, gawk, grep, inetutils, less, modutils, net-tools,
+     patch, procps, sed, shadow, sysklogd, sysvinit, tar, util-linux, and
+     vim. I was in the process of writing a new shell to replace bash
+     with when I left.
+
+     Firmware Linux stalled while I was BusyBox maintainer (2005-2006)
+     due to lack of time, and since that ended most of my spare
+     programming time has gone into launching toybox. But one of the main
+     goals of toybox is to replace BusyBox in Firmware Linux, so as
+     toybox matures it'll naturally lead to more of my time spent working
+     on FWL.
+
+     The server behind this website does not currently run on Firmware
+     Linux. Making it do so is a TODO item. After that, I'd like to get
+     it to the point where I can use it on my laptop. :)
+
+     A snapshot of the old website is [68]available here.
+
+     I [69]started playing around with QEMU in november 2005, about the
+     same time I started keeping a more detailed [70]technical blog on my
+     own website, and shortly before I [71]went to work for TimeSys.
+     __________________________________________________________________
+
+   Copyright 2002, 2011 Rob Landley <rob@landley.net>
+
+References
+
+   1. http://landley.net/aboriginal/about.html
+   2. http://landley.net/aboriginal/downloads/aboriginal-1.4.4.tar.gz
+   3. http://landley.net/aboriginal/bin
+   4. https://github.com/landley/aboriginal
+   5. https://github.com/landley/aboriginal/commits/master.atom
+   6. https://github.com/landley/aboriginal/archive/master.tar.gz
+   7. http://lists.landley.net/listinfo.cgi/aboriginal-landley.net
+   8. http://landley.net/aboriginal/news.html
+   9. http://landley.net/aboriginal/about.html
+  10. http://landley.net/aboriginal/README
+  11. http://landley.net/aboriginal/build-stages.html
+  12. http://landley.net/aboriginal/downloads/binaries
+  13. http://landley.net/aboriginal/screenshots
+  14. http://landley.net/aboriginal/FAQ.html
+  15. https://speakerdeck.com/landley/developing-for-non-x86-targets-using-qemu
+  16. http://landley.net/aboriginal/downloads/presentation.pdf
+  17. http://landley.net/aboriginal/presentation.html
+  18. http://landley.net/aboriginal/downloads
+  19. http://landley.net/aboriginal/downloads/binaries
+  20. http://landley.net/aboriginal/downloads/old/binaries
+  21. http://lists.landley.net/listinfo.cgi/aboriginal-landley.net
+  22. http://landley.net/notes.html
+  23. https://github.com/landley/aboriginal
+  24. https://github.com/landley/aboriginal/archive/master.tar.gz
+  25. https://github.com/landley/aboriginal/commits/master.atom
+  26. https://github.com/landley/aboriginal/tags.atom
+  27. http://landley.net/aboriginal/control-images
+  28. http://tldp.org/HOWTO/Bootdisk-HOWTO/index.html
+  29. http://www.toms.net/rb/
+  30. http://dvpn.sf.net/
+  31. http://landley.net/aboriginal/old
+  32. http://landley.livejournal.com/766.html
+  33. http://uclibc.org/lists/uclibc/2002-September/004380.html
+  34. http://archive.linuxfromscratch.org/lfs-museum/5.0/LFS-BOOK-5.0-HTML/chapter06/sed.html
+  35. http://archive.linuxfromscratch.org/lfs-museum/5.0/LFS-BOOK-5.0-HTML/chapter06/gzip.html
+  36. http://lkml.indiana.edu/hypermail/linux/kernel/0510.3/1732.html
+  37. http://lists.busybox.net/pipermail/busybox/2005-December/051458.html
+  38. http://www.uclibc.org/lists/uclibc/2003-August/006795.html
+  39. http://lists.uclibc.org/pipermail/uclibc/2003-September/027714.html
+  40. http://www.uclibc.org/lists/uclibc/2003-September/006875.html
+  41. http://lists.uclibc.org/pipermail/uclibc/2003-August/027643.html
+  42. http://landley.net/writing/docs/UML.html
+  43. http://landley.livejournal.com/10201.html
+  44. http://landley.livejournal.com/2005/01/21/
+  45. http://landley.livejournal.com/12578.html
+  46. http://landley.net/writing/docs/UML.html
+  47. http://www.uclibc.org/lists/uclibc/2003-August/006674.html
+  48. http://lists.uclibc.org/pipermail/uclibc/2003-August/027542.html
+  49. http://lists.uclibc.org/pipermail/uclibc/2003-August/027559.html
+  50. http://lists.uclibc.org/pipermail/uclibc/2003-August/027558.html
+  51. http://lists.uclibc.org/pipermail/uclibc/2003-November/028413.html
+  52. http://lists.uclibc.org/pipermail/uclibc/2003-November/028389.html
+  53. http://lists.uclibc.org/pipermail/uclibc/2003-December/028610.html
+  54. http://lists.uclibc.org/pipermail/uclibc/2003-August/027567.html
+  55. http://lists.uclibc.org/pipermail/uclibc/2003-November/028364.html
+  56. http://bellard.org/tcc/tccboot.html
+  57. http://www.usenix.org/publications/library/proceedings/usenix05/tech/freenix/bellard.html
+  58. http://www.winehq.org/pipermail/wine-devel/2003-March/015577.html
+  59. http://landley.net/notes-2005.html#27-10-2005
+  60. http://landley.livejournal.com/22566.html
+  61. http://landley.net/pictures/uclibc-cake-2005-1.jpg
+  62. http://landley.net/pictures/uclibc-cake-2005-2.jpg
+  63. http://lists.busybox.net/pipermail/uclibc/2006-July/016032.html
+  64. http://lists.uclibc.org/pipermail/uclibc/2003-November/028342.html
+  65. http://lists.uclibc.org/pipermail/uclibc/2005-October/033720.html
+  66. http://lists.uclibc.org/pipermail/uclibc/2006-July/036836.html
+  67. http://lwn.net/Articles/202106/
+  68. http://landley.net/aboriginal/old
+  69. http://landley.livejournal.com/22566.html
+  70. http://landley.net/notes-2005.html
+  71. http://landley.livejournal.com/24021.html

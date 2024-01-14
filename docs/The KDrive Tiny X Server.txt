@@ -1,0 +1,264 @@
+                            The KDrive Tiny X Server
+
+   This page is obsolete; the howto information contained herein does not
+   apply to recent X.Org releases. It may still be of interest if you want
+   to understand what KDrive is about.
+
+   KDrive (Tiny X, TinyX) is an X server written by Keith Packard that was
+   designed for low memory environments. On Linux/x86, a KDrive server
+   with RENDER support but without support for scalable fonts compiles
+   into less than 700 KB of text. KDrive tends to avoid large memory
+   allocations at runtime, and tries to perform operations "on the fly"
+   whenever possible (but this is also true of recent versions of the
+   stock XFree86 server).
+
+   Unlike the usual XFree86 server, a KDrive server is completely
+   self-contained: it does not require any configuration files, and will
+   even function if no on-disk fonts are available. All configuration is
+   done at compile time and through command-line flags.
+
+   At the time of writing, KDrive is for Linux only, although it could
+   probably be ported to other Unix-like systems with little effort.
+
+   Disclaimer: This text was written by an incompetent amateur (J.Ch.),
+   and does not carry the imprimatur of Keith Packard. I am not intimately
+   familiar with all of the KDrive code, and this document is probably
+   wildly inaccurate. I am sole responsible for any errors or omissions in
+   this document.
+
+   The information contained herein is offered in good faith, but with no
+   warranty of any kind. No kidding.
+
+The Xfbdev KDrive server
+
+   The default KDrive server, Xfbdev, is designed for a Linux installation
+   with a working /dev/fb and any common PC mouse on /dev/mouse. It
+   includes the following drivers:
+     * Linux OS support;
+     * generic Linux keyboard;
+     * generic mouse;
+     * Linux fbdev display (unaccelerated).
+
+   Xfbdev includes support for BDF and PCF bitmap fonts only. In addition,
+   it hardwires a number of standard fonts, notably cursor and fixed,
+   which will therefore be available even when there are no on-disk fonts.
+   By default, it does not contain support for local scalable fonts in any
+   format.
+
+   Xfbdev also includes support for a number of server extensions,
+   including the ubiquitous SHAPE and the soon-to-be ubiquitous RENDER.
+
+   In order to compile Xfbdev, you need a clean XFree86 tree; I recommend
+   version 4.0.2 or later. Put the following lines in your host.def file:
+
+   #define BuildServersOnly YES
+   #define KDriveXServer YES
+   #define TinyXServer YES
+   #define XfbdevServer YES
+
+   Now make World as usual; if the compilation proceeds without errors,
+   you should have an executable xc/programs/Xserver/Xfbdev.
+
+   You may now make install or make install.man.
+
+   For information on running the Xfbdev server, please see the
+   [1]Xfbdev(1), [2]Xkdrive(1) and [3]Xserver(1) manual pages.
+
+The Xvesa KDrive server
+
+   The Xvesa server is for x86 hardware only, and includes an
+   unaccelerated display driver that will support any card with a VESA,
+   VGA or even EGA BIOS (VESA 1.1 is the earliest supported version;
+   VESA 2.0 will give better performance). Except for the display driver,
+   the Xvesa server is identical to Xfbdev.
+
+   Unless you're using an original Hercules Graphics chipset or
+   compatible, your hardware is most probably supported. In addition, the
+   video driver in Xvesa will automagically do any initialisation of your
+   chipset that your BIOS knows about but that might be undocumented, and
+   thus not present in the stock XFree86 drivers. Xvesa is therefore an
+   excellent choice for laptops, and until recently I was using Xvesa as
+   the primary X server on mine.
+
+   God protect us from copper money and CGA cards.
+
+   In order to build the Xvesa server, include the following lines in your
+   host.def file:
+
+   #define BuildServersOnly YES
+   #define KDriveXServer YES
+   #define TinyXServer YES
+   #define XvesaServer YES
+
+   For information on running the Xvesa server, please see the
+   [4]Xvesa(1), [5]Xkdrive(1) and [6]Xserver(1) manual pages.
+
+Other standard KDrive servers
+
+   The KDrive makefiles include building recipes for a number of other
+   servers, some of which use accelerated display drivers. These servers
+   are not currently documented.
+
+   Any volunteers?
+
+   Fore more information, please see the [7]Xkdrive(1) manual page and the
+   file [8]xc/config/cf/kdrive.cf.
+
+Custom KDrive servers
+
+   A KDrive server does not include multiple drivers. In order to run
+   KDrive on your hardware, you need to compile a KDrive server with the
+   proper os, keyboard, mouse and display drivers. In addition, you will
+   need to select the set of font renderers and server extensions that you
+   want to compile.
+
+  OS support
+
+   At the time of writing, the publicly-available KDrive server only
+   supports Linux. As most of KDrive is OS-agnostic, porting to a
+   different Unix-like system should not be difficult.
+
+   Some bits of the source hint at support for certain proprietary
+   systems, but it seems incomplete.
+
+   If you port KDrive to a different OS, I'd be glad to hear from you (and
+   I am sure so would Keith). BSD should be easy. Minix-VMD might be more
+   challenging, as it lacks a standard socket library; but then, earlier
+   versions of XFree86 used to run on Minix-VMD, and KDrive uses the same
+   XTrans layer. Stock 32-bit Minix doesn't have a poll/select equivalent.
+
+   I want to see KDrive on stock Minix. Please.
+
+  Keyboard support
+
+   At the time of writing, the KDrive server only has support for a
+   generic Linux keyboard; the keyboard mapping is copied from the Linux
+   kernel tables at startup. As X11 has richer keyboard information than
+   Linux, and furthermore KDrive's mapping tables are incomplete, the
+   results are not always perfect; I have found it necessary to fix my
+   keyboard using xmodmap.
+
+  Mouse support
+
+   Since XFree86 4.2.0, KDrive automatically detects the type of mouse on
+   /dev/mouse, which should be a link to the correct mouse device. Most
+   common types of mice (including, of course, PS/2, Microsoft and
+   Logitech serial, and Microsoft "bus") are supported by the mouse
+   driver; if yours is not, your best bet is probably to use gmp in
+   repeater mode.
+
+  Display drivers
+
+   KDrive includes a fairly large selection of display drivers. Two are
+   fully generic but unaccelerated: fbdev (included in the Xfbdev server)
+   and vesa (included in the Xvesa server). The other drivers are
+   partially accelerated, and support specific video hardware.
+
+   The generic drivers are documented in the [9]Xfbdev(1) and [10]Xvesa(1)
+   manual pages. The accelerated drivers are currently undocumented; the
+   only source of information about them is the source. Please see the
+   directories under hw/kdrive/ and enjoy your read.
+
+  Font renderers
+
+   KDrive should be able to support all the font renderers supported by
+   XFree86. You may add any of the following to your host.def file:
+
+   #define BuildSpeedo YES
+   #define BuildType1 YES
+   #define BuildCID YES
+   #define BuildFreeType YES
+   #define FontServerAccess YES
+
+   In XFree86 4.3.0 and later, the FreeType backend includes support for
+   all common scalable font formats (including Type 1). For most uses, it
+   is the only one that you will need.
+
+   Some of these renderers are rather large; you may want to think twice
+   before including them in your "tiny" server.
+
+   As noted above, KDrive includes a number of hardwired, compiled-in
+   fonts. There is no good reason to disable support for these "built-in"
+   fonts; however, if you insist, you may use
+
+   #define BuildBuiltinFonts NO
+
+  Server extensions
+
+   KDrive might or might not be able to support any server extension
+   supported by XFree86 that is not directly related to hardware. Use the
+   usual incantations in your host.def file, for example,
+
+   #define BuildDBE YES
+
+   There is no good reason to disable the RENDER extension.
+
+  Additional defines
+
+   Any additional options that you want to pass to the C compiler should
+   be put in KdriveServerExtraDefines:
+
+   #define KdriveServerExtraDefines -DPIXPRIV
+
+Building against uClibc
+
+   At least the Xvesa server appears to build and run when linked against
+   [11]uClibc; note, however, that I haven't done any extensive testing.
+
+   You will first need to add two trivial functions to uClibc; this is
+   simply done by relinking uClibc with [12]uclibc-missing-math.c. Then,
+   assuming that your uclibc toolchain is invoked by i386-uclibc-cc, add
+   the following to your host.def file:
+
+   #define CcCmd i386-uclibc-cc
+
+   If you haven't recompiled libz against uClibc, you will also need to
+   add the following line to your host.def:
+
+   #define HasZlib NO
+
+   This will have the side-effect of disabling all support for compressed
+   fonts.
+
+   Is the uclibc-missing-math.c hack still necessary with recent uClibc
+   releases?
+
+Download
+
+   Binary KDrive servers for GNU/Linux/x86 might be available from [13]my
+   KDrive download directory.
+
+   These binaries are offered in good faith, but really with no guarantee.
+   Not even of any kind.
+
+References
+
+   [14]Handhelds Org and Jim Gettys' page about [15]cross-compiling
+   KDrive.
+
+   [16]Keith Packard, the primary author of KDrive.
+
+   [17]Back to my software page.
+
+   [18]Juliusz Chroboczek, <jch@pps.jussieu.fr>
+
+References
+
+   1. http://www.xfree86.org/current/Xfbdev.1.html
+   2. http://www.xfree86.org/current/Xkdrive.1.html
+   3. http://www.xfree86.org/current/Xserver.1.html
+   4. http://www.xfree86.org/current/Xvesa.1.html
+   5. http://www.xfree86.org/current/Xkdrive.1.html
+   6. http://www.xfree86.org/current/Xserver.1.html
+   7. http://www.xfree86.org/current/Xkdrive.1.html
+   8. http://cvsweb.xfree86.org/cvsweb/xc/config/cf/kdrive.cf
+   9. http://www.xfree86.org/current/Xfbdev.1.html
+  10. http://www.xfree86.org/current/Xvesa.1.html
+  11. http://www.uclibc.org/
+  12. https://www.pps.jussieu.fr/~jch/software/uclibc-missing-math.c
+  13. https://www.pps.jussieu.fr/~jch/software/kdrive/
+  14. http://www.handhelds.org/
+  15. http://www.handhelds.org/minihowto/building-x.html
+  16. http://www.keithp.com/
+  17. https://www.irif.univ-paris-diderot.fr/~jch/software/
+  18. https://www.irif.univ-paris-diderot.fr/~jch/

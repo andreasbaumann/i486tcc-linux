@@ -1,0 +1,535 @@
+   #[1]help [2]search [3]contents [4]Tiny Core Linux - RSS [5]prev [6]next
+   [7]index
+
+    [8]Welcome Welcome | [9]FAQ FAQ | [10]Downloads Downloads | [11]Wiki
+                                    Wiki
+
+[12]Tiny Core Linux
+
+   * Tiny Core Linux Forum
+   Welcome, Guest. Please [13]login or [14]register.
+   Did you miss your [15]activation email?
+   __________ __________ [Forever] Login
+   Login with username, password and session length
+   ____________________  Search
+
+News:
+
+   [16]Language translations now possible!
+     * [17]Home
+     * [18]Help
+     * [19]Login
+     * [20]Register
+
+     * [21]Tiny Core Linux »
+     * [22]General TC »
+     * [23]General TC Talk »
+     * [24]Announcing tinyx - our X server fork
+
+   [25]« previous [26]next »
+     * [27]Print
+
+   Pages: [1] [28]2 [29]3 [30]4   [31]Go Down
+
+Author Topic: Announcing tinyx - our X server fork  (Read 27724 times)
+
+Offline [32]curaga
+
+     * Administrator
+     * Hero Member
+     * * * * * *
+     *
+     * Posts: 10922
+     *
+
+[33]Announcing tinyx - our X server fork
+
+   « on: November 30, 2013, 06:13:57 AM »
+   Our current Xvesa and Xfbdev hail from the XFree86 4.8.0 era. Not easy
+   to build with a current environment, and so hard to fix bugs in. They
+   are also somewhat bigger than necessary.
+   So, as one of the last few users of Xvesa, we're announcing a fork of
+   xorg-server-1.2.0. It's been updated to build in a current environment,
+   had everything unnecessary stripped, and some custom tweaks for
+   user-friendliness and faster startup.
+   Compared to the existing ~700kb 32-bit binaries, these are ~500kb when
+   built with -Os, while at the same time supporting much more
+   functionality (15 extensions vs 8, DPMS among the most important).
+   Clone with "git clone [34]http://git.tinycorelinux.net/tinyx" to try it
+   out. Packages may be updated into the next (or next+1) release.
+   Or grab a release tarball from
+   [35]http://www.tinycorelinux.net/~curaga/tinyx-1.0rc1.tar.bz2 for an
+   easier build.
+   Test packages available at [36]http://tinycorelinux.net/~curaga/
+   « Last Edit: December 13, 2013, 06:35:43 AM by curaga »
+   Logged
+   The only barriers that can stop you are the ones you create yourself.
+     __________________________________________________________________
+
+Offline [37]gerald_clark
+
+     * TinyCore Moderator
+     * Hero Member
+     * * * * * *
+     *
+     * Posts: 4254
+     *
+
+[38]Re: Announcing tinyx - our X server fork
+
+   « Reply #1 on: November 30, 2013, 08:40:50 AM »
+   How about some instructions.
+   I loaded compiletc, autoconf, perl5, automake, libtool, and gettext.
+   I still can't get it to compile under Core 5.
+   Logged
+     __________________________________________________________________
+
+Offline [39]curaga
+
+     * Administrator
+     * Hero Member
+     * * * * * *
+     *
+     * Posts: 10922
+     *
+
+[40]Re: Announcing tinyx - our X server fork
+
+   « Reply #2 on: November 30, 2013, 10:10:01 AM »
+   Sure, I think you're missing the X headers - Xorg-7.7-dev should do.
+   libtool-dev is also needed to generate the configure script.
+   The autofoo are only needed for git builds, for (future) release
+   tarballs only compiletc + Xorg-7.7-dev are enough.
+   edit: Added libXfont-dev as Xorg-dev's dep.
+   « Last Edit: November 30, 2013, 10:11:41 AM by curaga »
+   Logged
+   The only barriers that can stop you are the ones you create yourself.
+     __________________________________________________________________
+
+Offline [41]Zendrael
+
+     * Sr. Member
+     * * * * *
+     *
+     * Posts: 360
+     *
+          + [42]Zendrael's home of projects
+
+[43]Re: Announcing tinyx - our X server fork
+
+   « Reply #3 on: December 01, 2013, 01:33:48 PM »
+   Very nice!
+   Will get some tcz on the repo soon? There are already some "benchmarks"
+   against the Xvesa? The tinyX will suport more resolutions? Support for
+   Xcompmanger?
+   Thanks!
+   Logged
+     __________________________________________________________________
+
+Offline [44]tinypoodle
+
+     * Hero Member
+     * * * * * *
+     *
+     * Posts: 3857
+     *
+
+[45]Re: Announcing tinyx - our X server fork
+
+   « Reply #4 on: December 01, 2013, 10:23:26 PM »
+   Interesting news :)
+   Logged
+   "Software gets slower faster than hardware gets faster." Niklaus Wirth
+   - A Plea for Lean Software (1995)
+     __________________________________________________________________
+
+Offline [46]curaga
+
+     * Administrator
+     * Hero Member
+     * * * * * *
+     *
+     * Posts: 10922
+     *
+
+[47]Re: Announcing tinyx - our X server fork
+
+   « Reply #5 on: December 02, 2013, 07:09:47 AM »
+   TCZ packages will get there in a week or two.
+   Quote
+
+     There are already some "benchmarks" against the Xvesa? The tinyX
+     will suport more resolutions? Support for Xcompmanger?
+
+   - benchmarks: the main goal for fbdev and vesa is to be small. They
+   have no render acceleration, for that, use Xorg.
+   - more resolutions: this is not possible, as fbdev uses the existing
+   resolution, and vesa gets the resolutions from your BIOS.
+   - Xcompmgr: no, composite support is not included. Please use Xorg for
+   this.
+   As mentioned in the README, a possible future "Xmodesetting" would be
+   able to use any resolution, as long as an open KMS kernel driver
+   existed in graphics-KERNEL.tcz. However, you can already get the best
+   resolution by loading graphics- and Xfbdev, so the new server is not a
+   high priority.
+   Logged
+   The only barriers that can stop you are the ones you create yourself.
+     __________________________________________________________________
+
+Offline [48]Misalf
+
+     * Hero Member
+     * * * * * *
+     *
+     * Posts: 1702
+     *
+
+[49]Re: Announcing tinyx - our X server fork
+
+   « Reply #6 on: December 02, 2013, 12:17:55 PM »
+   With current Xvesa, I can't move windows via mouse (in fluxbox) while
+   numlock is activated. Could this possibly be fixed with this version?
+   --
+   I tryed compiling both, git and tarball. Both fail to launch for me.
+   I did load the mentioned extensions for compiling.
+   Compiler flags as mentioned in wiki.
+   For the git version, I did first ran  autogen.sh .
+   Code: [50][Select]
+   $ ./configure --prefix=/usr/local
+   ...
+   $ make
+   ...
+   $ make DESTDIR=/tmp/tinyx install-stripCompiling finishes without
+   errors.
+   I did also try  make install  with  sudo  but I guess that doesn't make
+   a difference when 'installing' to /tmp ?
+   Then I have repacked the current Xvesa.tcz with  /usr/local/bin/Xvesa
+   replaced with that newly created one.
+   I tryed  chown root:staff (like default Xvesa), root:root  and
+   tc:staff  on Xvesa before packing. Always same result:
+   $ startx  gives error: "failed in waitforX"
+   $ Xvesa  gives error: "Server must be suid root"
+   Logged
+   Download a copy and keep it handy: [51]Core book ;)
+     __________________________________________________________________
+
+Offline [52]tinypoodle
+
+     * Hero Member
+     * * * * * *
+     *
+     * Posts: 3857
+     *
+
+[53]Re: Announcing tinyx - our X server fork
+
+   « Reply #7 on: December 02, 2013, 07:23:29 PM »
+   What happens when you try to run it as root?
+   Logged
+   "Software gets slower faster than hardware gets faster." Niklaus Wirth
+   - A Plea for Lean Software (1995)
+     __________________________________________________________________
+
+Offline [54]Misalf
+
+     * Hero Member
+     * * * * * *
+     *
+     * Posts: 1702
+     *
+
+[55]Re: Announcing tinyx - our X server fork
+
+   « Reply #8 on: December 02, 2013, 10:39:23 PM »
+   Then it complains about bad resolution and being unable to find fonts -
+   "fixed" in particular.
+   Same if I add  -screen 1280x1024
+   I will test on a clean install later.
+   Logged
+   Download a copy and keep it handy: [56]Core book ;)
+     __________________________________________________________________
+
+Offline [57]coreplayer2
+
+     * Hero Member
+     * * * * * *
+     * Posts: 3020
+     *
+
+[58]Re: Announcing tinyx - our X server fork
+
+   « Reply #9 on: December 03, 2013, 12:09:12 AM »
+   [59]Quote from: Misalf on December 02, 2013, 12:17:55 PM
+
+     With current Xvesa, I can't move windows via mouse (in fluxbox)
+     while numlock is activated. Could this possibly be fixed with this
+     version?
+
+   I can't remember off-hand how to resolve this issue but is not related
+   to Xvesa iirc,   strangely i've experienced this before once..   though
+   haven't had the issue for a while, then today while trying to duplicate
+   the NumLK/typing/move windows issue with the hope of finding the
+   resolution, I've gone and activated the feature accidentally.   So now
+   I have the issue where you can either type or you can move windows, but
+   not both. and i can't remember how I arrived here.  Though I believe
+   this is fluxbox related
+   Nice work on the Xvesa/Xfbdev,  after compiling I noticed that Xfbdev
+   is half the size of the version it replaces  :thumbup:
+   going to take them both for a spin here if I can regain control of my
+   keyboard  :p
+   « Last Edit: December 03, 2013, 12:16:13 AM by coreplayer2 »
+   Logged
+     __________________________________________________________________
+
+Offline [60]tinypoodle
+
+     * Hero Member
+     * * * * * *
+     *
+     * Posts: 3857
+     *
+
+[61]Re: Announcing tinyx - our X server fork
+
+   « Reply #10 on: December 03, 2013, 12:23:11 AM »
+   [62]Quote from: Misalf on December 02, 2013, 10:39:23 PM
+
+     Then it complains about bad resolution and being unable to find
+     fonts - "fixed" in particular.
+     Same if I add  -screen 1280x1024
+     I will test on a clean install later.
+
+   Try this:
+   Code: [63][Select]
+   sudo chmod u+rwxs,a+rx /path/to/Xvesa
+   Logged
+   "Software gets slower faster than hardware gets faster." Niklaus Wirth
+   - A Plea for Lean Software (1995)
+     __________________________________________________________________
+
+Offline [64]curaga
+
+     * Administrator
+     * Hero Member
+     * * * * * *
+     *
+     * Posts: 10922
+     *
+
+[65]Re: Announcing tinyx - our X server fork
+
+   « Reply #11 on: December 03, 2013, 06:44:11 AM »
+   Sorry about that, my fault in not posting better instructions.
+   The existing Xvesa had --prefix=/usr, and was later moved to
+   /usr/local. Per this, the bitmap fonts are in /usr. So the recommended
+   configure is:
+   ./configure --with-fontdir=/usr/lib/X11/fonts
+   This installs to /usr/local but also finds the existing fonts.
+   Logged
+   The only barriers that can stop you are the ones you create yourself.
+     __________________________________________________________________
+
+Offline [66]Misalf
+
+     * Hero Member
+     * * * * * *
+     *
+     * Posts: 1702
+     *
+
+[67]Re: Announcing tinyx - our X server fork
+
+   « Reply #12 on: December 03, 2013, 08:13:51 AM »
+   My first days with tinycore + fluxbox + Xvesa, I thought it would be
+   unstable until I discovered that I just have to re-deactivate the
+   numlock in order to move windows. I have qwertzy layout thus I use the
+   numpad a lot for inserting the  '/'  character (instead of SHIFT+7).
+   Under Xorg it works.
+   --
+   Thanks curaga, I'll try that.
+   Logged
+   Download a copy and keep it handy: [68]Core book ;)
+     __________________________________________________________________
+
+Offline [69]coreplayer2
+
+     * Hero Member
+     * * * * * *
+     * Posts: 3020
+     *
+
+[70]Re: Announcing tinyx - our X server fork
+
+   « Reply #13 on: December 03, 2013, 09:35:10 AM »
+   Quote
+
+     ./configure --with-fontdir=/usr/lib/X11/fonts
+
+   Thanks, Ok will also try this (since I appear to have the same issue
+   with the fonts)
+   @Misalf  I couldn't find which key combo I pressed to change the
+   NumLK/windows position state from having control to not having any
+   control, so I rebooted restoring the Fluxbox default configuration and
+   the numlk window feature is acting normally again in Xvesa.  good luck
+   Logged
+     __________________________________________________________________
+
+Offline [71]Misalf
+
+     * Hero Member
+     * * * * * *
+     *
+     * Posts: 1702
+     *
+
+[72]Re: Announcing tinyx - our X server fork
+
+   « Reply #14 on: December 03, 2013, 10:19:48 AM »
+   Code: [73][Select]
+   sudo chmod u+rwxs,a+rx /path/to/XvesaDid not help.
+   --
+   Code: [74][Select]
+   ./configure --with-fontdir=/usr/lib/X11/fontsNow I'm able to lauch
+   sudo Xvesa  (allone) but  startx still doesn't work.
+   So I edited  ~/.xsession  to start Xvesa with  sudo  and this now
+   results in a seemingly workin X desktop.
+   Is it OK or even required for Xvesa to be ran as root?
+   However, after exiting X and running  startx  again, fluxbox fails to
+   launch (my conky lives, though).
+   /tmp/wm_errors
+   Code: [75][Select]
+   Error: Couldn't connect to XServer:0.0(Numlock/window-move bug still
+   there with this Xvesa; but can't test with default fluxbox configs)
+   running  startx  for a 3rd time, I also have a wbar.
+   --
+   [Don't worry guys, i did not backup so I can go back any time][/code]
+   Logged
+   Download a copy and keep it handy: [76]Core book ;)
+     __________________________________________________________________
+
+     * [77]Print
+
+   Pages: [1] [78]2 [79]3 [80]4   [81]Go Up
+   [82]« previous [83]next »
+     * [84]Tiny Core Linux »
+     * [85]General TC »
+     * [86]General TC Talk »
+     * [87]Announcing tinyx - our X server fork
+
+
+     * [88]SMF 2.0.19 | [89]SMF © 2021, [90]Simple Machines
+     * [91]XHTML
+     * [92]RSS
+     * [93]WAP2
+
+References
+
+   Visible links:
+   1. http://forum.tinycorelinux.net/index.php?action=help
+   2. http://forum.tinycorelinux.net/index.php?action=search
+   3. http://forum.tinycorelinux.net/index.php
+   4. http://forum.tinycorelinux.net/index.php?type=rss;action=.xml
+   5. http://forum.tinycorelinux.net/index.php/topic,16299.0/prev_next,prev.html
+   6. http://forum.tinycorelinux.net/index.php/topic,16299.0/prev_next,next.html
+   7. http://forum.tinycorelinux.net/index.php/board,28.0.html
+   8. http://tinycorelinux.net/
+   9. http://tinycorelinux.net/faq.html
+  10. http://tinycorelinux.net/downloads.html
+  11. https://wiki.tinycorelinux.net/
+  12. http://forum.tinycorelinux.net/index.php
+  13. http://forum.tinycorelinux.net/index.php?action=login
+  14. http://forum.tinycorelinux.net/index.php?action=register
+  15. http://forum.tinycorelinux.net/index.php?action=activate
+  16. http://forum.tinycorelinux.net/index.php/topic,7169.html
+  17. http://forum.tinycorelinux.net/index.php
+  18. http://forum.tinycorelinux.net/index.php?action=help
+  19. http://forum.tinycorelinux.net/index.php?action=login
+  20. http://forum.tinycorelinux.net/index.php?action=register
+  21. http://forum.tinycorelinux.net/index.php
+  22. http://forum.tinycorelinux.net/index.php#c9
+  23. http://forum.tinycorelinux.net/index.php/board,28.0.html
+  24. http://forum.tinycorelinux.net/index.php/topic,16299.0.html
+  25. http://forum.tinycorelinux.net/index.php/topic,16299.0/prev_next,prev.html#new
+  26. http://forum.tinycorelinux.net/index.php/topic,16299.0/prev_next,next.html#new
+  27. http://forum.tinycorelinux.net/index.php?action=printpage;topic=16299.0
+  28. http://forum.tinycorelinux.net/index.php/topic,16299.15.html
+  29. http://forum.tinycorelinux.net/index.php/topic,16299.30.html
+  30. http://forum.tinycorelinux.net/index.php/topic,16299.45.html
+  31. http://forum.tinycorelinux.net/index.php?topic=16299.0#lastPost
+  32. http://forum.tinycorelinux.net/index.php?action=profile;u=5
+  33. http://forum.tinycorelinux.net/index.php/topic,16299.msg96699.html#msg96699
+  34. http://git.tinycorelinux.net/tinyx
+  35. http://www.tinycorelinux.net/~curaga/tinyx-1.0rc1.tar.bz2
+  36. http://tinycorelinux.net/~curaga/
+  37. http://forum.tinycorelinux.net/index.php?action=profile;u=531
+  38. http://forum.tinycorelinux.net/index.php/topic,16299.msg96700.html#msg96700
+  39. http://forum.tinycorelinux.net/index.php?action=profile;u=5
+  40. http://forum.tinycorelinux.net/index.php/topic,16299.msg96701.html#msg96701
+  41. http://forum.tinycorelinux.net/index.php?action=profile;u=1688
+  42. http://www.zendrael.com/
+  43. http://forum.tinycorelinux.net/index.php/topic,16299.msg96746.html#msg96746
+  44. http://forum.tinycorelinux.net/index.php?action=profile;u=1608
+  45. http://forum.tinycorelinux.net/index.php/topic,16299.msg96758.html#msg96758
+  46. http://forum.tinycorelinux.net/index.php?action=profile;u=5
+  47. http://forum.tinycorelinux.net/index.php/topic,16299.msg96770.html#msg96770
+  48. http://forum.tinycorelinux.net/index.php?action=profile;u=13949
+  49. http://forum.tinycorelinux.net/index.php/topic,16299.msg96780.html#msg96780
+  50. javascript:void(0);
+  51. http://tinycorelinux.net/book.html
+  52. http://forum.tinycorelinux.net/index.php?action=profile;u=1608
+  53. http://forum.tinycorelinux.net/index.php/topic,16299.msg96787.html#msg96787
+  54. http://forum.tinycorelinux.net/index.php?action=profile;u=13949
+  55. http://forum.tinycorelinux.net/index.php/topic,16299.msg96791.html#msg96791
+  56. http://tinycorelinux.net/book.html
+  57. http://forum.tinycorelinux.net/index.php?action=profile;u=3262
+  58. http://forum.tinycorelinux.net/index.php/topic,16299.msg96794.html#msg96794
+  59. http://forum.tinycorelinux.net/index.php/topic,16299.msg96780.html#msg96780
+  60. http://forum.tinycorelinux.net/index.php?action=profile;u=1608
+  61. http://forum.tinycorelinux.net/index.php/topic,16299.msg96795.html#msg96795
+  62. http://forum.tinycorelinux.net/index.php/topic,16299.msg96791.html#msg96791
+  63. javascript:void(0);
+  64. http://forum.tinycorelinux.net/index.php?action=profile;u=5
+  65. http://forum.tinycorelinux.net/index.php/topic,16299.msg96810.html#msg96810
+  66. http://forum.tinycorelinux.net/index.php?action=profile;u=13949
+  67. http://forum.tinycorelinux.net/index.php/topic,16299.msg96813.html#msg96813
+  68. http://tinycorelinux.net/book.html
+  69. http://forum.tinycorelinux.net/index.php?action=profile;u=3262
+  70. http://forum.tinycorelinux.net/index.php/topic,16299.msg96818.html#msg96818
+  71. http://forum.tinycorelinux.net/index.php?action=profile;u=13949
+  72. http://forum.tinycorelinux.net/index.php/topic,16299.msg96819.html#msg96819
+  73. javascript:void(0);
+  74. javascript:void(0);
+  75. javascript:void(0);
+  76. http://tinycorelinux.net/book.html
+  77. http://forum.tinycorelinux.net/index.php?action=printpage;topic=16299.0
+  78. http://forum.tinycorelinux.net/index.php/topic,16299.15.html
+  79. http://forum.tinycorelinux.net/index.php/topic,16299.30.html
+  80. http://forum.tinycorelinux.net/index.php/topic,16299.45.html
+  81. http://forum.tinycorelinux.net/index.php?topic=16299.0#top
+  82. http://forum.tinycorelinux.net/index.php/topic,16299.0/prev_next,prev.html#new
+  83. http://forum.tinycorelinux.net/index.php/topic,16299.0/prev_next,next.html#new
+  84. http://forum.tinycorelinux.net/index.php
+  85. http://forum.tinycorelinux.net/index.php#c9
+  86. http://forum.tinycorelinux.net/index.php/board,28.0.html
+  87. http://forum.tinycorelinux.net/index.php/topic,16299.0.html
+  88. http://forum.tinycorelinux.net/index.php?action=credits
+  89. https://www.simplemachines.org/about/smf/license.php
+  90. https://www.simplemachines.org/
+  91. http://validator.w3.org/check?uri=referer
+  92. http://forum.tinycorelinux.net/index.php?action=.xml;type=rss
+  93. http://forum.tinycorelinux.net/index.php?wap2
+
+   Hidden links:
+  95. http://forum.tinycorelinux.net/index.php?action=profile;u=5
+  96. http://forum.tinycorelinux.net/index.php?action=profile;u=531
+  97. http://forum.tinycorelinux.net/index.php?action=profile;u=5
+  98. http://forum.tinycorelinux.net/index.php?action=profile;u=1688
+  99. http://forum.tinycorelinux.net/index.php?action=profile;u=1608
+ 100. http://forum.tinycorelinux.net/index.php?action=profile;u=5
+ 101. http://forum.tinycorelinux.net/index.php?action=profile;u=13949
+ 102. http://forum.tinycorelinux.net/index.php?action=profile;u=1608
+ 103. http://forum.tinycorelinux.net/index.php?action=profile;u=13949
+ 104. http://forum.tinycorelinux.net/index.php?action=profile;u=1608
+ 105. http://forum.tinycorelinux.net/index.php?action=profile;u=5
+ 106. http://forum.tinycorelinux.net/index.php?action=profile;u=13949
+ 107. http://forum.tinycorelinux.net/index.php?action=profile;u=13949

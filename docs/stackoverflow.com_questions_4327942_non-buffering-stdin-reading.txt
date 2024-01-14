@@ -1,0 +1,725 @@
+   #[1]Stack Overflow [2]Feed for question 'non-buffering stdin reading'
+
+   [3]Stack Overflow
+    1. [4]About
+    2. [5]Products
+    3. [6]For Teams
+
+    1. [7]Stack Overflow Public questions & answers
+    2. [8]Stack Overflow for Teams Where developers & technologists share
+       private knowledge with coworkers
+    3. [9]Talent Build your employer brand
+    4. [10]Advertising Reach developers & technologists worldwide
+    5. [11]Labs The future of collective knowledge sharing
+    6. [12]About the company
+
+   ____________________
+   Loading...
+
+    1.
+
+[13]current community
+       (BUTTON)
+          + Stack Overflow
+            [14]help [15]chat
+          + Meta Stack Overflow
+
+your communities
+       [16]Sign up or [17]log in to customize your list.
+
+[18]more stack exchange communities
+       [19]company blog
+    2. (BUTTON)
+    3. [20]Log in
+    4. [21]Sign up
+
+    1.
+         1. [22]Home
+         2. [23]Questions
+         3. [24]Tags
+         4.
+         5. [25]Users
+         6. [26]Companies
+         7. Collectives
+         8. [27]Explore Collectives
+         9. Labs
+        10. [28]Discussions
+    2. Teams
+       Stack Overflow for Teams - Start collaborating and sharing
+       organizational knowledge. [29]Create a free Team [30]Why Teams?
+    3. Teams
+    4. Create free Team
+
+Collectives(TM) on Stack Overflow
+
+   Find centralized, trusted content and collaborate around the
+   technologies you use most.
+   [31]Learn more about Collectives
+
+   Teams
+
+   Q&A for work
+
+   Connect and share knowledge within a single location that is structured
+   and easy to search.
+   [32]Learn more about Teams
+
+   Get early access and see previews of new features.
+   [33]Learn more about Labs
+
+[34]non-buffering stdin reading
+
+   [35]Ask Question
+   Asked 13 years, 1 month ago
+   Modified [36]9 years ago
+   Viewed 6k times
+   (BUTTON)
+   9
+   (BUTTON) (BUTTON)
+
+   My test application is
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <signal.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <fcntl.h>
+
+int main(int argc, char *argv[], char *envp[]) {
+  int fd[2];
+
+  if(pipe(fd) < 0) {
+    printf("Can\'t create pipe\n");
+    exit(-1);
+  }
+
+  pid_t fpid = fork();
+  if (fpid == 0) {
+    close(0);
+    close(fd[1]);
+    char *s = (char *) malloc(sizeof(char));
+    while(1) if (read(fd[0], s, 1)) printf("%i\n", *s);
+  }
+  close(fd[0]);
+  char *c = (char *) malloc(sizeof(char));
+  while (1) {
+    if (read(0, c, 1) > 0) write(fd[1], c, 1);
+  }
+  return 0;
+}
+
+   I want to see char-code after each entered char. But in fact *s is
+   printed only after '\n' in the console. So seems like stdin (file with
+   desc 0) is buffered. But the read function is buffer-less, isn't it?
+   Where am I wrong.
+
+   UPD: I use linux.
+
+   So the solution is
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <termios.h>
+
+int main(int argc, char *argv[], char *envp[]) {
+  int fd[2];
+
+  if(pipe(fd) < 0) {
+    printf("Can\'t create pipe\n");
+    exit(-1);
+  }
+
+  struct termios term, term_orig;
+
+  if(tcgetattr(0, &term_orig)) {
+    printf("tcgetattr failed\n");
+    exit(-1);
+  }
+
+  term = term_orig;
+
+  term.c_lflag &= ~ICANON;
+  term.c_lflag |= ECHO;
+  term.c_cc[VMIN] = 0;
+  term.c_cc[VTIME] = 0;
+
+  if (tcsetattr(0, TCSANOW, &term)) {
+    printf("tcsetattr failed\n");
+    exit(-1);
+  }
+
+  pid_t fpid = fork();
+  if (fpid == 0) {
+    close(0);
+    close(fd[1]);
+    char *s = (char *) malloc(sizeof(char));
+    while(1) if (read(fd[0], s, 1)) printf("%i\n", *s);
+  }
+  close(fd[0]);
+  char *c = (char *) malloc(sizeof(char));
+  while (1) {
+    if (read(0, c, 1) > 0) write(fd[1], c, 1);
+  }
+  return 0;
+}
+
+     * [37]c
+     * [38]linux
+     * [39]unix
+     * [40]posix
+
+   [41]Share
+   (BUTTON) Follow
+   [42]edited Dec 1, 2010 at 19:10
+   Ximik
+   asked Dec 1, 2010 at 18:54
+   Ximik's user avatar
+   [43]XimikXimik
+   2,45533 gold badges2727 silver badges5353 bronze badges
+   2
+     * 1
+       Note that this has nothing to do with buffering.
+       - [44]Simon Tóth
+       Dec 1, 2010 at 19:05
+     * Shouldn't the code reset the terminal attributes in the parent to
+       term_orig before exiting? You should probably also have the child
+       exit at some point -- it will continually get 0 from read() after
+       the parent shuts up shop. However, the parent is also in an
+       infinite loop; the processes only end when signalled. You really
+       need a signal handler that calls tcsetattr() with the original
+       terminal values for the main signals you're likely to get (that can
+       be handled): HUP, INT, QUIT perhaps, PIPE and TERM is a good set.
+       You can't do anything about KILL or STOP, of course.
+       - [45]Jonathan Leffler
+       Jan 19, 2021 at 3:27
+
+   [46]Add a comment  |
+
+3 Answers 3
+
+   Sorted by: [47]Reset to default
+   [Highest score (default)___________]
+   (BUTTON)
+   15
+   (BUTTON) (BUTTON)
+
+   Unfortunately, the behavior you're looking for is not possible with
+   standard ANSI C, and the default mode for UNIX terminal I/O is
+   line-oriented, which means you will always need an inputted \n
+   character to retrieve the input. You'll need to use terminal I/O
+   facilities that let you program in [48]non-canonical mode, so that each
+   key-press triggers an event. On Linux/UNIX, you can look into the
+   <termios.h> header, or the [49]ncurses library.
+   [50]Share
+   (BUTTON) Follow
+   [51]edited May 23, 2017 at 10:29
+   Community's user avatar
+   [52]CommunityBot
+   111 silver badge
+   answered Dec 1, 2010 at 18:56
+   Charles Salvia's user avatar
+   [53]Charles SalviaCharles Salvia
+   52.6k1414 gold badges130130 silver badges142142 bronze badges
+   1
+     * 4
+       @Ximik, yes and they are not using standard ANSI C. Most use
+       external libraries such as ncurses or termcap.
+       - [54]Charles Salvia
+       Dec 1, 2010 at 18:59
+
+   [55]Add a comment  |
+   (BUTTON)
+   5
+   (BUTTON) (BUTTON)
+
+   It seems to me that your solution is a little bit complicated. Still
+   don't understand why do you need pipe and 2 process.
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <termios.h>
+
+int main(int argc, char *argv[], char *envp[]) {
+  struct termios term, term_orig;
+
+  if(tcgetattr(0, &term_orig)) {
+    printf("tcgetattr failed\n");
+    exit(-1);
+  }
+
+  term = term_orig;
+
+  term.c_lflag &= ~ICANON;
+  term.c_lflag |= ECHO;
+  term.c_cc[VMIN] = 0;
+  term.c_cc[VTIME] = 0;
+
+  if (tcsetattr(0, TCSANOW, &term)) {
+    printf("tcsetattr failed\n");
+    exit(-1);
+  }
+
+  char ch;
+  while (1) {
+    if (read(0, &ch, 1) > 0)
+      printf(" %d\n", ch);
+  }
+  return 0;
+}
+
+   [56]Share
+   (BUTTON) Follow
+   [57]edited Dec 30, 2014 at 12:56
+   answered Dec 30, 2014 at 12:14
+   Sam Toliman's user avatar
+   [58]Sam TolimanSam Toliman
+   12311 silver badge55 bronze badges
+
+   [59]Add a comment  |
+   (BUTTON)
+   3
+   (BUTTON) (BUTTON)
+
+   Unix buffers your tty characters inside the kernel in part so that
+   programs don't have to individually handle line editing unless they
+   want to.
+
+   You can instruct the tty driver to give you the bytes immediately.
+   There are various libraries that make this a bit easier than using the
+   raw ioctl. You might start with termios(3).
+   [60]Share
+   (BUTTON) Follow
+   answered Dec 1, 2010 at 18:59
+   DigitalRoss's user avatar
+   [61]DigitalRossDigitalRoss
+   144k2525 gold badges250250 silver badges330330 bronze badges
+   1
+     * 3
+       And sadly nobody got around to improving this kernel-level line
+       editing to make it actually usable... In principle it could be
+       nearly as nice as readline.
+       - [62]R.. GitHub STOP HELPING ICE
+       Dec 1, 2010 at 20:46
+
+   [63]Add a comment  |
+
+Your Answer
+
+   Reminder: Answers generated by artificial intelligence tools are not
+   allowed on Stack Overflow. [64]Learn more
+   (BUTTON)
+
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+   _______________________________________________________________________
+
+   Thanks for contributing an answer to Stack Overflow!
+     * Please be sure to answer the question. Provide details and share
+       your research!
+
+   But avoid ...
+     * Asking for help, clarification, or responding to other answers.
+     * Making statements based on opinion; back them up with references or
+       personal experience.
+
+   To learn more, see our [65]tips on writing great answers.
+   (BUTTON)
+   Draft saved
+   Draft discarded
+   ____________________
+
+Sign up or [66]log in
+
+   Sign up using Google
+   Sign up using Facebook
+   Sign up using Email and Password
+   (BUTTON) Submit
+
+Post as a guest
+
+   Name
+   ____________________
+   Email
+
+   Required, but never shown
+   ________________________________________
+
+Post as a guest
+
+   Name
+   ____________________
+   Email
+
+   Required, but never shown
+   ________________________________________
+   (BUTTON) Post Your Answer (BUTTON) Discard
+
+   By clicking "Post Your Answer", you agree to our [67]terms of service
+   and acknowledge you have read our [68]privacy policy.
+
+   Not the answer you're looking for? Browse other questions tagged
+     * [69]c
+     * [70]linux
+     * [71]unix
+     * [72]posix
+
+   or [73]ask your own question.
+     * The Overflow Blog
+     * [74]Maximum Glitch: How to break Tetris
+     * [75]How to build a role-playing video game in 24 hours
+     * Featured on Meta
+     * [76]Sites can now request to enable a banner to warn about their
+       policy on...
+     * [77]Temporary policy: Generative AI (e.g., ChatGPT) is banned
+
+Linked
+
+   55
+   [78]Canonical vs. non-canonical terminal input
+   0
+   [79]Why does this C code have unexpected behavior
+   2
+   [80]End while loop when 'Enter'
+   2
+   [81]How does copying input to output program work?
+   0
+   [82]Output behaviour of scanf and printf in C (Eclipse Console)
+   0
+   [83]How would I go about, using the scanner class, taking in one
+   character and then continuing to display the next random character for
+   the user to enter?
+
+Related
+
+   2
+   [84]Reading stdin in C
+   6
+   [85]Making stdin non-blocking
+   18
+   [86]read() from stdin
+   51
+   [87]Reading from stdin
+   0
+   [88]Linux unbuffered reads from STDIO
+   2
+   [89]Buffering stdin & stdout
+   1
+   [90]read() for reading stream from stdin
+   1
+   [91]Read from stdin and fill buffer until EOF
+   1
+   [92]Linux stdin buffering
+   1
+   [93]Pipes in C, buffer for reading stdin
+
+[94]Hot Network Questions
+
+     * [95]Why was this move a miss?
+     * [96]Using an op-amp to produce a low-current voltage rail
+     * [97]The sum of the squares of the diagonals in a polygon
+     * [98]Do courts declare acts of the legislature unconstitutional?
+     * [99]Is George a dishwasher?
+     * [100]Cybernetic AIs get hacked, while sentient AGIs are immune?
+     * [101]What happened to Jazz in 1980?
+     * [102]I have an absolute certainty that cannot be refuted
+     * [103]Seeking an English Equivalent for the Concept of "Evil Eye"
+     * [104]What commercial airplane broke the sound barrier in 1979?
+     * [105]Validate a CPF number
+     * [106]is there a program that automatically convert old printings
+       into TeX files?
+     * [107]Including an old publication in a CV for a PhD
+     * [108]Why did my coworker see a "painting-ified" version of my
+       background image on a Zoom call?
+     * [109]Group generated by two irrational plane rotations
+     * [110]Planet orbiting a star orbiting a black hole - can there be
+       life?
+     * [111]Why is it possible to keep an object, say a book, horizontal
+       while holding its corner?
+     * [112]Significant Mann Whitney, and significant t-test, but in the
+       other direction
+     * [113]What is the lowest tech level that could sustain life on Mars
+       or the Moon?
+     * [114]Does wire gauge matter for speaker cable for a home stereo
+       system?
+     * [115]Algorithm needed to find optimum area of 2-dimensional data
+       set
+     * [116]First fundamental theorem of Calculus continuity not
+       necessary?
+     * [117]Find a fraction with the smallest denominator
+     * [118]Is This a Fake Bank?
+
+   [119]more hot questions
+   [120]Question feed
+
+Subscribe to RSS
+
+   Question feed
+
+   To subscribe to this RSS feed, copy and paste this URL into your RSS
+   reader.
+   https://stackoverflo
+   lang-c
+
+[121]Stack Overflow
+
+     * [122]Questions
+     * [123]Help
+
+[124]Products
+
+     * [125]Teams
+     * [126]Advertising
+     * [127]Collectives
+     * [128]Talent
+
+[129]Company
+
+     * [130]About
+     * [131]Press
+     * [132]Work Here
+     * [133]Legal
+     * [134]Privacy Policy
+     * [135]Terms of Service
+     * [136]Contact Us
+     * [137]Cookie Settings
+     * [138]Cookie Policy
+
+[139]Stack Exchange Network
+
+     * [140]Technology
+     * [141]Culture & recreation
+     * [142]Life & arts
+     * [143]Science
+     * [144]Professional
+     * [145]Business
+     * [146]API
+     * [147]Data
+
+     * [148]Blog
+     * [149]Facebook
+     * [150]Twitter
+     * [151]LinkedIn
+     * [152]Instagram
+
+   Site design / logo © 2024 Stack Exchange Inc; user contributions
+   licensed under [153]CC BY-SA. rev 2024.1.10.3270
+
+   Your privacy
+
+   By clicking "Accept all cookies", you agree Stack Exchange can store
+   cookies on your device and disclose information in accordance with our
+   [154]Cookie Policy.
+   (BUTTON) Accept all cookies (BUTTON) Necessary cookies only
+   (BUTTON) Customize settings
+
+References
+
+   Visible links:
+   1. https://stackoverflow.com/opensearch.xml
+   2. https://stackoverflow.com/feeds/question/4327942
+   3. https://stackoverflow.com/
+   4. https://stackoverflow.co/
+   5. https://stackoverflow.com/questions/4327942/non-buffering-stdin-reading
+   6. https://stackoverflow.co/teams/
+   7. https://stackoverflow.com/questions
+   8. https://stackoverflow.co/teams/
+   9. https://stackoverflow.co/talent/
+  10. https://stackoverflow.co/advertising/
+  11. https://stackoverflow.co/labs/
+  12. https://stackoverflow.co/
+  13. https://stackoverflow.com/
+  14. https://stackoverflow.com/help
+  15. https://chat.stackoverflow.com/?tab=site&host=stackoverflow.com
+  16. https://stackoverflow.com/users/signup?ssrc=site_switcher&returnurl=https%3a%2f%2fstackoverflow.com%2fquestions%2f4327942%2fnon-buffering-stdin-reading
+  17. https://stackoverflow.com/users/login?ssrc=site_switcher&returnurl=https%3a%2f%2fstackoverflow.com%2fquestions%2f4327942%2fnon-buffering-stdin-reading
+  18. https://stackexchange.com/sites
+  19. https://stackoverflow.blog/
+  20. https://stackoverflow.com/users/login?ssrc=head&returnurl=https%3a%2f%2fstackoverflow.com%2fquestions%2f4327942%2fnon-buffering-stdin-reading
+  21. https://stackoverflow.com/users/signup?ssrc=head&returnurl=https%3a%2f%2fstackoverflow.com%2fquestions%2f4327942%2fnon-buffering-stdin-reading
+  22. https://stackoverflow.com/
+  23. https://stackoverflow.com/questions
+  24. https://stackoverflow.com/tags
+  25. https://stackoverflow.com/users
+  26. https://stackoverflow.com/jobs/companies?so_medium=stackoverflow&so_source=SiteNav
+  27. https://stackoverflow.com/collectives
+  28. https://stackoverflow.com/collectives/beta/discussions
+  29. https://try.stackoverflow.co/why-teams/?utm_source=so-owned&utm_medium=side-bar&utm_campaign=campaign-38&utm_content=cta
+  30. https://stackoverflow.co/teams/
+  31. https://stackoverflow.com/collectives
+  32. https://stackoverflow.co/teams/
+  33. https://stackoverflow.co/labs/
+  34. https://stackoverflow.com/questions/4327942/non-buffering-stdin-reading
+  35. https://stackoverflow.com/questions/ask
+  36. https://stackoverflow.com/questions/4327942/non-buffering-stdin-reading?lastactivity
+  37. https://stackoverflow.com/questions/tagged/c
+  38. https://stackoverflow.com/questions/tagged/linux
+  39. https://stackoverflow.com/questions/tagged/unix
+  40. https://stackoverflow.com/questions/tagged/posix
+  41. https://stackoverflow.com/q/4327942
+  42. https://stackoverflow.com/posts/4327942/revisions
+  43. https://stackoverflow.com/users/414016/ximik
+  44. https://stackoverflow.com/users/211659/%c5%a0imon-t%c3%b3th
+  45. https://stackoverflow.com/users/15168/jonathan-leffler
+  46. https://stackoverflow.com/questions/4327942/non-buffering-stdin-reading
+  47. https://stackoverflow.com/questions/4327942/non-buffering-stdin-reading?answertab=scoredesc#tab-top
+  48. https://stackoverflow.com/questions/358342/canonical-vs-non-canonical-terminal-input
+  49. http://www.gnu.org/software/ncurses/
+  50. https://stackoverflow.com/a/4327964
+  51. https://stackoverflow.com/posts/4327964/revisions
+  52. https://stackoverflow.com/users/-1/community
+  53. https://stackoverflow.com/users/168288/charles-salvia
+  54. https://stackoverflow.com/users/168288/charles-salvia
+  55. https://stackoverflow.com/questions/4327942/non-buffering-stdin-reading
+  56. https://stackoverflow.com/a/27705297
+  57. https://stackoverflow.com/posts/27705297/revisions
+  58. https://stackoverflow.com/users/4177256/sam-toliman
+  59. https://stackoverflow.com/questions/4327942/non-buffering-stdin-reading
+  60. https://stackoverflow.com/a/4328000
+  61. https://stackoverflow.com/users/140740/digitalross
+  62. https://stackoverflow.com/users/379897/r-github-stop-helping-ice
+  63. https://stackoverflow.com/questions/4327942/non-buffering-stdin-reading
+  64. https://stackoverflow.com/help/ai-policy
+  65. https://stackoverflow.com/help/how-to-answer
+  66. https://stackoverflow.com/users/login?ssrc=question_page&returnurl=https%3a%2f%2fstackoverflow.com%2fquestions%2f4327942%2fnon-buffering-stdin-reading%23new-answer
+  67. https://stackoverflow.com/legal/terms-of-service/public
+  68. https://stackoverflow.com/legal/privacy-policy
+  69. https://stackoverflow.com/questions/tagged/c
+  70. https://stackoverflow.com/questions/tagged/linux
+  71. https://stackoverflow.com/questions/tagged/unix
+  72. https://stackoverflow.com/questions/tagged/posix
+  73. https://stackoverflow.com/questions/ask
+  74. https://stackoverflow.blog/2024/01/09/maximum-glitch-how-to-break-tetris/
+  75. https://stackoverflow.blog/2024/01/11/how-to-build-a-role-playing-video-game-in-24-hours/
+  76. https://meta.stackexchange.com/questions/395881/sites-can-now-request-to-enable-a-banner-to-warn-about-their-policy-on-ai-genera
+  77. https://meta.stackoverflow.com/questions/421831/temporary-policy-generative-ai-e-g-chatgpt-is-banned
+  78. https://stackoverflow.com/questions/358342/canonical-vs-non-canonical-terminal-input?noredirect=1
+  79. https://stackoverflow.com/questions/9635877/why-does-this-c-code-have-unexpected-behavior?noredirect=1
+  80. https://stackoverflow.com/questions/22420665/end-while-loop-when-enter?noredirect=1
+  81. https://stackoverflow.com/questions/19358874/how-does-copying-input-to-output-program-work?noredirect=1
+  82. https://stackoverflow.com/questions/62695441/output-behaviour-of-scanf-and-printf-in-c-eclipse-console?noredirect=1
+  83. https://stackoverflow.com/questions/18948393/how-would-i-go-about-using-the-scanner-class-taking-in-one-character-and-then?noredirect=1
+  84. https://stackoverflow.com/questions/5976520/reading-stdin-in-c
+  85. https://stackoverflow.com/questions/8101079/making-stdin-non-blocking
+  86. https://stackoverflow.com/questions/8975521/read-from-stdin
+  87. https://stackoverflow.com/questions/15883568/reading-from-stdin
+  88. https://stackoverflow.com/questions/17848561/linux-unbuffered-reads-from-stdio
+  89. https://stackoverflow.com/questions/35358924/buffering-stdin-stdout
+  90. https://stackoverflow.com/questions/46391925/read-for-reading-stream-from-stdin
+  91. https://stackoverflow.com/questions/49826427/read-from-stdin-and-fill-buffer-until-eof
+  92. https://stackoverflow.com/questions/57916475/linux-stdin-buffering
+  93. https://stackoverflow.com/questions/70254889/pipes-in-c-buffer-for-reading-stdin
+  94. https://stackexchange.com/questions?tab=hot
+  95. https://chess.stackexchange.com/questions/43542/why-was-this-move-a-miss
+  96. https://electronics.stackexchange.com/questions/697252/using-an-op-amp-to-produce-a-low-current-voltage-rail
+  97. https://math.stackexchange.com/questions/4843747/the-sum-of-the-squares-of-the-diagonals-in-a-polygon
+  98. https://law.stackexchange.com/questions/98786/do-courts-declare-acts-of-the-legislature-unconstitutional
+  99. https://literature.stackexchange.com/questions/26019/is-george-a-dishwasher
+ 100. https://worldbuilding.stackexchange.com/questions/253485/cybernetic-ais-get-hacked-while-sentient-agis-are-immune
+ 101. https://music.stackexchange.com/questions/133400/what-happened-to-jazz-in-1980
+ 102. https://philosophy.stackexchange.com/questions/107345/i-have-an-absolute-certainty-that-cannot-be-refuted
+ 103. https://ell.stackexchange.com/questions/346463/seeking-an-english-equivalent-for-the-concept-of-evil-eye
+ 104. https://aviation.stackexchange.com/questions/102460/what-commercial-airplane-broke-the-sound-barrier-in-1979
+ 105. https://codegolf.stackexchange.com/questions/269151/validate-a-cpf-number
+ 106. https://tex.stackexchange.com/questions/706975/is-there-a-program-that-automatically-convert-old-printings-into-tex-files
+ 107. https://academia.stackexchange.com/questions/205791/including-an-old-publication-in-a-cv-for-a-phd
+ 108. https://superuser.com/questions/1825387/why-did-my-coworker-see-a-painting-ified-version-of-my-background-image-on-a-z
+ 109. https://mathoverflow.net/questions/462012/group-generated-by-two-irrational-plane-rotations
+ 110. https://worldbuilding.stackexchange.com/questions/253544/planet-orbiting-a-star-orbiting-a-black-hole-can-there-be-life
+ 111. https://physics.stackexchange.com/questions/796748/why-is-it-possible-to-keep-an-object-say-a-book-horizontal-while-holding-its-c
+ 112. https://stats.stackexchange.com/questions/636755/significant-mann-whitney-and-significant-t-test-but-in-the-other-direction
+ 113. https://worldbuilding.stackexchange.com/questions/253452/what-is-the-lowest-tech-level-that-could-sustain-life-on-mars-or-the-moon
+ 114. https://diy.stackexchange.com/questions/290981/does-wire-gauge-matter-for-speaker-cable-for-a-home-stereo-system
+ 115. https://or.stackexchange.com/questions/11506/algorithm-needed-to-find-optimum-area-of-2-dimensional-data-set
+ 116. https://math.stackexchange.com/questions/4843647/first-fundamental-theorem-of-calculus-continuity-not-necessary
+ 117. https://codegolf.stackexchange.com/questions/269180/find-a-fraction-with-the-smallest-denominator
+ 118. https://money.stackexchange.com/questions/160911/is-this-a-fake-bank
+ 119. https://stackoverflow.com/questions/4327942/non-buffering-stdin-reading
+ 120. https://stackoverflow.com/feeds/question/4327942
+ 121. https://stackoverflow.com/
+ 122. https://stackoverflow.com/questions
+ 123. https://stackoverflow.com/help
+ 124. https://stackoverflow.co/
+ 125. https://stackoverflow.co/teams/
+ 126. https://stackoverflow.co/advertising/
+ 127. https://stackoverflow.co/collectives/
+ 128. https://stackoverflow.co/talent/
+ 129. https://stackoverflow.co/
+ 130. https://stackoverflow.co/
+ 131. https://stackoverflow.co/company/press/
+ 132. https://stackoverflow.co/company/work-here/
+ 133. https://stackoverflow.com/legal
+ 134. https://stackoverflow.com/legal/privacy-policy
+ 135. https://stackoverflow.com/legal/terms-of-service/public
+ 136. https://stackoverflow.co/company/contact/
+ 137. https://stackoverflow.com/questions/4327942/non-buffering-stdin-reading
+ 138. https://stackoverflow.com/legal/cookie-policy
+ 139. https://stackexchange.com/
+ 140. https://stackexchange.com/sites#technology
+ 141. https://stackexchange.com/sites#culturerecreation
+ 142. https://stackexchange.com/sites#lifearts
+ 143. https://stackexchange.com/sites#science
+ 144. https://stackexchange.com/sites#professional
+ 145. https://stackexchange.com/sites#business
+ 146. https://api.stackexchange.com/
+ 147. https://data.stackexchange.com/
+ 148. https://stackoverflow.blog/?blb=1
+ 149. https://www.facebook.com/officialstackoverflow/
+ 150. https://twitter.com/stackoverflow
+ 151. https://linkedin.com/company/stack-overflow
+ 152. https://www.instagram.com/thestackoverflow
+ 153. https://stackoverflow.com/help/licensing
+ 154. https://stackoverflow.com/legal/cookie-policy
+
+   Hidden links:
+ 156. https://stackoverflow.com/questions/4327942/non-buffering-stdin-reading
+ 157. https://stackoverflow.com/
+ 158. https://meta.stackoverflow.com/
+ 159. javascript:void(0)
+ 160. javascript:void(0)
+ 161. javascript:void(0)
+ 162. https://stackoverflowteams.com/teams/create/free/?utm_source=so-owned&utm_medium=side-bar&utm_campaign=campaign-38&utm_content=cta
+ 163. https://stackoverflow.com/posts/4327942/timeline
+ 164. https://stackoverflow.com/users/414016/ximik
+ 165. https://stackoverflow.com/questions/4327942/non-buffering-stdin-reading
+ 166. https://stackoverflow.com/posts/4327964/timeline
+ 167. https://stackoverflow.com/users/-1/community
+ 168. https://stackoverflow.com/users/168288/charles-salvia
+ 169. https://stackoverflow.com/questions/4327942/non-buffering-stdin-reading
+ 170. https://stackoverflow.com/posts/27705297/timeline
+ 171. https://stackoverflow.com/users/4177256/sam-toliman
+ 172. https://stackoverflow.com/questions/4327942/non-buffering-stdin-reading
+ 173. https://stackoverflow.com/posts/4328000/timeline
+ 174. https://stackoverflow.com/users/140740/digitalross
+ 175. https://stackoverflow.com/questions/4327942/non-buffering-stdin-reading
+ 176. https://stackoverflow.com/q/358342
+ 177. https://stackoverflow.com/q/9635877
+ 178. https://stackoverflow.com/q/22420665
+ 179. https://stackoverflow.com/q/19358874
+ 180. https://stackoverflow.com/q/62695441
+ 181. https://stackoverflow.com/q/18948393
+ 182. https://stackoverflow.com/q/5976520
+ 183. https://stackoverflow.com/q/8101079
+ 184. https://stackoverflow.com/q/8975521
+ 185. https://stackoverflow.com/q/15883568
+ 186. https://stackoverflow.com/q/17848561
+ 187. https://stackoverflow.com/q/35358924
+ 188. https://stackoverflow.com/q/46391925
+ 189. https://stackoverflow.com/q/49826427
+ 190. https://stackoverflow.com/q/57916475
+ 191. https://stackoverflow.com/q/70254889
+ 192. https://stackoverflow.com/questions/4327942/non-buffering-stdin-reading
+ 193. https://stackoverflow.com/
