@@ -866,8 +866,9 @@ links
   - https://blog.stephencleary.com/2010/10/implementing-gccs-builtin-functions.html: on __builtin_clz
 - C Libraries
   - https://www.fefe.de/dietlibc
-    (https://www.monperrus.net/martin/compiling-tcc-with-dietlibc: sadly
-    has issues and was never designed to use tcc in the first place)
+  - https://www.monperrus.net/martin/compiling-tcc-with-dietlibc
+  - https://dietlibc.fefe.narkive.com/mf2Z2Db3/tcc: sadly
+    has issues and was never designed to use tcc in the first place
 - tinycc and musl
   - https://wiki.musl-libc.org/design-concepts.html
   - https://www.mail-archive.com/tinycc-devel@nongnu.org/msg08533.html
