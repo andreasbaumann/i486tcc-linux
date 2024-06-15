@@ -424,7 +424,6 @@ if [ ! -f "${BASE}/build/stage1/bin/dropbearmulti" ]; then
 	# as host keys are supposed to be built on each unique host!
 	mkdir "${BASE}/build/stage1/etc/dropbear"
 	"${BASE}/build/stage1/bin/dropbearkey" -t rsa -f "${BASE}/build/stage1/etc/dropbear/dropbear_rsa_host_key"
-	"${BASE}/build/stage1/bin/dropbearkey" -t dss -f "${BASE}/build/stage1//etc/dropbear/dropbear_dss_host_key"
 	"${BASE}/build/stage1/bin/dropbearkey" -t ecdsa -f "${BASE}/build/stage1//etc/dropbear/dropbear_ecdsa_host_key"
 	"${BASE}/build/stage1/bin/dropbearkey" -t ed25519 -f "${BASE}/build/stage1//etc/dropbear/dropbear_ed25519_host_key"
 	cd .. || exit 1
