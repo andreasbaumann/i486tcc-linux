@@ -85,6 +85,7 @@ if [ ! -x "${BASE}/build/stage1/bin/i386-tcc" ]; then
 	sed -i "s|@@TINYCC_VERSION@@|${TINYCC_VERSION}|g" Makefile configure config-extra.mak
 	./configure --enable-static --prefix="${BASE}/build/stage1" \
 		--cc="${BASE}/build/stage0/bin/i386-tcc" --config-musl \
+		--ar="${BASE}/build/stage0/bin/i386-tcc -ar" \
 		--enable-cross
 	make -j$CPUS
 	make -j$CPUS install
@@ -223,6 +224,9 @@ if [ ! -f "${BASE}/build/stage1/lib/libncurses.a" ]; then
 	tar xf "${BASE}/downloads/netbsd-curses-${NETBSD_NCURSES_VERSION}.tar.gz"
 	cd "netbsd-curses-${NETBSD_NCURSES_VERSION}" || exit 1
 	patch -Np1 < "${BASE}/patches/netbsd-curses-attributes.patch"
+	cd "nbperf" || exit 1
+	make nbperf
+	cd .. || exit 1
 	CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS='-static' make -j$CPUS all-static
 	CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS='-static' make -j$CPUS install-static \
 		PREFIX="${BASE}/build/stage1"
@@ -254,7 +258,8 @@ if [ ! -f "${BASE}/build/stage1/lib/libevent.a" ]; then
 	cd "libevent-${LIBEVENT_VERSION}" || exit 1
 	CC="${BASE}/build/stage1/bin/i386-tcc" \
 	./configure --prefix="${BASE}/build/stage1" \
-		--enable-static --disable-shared --disable-openssl
+		--enable-static --disable-shared --disable-openssl \
+		 --host="i386-linux-musl"		
 	make -j$CPUS
 	make -j$CPUS install PREFIX="${BASE}/build/stage1"
 	cd .. || exit 1
@@ -285,7 +290,8 @@ if [ ! -x "${BASE}/build/stage1/bin/tmux" ]; then
 	cd "tmux-${TMUX_VERSION}" || exit 1
 	CC="${BASE}/build/stage1/bin/i386-tcc" \
 	./configure --prefix="${BASE}/build/stage1" \
-		--enable-static
+		--enable-static \
+		 --host="i386-linux-musl"		
 	make -j$CPUS LIBS="-lncursesw -levent_core -lterminfo"
 	make -j$CPUS install PREFIX="${BASE}/build/stage1"
 	cd .. || exit 1
@@ -354,7 +360,8 @@ if [ ! -f "${BASE}/build/stage1/bin/nbd-client" ]; then
 	CC="${BASE}/build/stage1/bin/i386-tcc" \
 	./configure --prefix="${BASE}/build/stage1" \
 		--enable-static --disable-shared \
-		--without-gnutls --without-libnl
+		--without-gnutls --without-libnl \
+		--host="i386-linux-musl"
 	make -j$CPUS V=1 nbd-client
 	# libtool links wrongly dynamically with static archives?
 	${BASE}/build/stage1/bin/i386-tcc -static -g \
@@ -384,7 +391,8 @@ if [ ! -f "${BASE}/build/stage1/bin/joe" ]; then
 	cd "joe-${JOE_VERSION}" || exit 1
 	CC="${BASE}/build/stage1/bin/i386-tcc" \
 	./configure --prefix="${BASE}/build/stage1" \
-		--enable-static --disable-shared
+		--enable-static --disable-shared \
+		--host="i386-linux-musl"
 	make -j$CPUS LDFLAGS=-static
 	make -j$CPUS install
 	cd .. || exit 1
@@ -399,7 +407,8 @@ if [ ! -f "${BASE}/build/stage1/bin/dropbearmulti" ]; then
 	patch -Np1 < "${BASE}/patches/dropbear-path.patch"
 	CC="${BASE}/build/stage1/bin/i386-tcc" \
 	./configure --prefix="${BASE}/build/stage1" \
-		--enable-static --disable-shared
+		--enable-static --disable-shared \
+		--host="i386-linux-musl"
 	make -j$CPUS STATIC=1 MULTI=1 SCPPROGRESS=1 PROGRAMS="dropbear dbclient dropbearkey scp ssh"
 	cp dropbearmulti "${BASE}/build/stage1/bin/."
 	make -j$CPUS inst_dropbearmulti
@@ -503,7 +512,8 @@ if [ ! -f "${BASE}/build/stage1/bin/xauth" ]; then
 	CC="${BASE}/build/stage1/bin/i386-tcc" \
 	./configure --enable-static --prefix="${BASE}/build/stage1" \
 		--x-includes="${BASE}/build/stage1/include" \
-		--x-libraries="${BASE}/build/stage1/lib"
+		--x-libraries="${BASE}/build/stage1/lib" \
+		--host="i386-linux-musl"
 	make -j$CPUS LDFLAGS="-static"
 	make -j$CPUS install
 	cd .. || exit 1
@@ -519,7 +529,8 @@ if [ ! -f "${BASE}/build/stage1/bin/xhost" ]; then
 	CC="${BASE}/build/stage1/bin/i386-tcc" \
 	./configure --enable-static --prefix="${BASE}/build/stage1" \
 		--x-includes="${BASE}/build/stage1/include" \
-		--x-libraries="${BASE}/build/stage1/lib"
+		--x-libraries="${BASE}/build/stage1/lib" \
+		--host="i386-linux-musl"
 	make -j$CPUS LDFLAGS="-static"
 	make -j$CPUS install
 	cd .. || exit 1

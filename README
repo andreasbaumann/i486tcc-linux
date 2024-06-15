@@ -64,6 +64,9 @@ patches
   * 'sys/sysmacros.h' is missing for 'minor' and 'major'
 - netbsd-curses
   * ignoring 'strong alias' attribute
+  * build nbperf/nbperf with host CC before building the rest (is
+    used to generate a perfect hash during building the cross-
+    compiled library)
 - vis
   * disabled probing of 'curses/termcap' with 'pkconfig', added them
     directly to 'configure'

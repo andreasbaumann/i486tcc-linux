@@ -25,13 +25,12 @@ index f932edc..2e5114b 100644
   # make libtcc as static or dynamic library?
   ifeq ($(CONFIG_static),no)
    LIBTCC=libtcc$(DLLSUF)
-@@ -260,11 +261,14 @@ endif
+@@ -260,11 +261,13 @@ endif
  
  # convert "include/tccdefs.h" to "tccdefs_.h"
  %_.h : include/%.h conftest.c
 -	$S$(CC) -DC2STR $(filter %.c,$^) -o c2str.exe && ./c2str.exe $< $@
-+	$S$(CC) -I@@BASE@@/build/stage0/include -nostdlib -DC2STR $(filter %.c,$^) -o c2str.exe \
-+	@@BASE@@/build/stage0/lib/crt1.o @@BASE@@/build/stage0/lib/libc.a @@BASE@@/build/stage0/lib/tcc/i386-libtcc1.a \
++	gcc -DC2STR $(filter %.c,$^) -o c2str.exe \
 +	&& ./c2str.exe $< $@
  
  # target specific object rule

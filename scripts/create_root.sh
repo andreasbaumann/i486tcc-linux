@@ -29,7 +29,7 @@ test -f "${BASE}/root.img" && rm -f "${BASE}/root.img"
 dd if=/dev/zero of="${BASE}/root.img" bs=512 count=257040
 chmod 666 "${BASE}/root.img"
 sudo losetup /dev/loop0 "${BASE}/root.img"
-mke2fs /dev/loop0
+sudo mke2fs /dev/loop0
 mkdir "${BASE}/root"
 sudo mount /dev/loop0 "${BASE}/root"
 sudo chmod 777 "${BASE}/root"
