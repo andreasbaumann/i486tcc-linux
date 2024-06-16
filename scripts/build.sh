@@ -496,6 +496,7 @@ if [ ! -f "${BASE}/build/stage1/bin/rxvt" ]; then
 	./configure --enable-static --prefix="${BASE}/build/stage1" \
 		--x-includes="${BASE}/build/stage1/include" \
 		--x-libraries="${BASE}/build/stage1/lib"
+	sed -i 's/.*PTYS_ARE_PTMX.*/#define PTYS_ARE_PTMX 1/' config.h
 	make -j$CPUS LDFLAGS="-static"
 	make -j$CPUS install
 	cd .. || exit 1
