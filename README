@@ -98,6 +98,8 @@ patches
   * TODO: work in progress
 - rxvt
   * use the 'fixed' font per default and only that one
+  * config.h patching for PTYS_ARE_PTMX
+    checking for tty/pty type... configure: warning: Define/undefine PTYS_ARE_* in config.h manually
 - notion
   * disabled XCB for keysum definitions
   * patched for using the stage1 libraries and header files
@@ -484,8 +486,9 @@ int main( int argc, char *argv[] )
     exit( EXIT_SUCCESS );
 }
 EOF
-  i386-tcc -c -o test.o test.c
-  i386-tcc -static -o test test.o
+  i386-tcc -I/include -c -o test.o test.c
+  i386-tcc -static -nostdlib -o test test.o /lib/crt1.o /lib/libc.a
+  => the standard search paths need to be adapted, then the compiler from stage1 should work
   => recompilation of tcc inside the 486 system might be a problem because
      of the build system
 - modern Xorg ist out of reach (and old devices DO have good framebuffer support!),
