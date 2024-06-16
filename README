@@ -113,6 +113,8 @@ patches
 dependencies
 ------------
 
+- sc
+  - netbsd-curses
 - vis
   - libevent
   - libtermcap

@@ -400,6 +400,26 @@ else
 	echo "stage1 joe exists"
 fi
 
+# for sc
+if [ ! -f "${BASE}/build/stage1/bin/sc" ]; then
+	rm -rf "sc-${SC_VERSION}"
+	tar xf "${BASE}/downloads/sc-${SC_VERSION}.tar.gz"
+	cd "sc-${SC_VERSION}" || exit 1
+	CC="${BASE}/build/stage1/bin/i386-tcc" \
+	LDFLAGS=-L"${BASE}/build/stage1/lib -fla" \
+	CFLAGS=-I"${BASE}/build/stage1/include" \
+	./configure
+	sed -i 's/^DEFINES=.*/DEFINES= -DHAVE_STRLCPY -DHAVE_STRLCAT  -DHAVE_ATTR_T -DHAVE_ATTR_GET -DHAVE_CURSES_KEYNAME -DHAVE_ISFINITE -DNO_ATTR_GET -DHAVE_STDBOOL_H/g' Makefile
+	make -j$CPUS LDFLAGS=-static \
+	CC="${BASE}/build/stage1/bin/i386-tcc" \
+	CFLAGS=-I"${BASE}/build/stage1/include" \
+	LIB_CURSES="-static ${BASE}/build/stage1/lib/libcurses.a ${BASE}/build/stage1/lib/libtermcap.a"
+	make -j$CPUS prefix="${BASE}/build/stage1" install
+	cd .. || exit 1
+else
+	echo "stage1 sc exists"
+fi
+
 if [ ! -f "${BASE}/build/stage1/bin/dropbearmulti" ]; then
 	rm -rf "dropbear-${DROPBEAR_VERSION}"
 	tar xf "${BASE}/downloads/dropbear-${DROPBEAR_VERSION}.tar.bz2"
