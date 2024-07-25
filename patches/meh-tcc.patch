@@ -1,6 +1,6 @@
 diff -rauN meh/Makefile meh-tcc-patch/Makefile
---- meh/Makefile	2023-08-03 13:53:51.000000000 +0200
-+++ meh-tcc-patch/Makefile	2023-08-03 14:01:09.239337827 +0200
+--- meh/Makefile	2024-07-25 17:09:16.177620740 +0200
++++ meh-tcc-patch/Makefile	2024-07-25 17:09:48.754288527 +0200
 @@ -31,7 +31,7 @@
  -include $(DEPFILES)
  
@@ -11,8 +11,8 @@ diff -rauN meh/Makefile meh-tcc-patch/Makefile
  install:
  	install -Dm 755 meh $(DESTDIR)$(BINDIR)/meh
 diff -rauN meh/src/gif.c meh-tcc-patch/src/gif.c
---- meh/src/gif.c	2023-08-03 13:53:51.000000000 +0200
-+++ meh-tcc-patch/src/gif.c	2023-08-03 14:03:39.889558784 +0200
+--- meh/src/gif.c	2024-07-25 17:09:20.550954224 +0200
++++ meh-tcc-patch/src/gif.c	2024-07-25 17:09:48.754288527 +0200
 @@ -1,3 +1,4 @@
 +#ifdef HAVE_GIFLIB
  
@@ -24,8 +24,8 @@ diff -rauN meh/src/gif.c meh-tcc-patch/src/gif.c
  
 +#endif
 diff -rauN meh/src/imagemagick.c meh-tcc-patch/src/imagemagick.c
---- meh/src/imagemagick.c	2023-08-03 13:53:51.000000000 +0200
-+++ meh-tcc-patch/src/imagemagick.c	2023-08-03 14:08:50.440014266 +0200
+--- meh/src/imagemagick.c	2024-07-25 17:09:16.177620740 +0200
++++ meh-tcc-patch/src/imagemagick.c	2024-07-25 17:09:48.754288527 +0200
 @@ -1,3 +1,4 @@
 +#ifdef HAVE_IMAGEMAGICK
  
@@ -37,8 +37,8 @@ diff -rauN meh/src/imagemagick.c meh-tcc-patch/src/imagemagick.c
  
 +#endif
 diff -rauN meh/src/jpeg.c meh-tcc-patch/src/jpeg.c
---- meh/src/jpeg.c	2023-08-03 13:53:51.000000000 +0200
-+++ meh-tcc-patch/src/jpeg.c	2023-08-03 14:04:03.379593237 +0200
+--- meh/src/jpeg.c	2024-07-25 17:09:16.177620740 +0200
++++ meh-tcc-patch/src/jpeg.c	2024-07-25 17:09:48.754288527 +0200
 @@ -1,3 +1,4 @@
 +#ifdef HAVE_LIBJPEG
  
@@ -50,9 +50,9 @@ diff -rauN meh/src/jpeg.c meh-tcc-patch/src/jpeg.c
  
 +#endif
 diff -rauN meh/src/main.c meh-tcc-patch/src/main.c
---- meh/src/main.c	2023-08-03 13:53:51.000000000 +0200
-+++ meh-tcc-patch/src/main.c	2023-08-03 14:09:12.060045975 +0200
-@@ -17,13 +17,21 @@
+--- meh/src/main.c	2024-07-25 17:09:20.550954224 +0200
++++ meh-tcc-patch/src/main.c	2024-07-25 17:11:04.397624465 +0200
+@@ -18,14 +18,22 @@
  
  /* Supported Formats */
  static struct imageformat *formats[] = {
@@ -68,6 +68,7 @@ diff -rauN meh/src/main.c meh-tcc-patch/src/main.c
  	&giflib, /* HACK! make gif last (uses read()) */
 +#endif
  	&qoi,
+ 	&farbfeld,
 +#ifdef HAVE_IMAGEMAGICK
  	&imagemagick,
 +#endif
@@ -75,9 +76,9 @@ diff -rauN meh/src/main.c meh-tcc-patch/src/main.c
  };
  
 diff -rauN meh/src/meh.h meh-tcc-patch/src/meh.h
---- meh/src/meh.h	2023-08-03 13:53:51.000000000 +0200
-+++ meh-tcc-patch/src/meh.h	2023-08-03 14:07:02.309855672 +0200
-@@ -66,9 +66,15 @@
+--- meh/src/meh.h	2024-07-25 17:09:20.550954224 +0200
++++ meh-tcc-patch/src/meh.h	2024-07-25 17:09:48.754288527 +0200
+@@ -67,9 +67,15 @@
  #endif
  
  /* Supported Formats */
@@ -94,8 +95,8 @@ diff -rauN meh/src/meh.h meh-tcc-patch/src/meh.h
  extern struct imageformat netpbm;
  extern struct imageformat imagemagick;
 diff -rauN meh/src/png.c meh-tcc-patch/src/png.c
---- meh/src/png.c	2023-08-03 13:53:51.000000000 +0200
-+++ meh-tcc-patch/src/png.c	2023-08-03 14:04:22.809621735 +0200
+--- meh/src/png.c	2024-07-25 17:09:16.177620740 +0200
++++ meh-tcc-patch/src/png.c	2024-07-25 17:09:48.754288527 +0200
 @@ -1,3 +1,5 @@
 +#ifdef HAVE_LIBPNG
 +
