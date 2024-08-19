@@ -670,7 +670,14 @@ Some todos to sort out
   - https://opensource.com/article/19/10/why-use-rxvt-terminal
 - tmux/screen
 - joe/vis
-- vesa/frambuffer
+- vesa/framebuffer
+  - real Unisys machine
+    - fix VGA framebuffer vga16fb
+    - add GD5424 and ISA support to cirrusfb
+- wordgrinder
+  - static lua bindings as for notion, so we can use it on i486linux
+- real Unisys machine
+- fix NE2000/NE1000 bug on real chip
      
 other approaches
 ----------------
