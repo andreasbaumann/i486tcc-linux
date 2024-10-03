@@ -1,0 +1,112 @@
+   [1]Back
+
+   Linux on a 486SX
+     A year or two ago, I came into posession of a 1993 Compaq Presario
+   425.  It's a Mac-ish all-in-one with a 14" color (S?)VGA screen capable
+   of 800x600 in full 256-color glory.  On the inside it features a 25MHz
+   i486SX (the sort without a floating-point unit), paired with 20MB of
+   RAM - a significant upgrade over the stock 4MB.  When I received it it
+   had a nearly-dead 1.6GB hard drive[1] in it, which I replaced with a
+   far overkill 150GB drive[2].  It also has a single 3.5" floppy
+   drive.  On the back it has two PS/2 ports for keyboard and mouse input,
+   serial and parallel ports, and two ports for the built-in modem.  There
+   is also what appears to be a sound card, along with a single 36-pin
+   connector I don't recognize.
+     The hard drive it came with had (as far as I can tell) the stock
+   Windows for Workgroups 3.1 (not 3.11) installation, with Wolfenstein 3D
+   and a couple other games.  It had clearly been heavily used and
+   contained a large amount of personal data.
+
+   But can it run Linux?
+     I've spent the past several months trying on and off to make Linux
+   run on the Presario.  The 486SX is the oldest CPU Linux still
+   supports!  I was quite hindered by my lack of any floppy disks -
+   fortunately, I managed to get my hands on a few working ones for
+   Christmas this year and made some headway, first getting MS-DOS 6.22
+   installed on the new hard disk, then messing with the Linux kernel
+   configuration until I got it to work.
+     And yesterday I finally got it!  Here are the steps for configuring a
+   basic kernel with Linux 5.14.8.
+     Begin with make tinyconfig.  Then run make menuconfig, and change at
+   least the following options:
+       - Under General setup, turn on Configure standard kernel features
+   -> Enable support for printk, and change the kernel compression mode to
+   LZO for faster decompression.
+       - Under Processor type and features, change Processor family to
+   486SX.  Turn on Enable the LDT and Math emulation. Change Physical
+   address where the kernel is loaded to 0x400000 (only necessary for
+   bigger kernels, but good to have).
+       - Under Bus options (PCI  etc.), enable ISA support.
+       - Turn on Enable the block layer.
+       - Under Executable file formats, turn on Kernel support for ELF
+   binaries and Kernel support for scripts starting with #!.
+       - Under Device drivers:
+         - Turn on Block devices and Block devices -> Normal floppy disk
+   support.
+         - Under SCSI device support:
+           - Turn on SCSI disk support.
+           - Turn on SCSI generic support.
+         - Under Serial ATA and Parallel ATA drivers (libata):
+           - Turn on ATA SFF support.
+           - Turn on Generic platform device PATA support.
+           - Turn on Legacy ISA PATA support.
+         - Make sure Input devices -> Keyboards -> AT keyboard is enabled.
+         - Under Character devices:
+           - Turn on Enable TTY.
+           - Turn on TTY driver to output user messages via printk.
+         - Make sure Graphics support -> Console display driver support ->
+   VGA text console is enabled.
+       - Under File systems, enable Second extended fs support,
+   DOS/FAT/EXFAT/NT filesystems -> MSDOS fs support, and DOS/FAT/EXFAT/NT
+   filesystems -> VFAT (Windows-95) fs support.
+       - Under File systems -> Pseudo filesystems, enable /proc file
+   system support and sysfs file system support.
+
+     If you've done everything correctly you should have a working
+   kernel.  Mine has some other convenience things enabled, but the above
+   is the bare minimum for Linux to boot.
+     For the init system and coreutils I chose [2]BusyBox as it's
+   extremely lightweight.  I built it with [3]musl-cross-make.
+     For loading the kernel I used Syslinux on a FAT partition with the
+   following configuration:
+       DEFAULT lin
+       LABEL lin
+         LINUX /linux
+         APPEND rw loglevel=5 root=/dev/sda2
+     Putting this all together the result is a system image of about 4MB
+   in size (though the image I actually created is 128MB to give some
+   extra space).  It's surprisingly responsive for a 30-year-old machine,
+   and only takes around 50 seconds to do a cold boot - not much longer
+   than Windows 95, and at least 30 seconds of that is the BIOS doing a
+   memory test.
+     You can download the resulting image [4]here.  You should be able to
+   burn it directly to a hard drive[3] and boot it on just about any
+   machine with at least 8MB of RAM - any less than that and Linux fails
+   to decompress, at least in QEMU.  Mind that with 8MB you only get about
+   350KB of memory to work with, but it does boot.  I've included almost
+   the full set of BusyBox utilities as well as Lua.  Pretty much all of
+   the init setup comes from Krzysztof Krystian Jankowski's [5]Floppinux
+   tutorial.  The default credentials are root / root.
+     Edit 2022-02-01: Slimmed down another MB of memory usage by moving
+   the kernel load offset again; now only requires 8MB
+     [6]Here is a video of the system booting.  (Edited 2022-01-01: added
+   updated video)
+     [7]Here is a (slightly outdated) video of the system booting.  Since
+   recording this video I've switched from LZMA to LZO for kernel
+   compression, which made kernel decompression at least 200% faster.
+
+   Footnotes
+     1.  The stock drive was 200MB.
+     2.  The BIOS can only see 5GB or so of it.  I only put in such a
+   large hard drive because that was what I found on Amazon.
+     3.  After unxz-ing it, of course.
+
+References
+
+   1. https://ocawesome101.github.io/blog.html
+   2. https://busybox.net/
+   3. https://github.com/richfelker/musl-cross-make
+   4. https://oz-craft.pickardayune.com/downloads/486linux.img.xz
+   5. https://bits.p1x.in/floppinux-an-embedded-linux-on-a-single-floppy/
+   6. https://oz-craft.pickardayune.com/vid-compaq-presario-486sx-linux-new.mp4
+   7. https://oz-craft.pickardayune.com/vid-compaq-presario-486sx-linux.mp4
