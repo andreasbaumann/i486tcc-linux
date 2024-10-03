@@ -1072,6 +1072,8 @@ cat /sys/class/graphics/fb0/name
 Unsorted links
 --------------
 
+- other similar approaches
+  - https://distro.ibiblio.org/baslinux/
 - framebuffer
   - https://higfxback.github.io/
   - https://github.com/rothgar/awesome-tuis
