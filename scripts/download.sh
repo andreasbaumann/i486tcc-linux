@@ -224,6 +224,14 @@ if [ ! -f "${BASE}/downloads/dropbear-${DROPBEAR_VERSION}.tar.bz2" ]; then
 	wget -O "${BASE}/downloads/dropbear-${DROPBEAR_VERSION}.tar.bz2" "https://matt.ucc.asn.au/dropbear/releases/dropbear-${DROPBEAR_VERSION}.tar.bz2"
 fi
 
+if [ ! -f "${BASE}/downloads/mutt-${MUTT_VERSION}.tar.gz" ]; then
+	git clone https://gitlab.com/muttmua/mutt "mutt-${MUTT_VERSION}"
+	MUTT_TAG_VERSION=`echo "${MUTT_VERSION}" | tr '.' '-'`
+	git -C "mutt-${MUTT_VERSION}" checkout "mutt-${MUTT_TAG_VERSION}-rel"
+	tar zcf "${BASE}/downloads/mutt-${MUTT_VERSION}.tar.gz" "mutt-${MUTT_VERSION}"
+	rm -rf "mutt-${MUTT_VERSION}"
+fi
+
 cd .. || exit 1
 
 trap - 0

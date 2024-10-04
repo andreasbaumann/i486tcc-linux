@@ -646,6 +646,23 @@ else
 	echo "stage1 notion exists"
 fi
 
+if [ ! -f "${BASE}/build/stage1/bin/mutt" ]; then
+	rm -rf "mutt-${MUTT_VERSION}"
+	tar xf "${BASE}/downloads/mutt-${MUTT_VERSION}.tar.gz"
+	cd "mutt-${MUTT_VERSION}" || exit 1
+	autoreconf -fiv
+	LDFLAGS="-static ${BASE}/build/stage1/lib/libcurses.a ${BASE}/build/stage1/lib/libtermcap.a" \
+	CC="${BASE}/build/stage1/bin/i386-tcc" ./configure \
+		--prefix="${BASE}/build/stage1" \
+		--target=i386-linux-musl \
+		--with-curses="${BASE}/build/stage1"
+	make -j$CPUS CC="${BASE}/build/stage1/bin/i386-tcc"
+	make -j$CPUS install INSTALL_TOP="${BASE}/build/stage1"
+	cd .. || exit 1
+else
+	echo "stage1 mutt exists"
+fi
+
 
 #~ if [ ! -f "${BASE}/build/stage1/bin/wg" ]; then
 	#~ rm -rf "wordgrinder-${WORDGRINDER_VERSION}"
