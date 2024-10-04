@@ -804,6 +804,30 @@ Minimal Linux Live
 No toolchain, so we depend on the hosts toolchain, this breaks when building
 too easily. Kernel 5.18 no longer compiles with newer gcc versions.
 
+Basiclinux
+----------
+
+BasiLinux, BL3
+
+https://distro.ibiblio.org/baslinux/
+
+Two floppy version, based on a 2.2.26 kernel
+lilo boot loader, libc5 (though it also has a glibc2 package), static busybox.
+Slackware 4 packages support. Simple shell /etc/rc(.hd) for startup.
+X11/R6, XVesa and JWM. XSetup script which asks for X11 parameter on startup.
+(and writes them to /etc/Xconfig).
+Configuration in GUI is just calling an editor and let the user edit it, simple.
+Works in qemu with 4MB RAM
+100 MB HD
+
+So far I cannot find the build scripts nor can I find a lot about the
+origins of this distro:
+http://www.volny.cz/basiclinux/ older location of the ibiblio.org files.
+Found in webarchive: "BasicLinux is maintained by Steven Darnold."
+Steven C. Darnold
+ichi AT ihug.co.nz (New Zeeland)
+Might be originally be derived from a Slack 3.5/4.
+
 links
 -----
 
@@ -1073,7 +1097,6 @@ Unsorted links
 --------------
 
 - other similar approaches
-  - https://distro.ibiblio.org/baslinux/
   - https://bits.p1x.in/floppinux-an-embedded-linux-on-a-single-floppy/
   - https://ocawesome101.github.io/486-linux.html
 - framebuffer
