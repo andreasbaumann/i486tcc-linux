@@ -174,7 +174,7 @@ fi
 
 if [ ! -f "${BASE}/downloads/bdftopcf-${BDFTOPCF_VERSION}.tar.gz" ]; then
 	wget -O "${BASE}/downloads/bdftopcf-${BDFTOPCF_VERSION}.tar.gz" \
-		"https://www.x.org/archive/individual/app/bdftopcf-${BDFTOPCF_VERSION}.tar.gz"
+		"https://xorg.freedesktop.org/archive/individual/util/bdftopcf-${BDFTOPCF_VERSION}.tar.gz"
 fi
 
 if [ ! -f "${BASE}/downloads/font-cursor-misc-${FONT_CURSOR_MISC_VERSION}.tar.gz" ]; then
@@ -185,6 +185,11 @@ fi
 if [ ! -f "${BASE}/downloads/font-misc-misc-${FONT_MISC_MISC_VERSION}.tar.gz" ]; then
 	wget -O "${BASE}/downloads/font-misc-misc-${FONT_MISC_MISC_VERSION}.tar.gz" \
 		"https://www.x.org/archive/individual/font/font-misc-misc-${FONT_MISC_MISC_VERSION}.tar.gz"
+fi
+
+if [ ! -f "${BASE}/downloads/font-util-${FONT_UTIL_VERSION}.tar.gz" ]; then
+	wget -O "${BASE}/downloads/font-util-${FONT_UTIL_VERSION}.tar.gz" \
+		"https://www.x.org/archive/individual/font/font-util-${FONT_UTIL_VERSION}.tar.gz"
 fi
 
 if [ ! -f "${BASE}/downloads/lua-${LUA_VERSION}.tar.gz" ]; then

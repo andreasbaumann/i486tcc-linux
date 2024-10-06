@@ -498,9 +498,6 @@ EOF
   timing), this might be because we use musl?
   Xfbdev builds, vesafb only works when started at boot time (not as module) which is
   annoying.
-- minimize fonts
-   4675 Oct  6 14:49 6x13-ISO8859-1.pcf.gz Arch
-  68092 Sep 28 21:25 6x13-ISO8859-1.pcf.gz our build
 - Xfbdev :0 -fp /share/X11/fonts
 - "Could not init font path element ../share/X11/fonts/, removing from list"
   https://www.x.org/releases/X11R7.5/doc/libXfont/fontlib.html
