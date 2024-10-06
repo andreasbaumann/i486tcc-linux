@@ -499,6 +499,8 @@ EOF
   Xfbdev builds, vesafb only works when started at boot time (not as module) which is
   annoying.
 - minimize fonts
+   4675 Oct  6 14:49 6x13-ISO8859-1.pcf.gz Arch
+  68092 Sep 28 21:25 6x13-ISO8859-1.pcf.gz our build
 - Xfbdev :0 -fp /share/X11/fonts
 - "Could not init font path element ../share/X11/fonts/, removing from list"
   https://www.x.org/releases/X11R7.5/doc/libXfont/fontlib.html
@@ -908,6 +910,8 @@ links
   - https://www.monperrus.net/martin/compiling-tcc-with-dietlibc
   - https://dietlibc.fefe.narkive.com/mf2Z2Db3/tcc: sadly
     has issues and was never designed to use tcc in the first place
+- FeFe userland (question is, if libowfat and the tools also build on musl)
+  - ncp, embutils, fget, mininet, gatling, tcpserver, tinyldap, minit, ...
 - tinycc and musl
   - https://wiki.musl-libc.org/design-concepts.html
   - https://www.mail-archive.com/tinycc-devel@nongnu.org/msg08533.html
