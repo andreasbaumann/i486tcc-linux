@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/x86 6.10.10 Kernel Configuration
+# Linux/x86 6.11.3 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 14.2.1 20240910"
 CONFIG_CC_IS_GCC=y
@@ -637,6 +637,7 @@ CONFIG_BINFMT_SCRIPT=y
 #
 CONFIG_SWAP=y
 # CONFIG_ZSWAP is not set
+CONFIG_HAVE_ZSMALLOC=y
 
 #
 # Slab allocator options
@@ -843,6 +844,11 @@ CONFIG_VGA_ARB_MAX_GPUS=1
 # Mobiveil-based PCIe controllers
 #
 # end of Mobiveil-based PCIe controllers
+
+#
+# PLDA-based PCIe controllers
+#
+# end of PLDA-based PCIe controllers
 # end of PCI controller drivers
 
 #
@@ -995,6 +1001,7 @@ CONFIG_BLK_DEV_NBD=m
 # CONFIG_MISC_ALCOR_PCI is not set
 # CONFIG_MISC_RTSX_PCI is not set
 # CONFIG_PVPANIC is not set
+# CONFIG_KEBA_CP500 is not set
 # end of Misc devices
 
 #
@@ -1257,6 +1264,7 @@ CONFIG_ETHERNET=y
 # CONFIG_NET_VENDOR_LITEX is not set
 # CONFIG_NET_VENDOR_MARVELL is not set
 # CONFIG_NET_VENDOR_MELLANOX is not set
+CONFIG_NET_VENDOR_META=y
 # CONFIG_NET_VENDOR_MICREL is not set
 # CONFIG_NET_VENDOR_MICROCHIP is not set
 # CONFIG_NET_VENDOR_MICROSEMI is not set
@@ -1318,6 +1326,7 @@ CONFIG_8139TOO=m
 #
 # PCS device drivers
 #
+# CONFIG_PCS_XPCS is not set
 # end of PCS device drivers
 
 # CONFIG_PPP is not set
@@ -1537,6 +1546,7 @@ CONFIG_PTP_1588_CLOCK_OPTIONAL=y
 # CONFIG_GPIOLIB is not set
 # CONFIG_W1 is not set
 # CONFIG_POWER_RESET is not set
+# CONFIG_POWER_SEQUENCING is not set
 # CONFIG_POWER_SUPPLY is not set
 # CONFIG_HWMON is not set
 # CONFIG_THERMAL is not set
@@ -1789,6 +1799,7 @@ CONFIG_RTC_MC146818_LIB=y
 # CONFIG_STAGING is not set
 # CONFIG_GOLDFISH is not set
 # CONFIG_CHROME_PLATFORMS is not set
+# CONFIG_CZNIC_PLATFORMS is not set
 # CONFIG_MELLANOX_PLATFORM is not set
 # CONFIG_SURFACE_PLATFORMS is not set
 # CONFIG_X86_PLATFORM_DEVICES is not set
@@ -1902,6 +1913,7 @@ CONFIG_CLKBLD_I8253=y
 #
 # IRQ chip support
 #
+# CONFIG_LAN966X_OIC is not set
 # end of IRQ chip support
 
 # CONFIG_IPACK_BUS is not set
@@ -2047,6 +2059,9 @@ CONFIG_SYSFS=y
 #
 # CONFIG_KEYS is not set
 # CONFIG_SECURITY_DMESG_RESTRICT is not set
+CONFIG_PROC_MEM_ALWAYS_FORCE=y
+# CONFIG_PROC_MEM_FORCE_PTRACE is not set
+# CONFIG_PROC_MEM_NO_FORCE is not set
 # CONFIG_SECURITY is not set
 # CONFIG_SECURITYFS is not set
 # CONFIG_HARDENED_USERCOPY is not set
@@ -2111,7 +2126,6 @@ CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=y
 # CONFIG_CRYPTO_ECDH is not set
 # CONFIG_CRYPTO_ECDSA is not set
 # CONFIG_CRYPTO_ECRDSA is not set
-# CONFIG_CRYPTO_SM2 is not set
 # CONFIG_CRYPTO_CURVE25519 is not set
 # end of Public-key cryptography
 
