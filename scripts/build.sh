@@ -507,8 +507,10 @@ cd "${BASE}/src/stage1" || exit 1
 if [ ! -d "${BASE}/build/stage1/share/X11/fonts" ]; then
 	rm -rf "font-cursor-misc-${FONT_CURSOR_MISC_VERSION}"
 	rm -rf "font-misc-misc-${FONT_MISC_MISC_VERSION}"
+	rm -rf "font-util-${FONT_UTIL_VERSION}"
 	tar xf "${BASE}/downloads/font-cursor-misc-${FONT_CURSOR_MISC_VERSION}.tar.gz"
 	tar xf "${BASE}/downloads/font-misc-misc-${FONT_MISC_MISC_VERSION}.tar.gz"
+	tar xf "${BASE}/downloads/font-util-${FONT_UTIL_VERSION}.tar.gz"
 	mkdir -p "${BASE}/build/stage1/share/X11/fonts"
 	cp -dR "${BASE}/local/share/X11/fonts/"* "${BASE}/build/stage1/share/X11/fonts/."
 	"${BASE}/tools/bdftopcf" -t "font-cursor-misc-${FONT_CURSOR_MISC_VERSION}/cursor.bdf" | gzip -n -9 > "${BASE}/build/stage1/share/X11/fonts/cursor.pcf.gz"
