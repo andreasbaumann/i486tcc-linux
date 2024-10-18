@@ -667,6 +667,7 @@ Some todos to sort out
   - use libz or zlib-ng
 - st/rxvt
   - https://opensource.com/article/19/10/why-use-rxvt-terminal
+  - st: requires a Xft implementation, tinyxserver has none
 - tmux/screen
 - joe/vis
 - vesa/framebuffer
