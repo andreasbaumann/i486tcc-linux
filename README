@@ -827,6 +827,8 @@ Steven C. Darnold
 ichi AT ihug.co.nz (New Zeeland)
 Might be originally be derived from a Slack 3.5/4.
 
+2.2.6 kernel
+
 links
 -----
 
@@ -975,6 +977,7 @@ links
     - https://beastiebox.sourceforge.net/
     - https://www.fefe.de/embutils/
     - https://heirloom.sourceforge.net/
+    - :pserver:anonymous@heirloom.cvs.sourceforge.net:/cvsroot/heirloom
   - gopher://bitreich.org
   - https://git.2f30.org/hbase/log.html: Heirlom
   - https://www.glendix.org/: we could also go into the direction of using
