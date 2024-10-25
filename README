@@ -498,6 +498,26 @@ EOF
   timing), this might be because we use musl?
   Xfbdev builds, vesafb only works when started at boot time (not as module) which is
   annoying.
+- alterernative path: reactivate framebuffers and use those instead of an old X server:
+  - Nicolas Caramelli, https://www.youtube.com/watch?app=desktop&v=x1oXByIJcHU
+  - https://gitlab.com/meetroger/fb-test-app
+  - fb-test-app, fbmark
+  - https://github.com/caramelli/fbmark
+  - https://github.com/aligrudi/fbpad
+  - FBI, FIM: image viewers:
+    - https://git.kraxel.org/cgit/fbida (Gerd Hoffmann)
+    - https://www.nongnu.org/fbi-improved/
+  - webbrowsers: netsurf, links
+    - https://www.netsurf-browser.org/projects/libnsfb/
+  - fbff, mplayer: https://github.com/aligrudi/fbff
+  - PDF viewer: https://github.com/aligrudi/fbpdf
+  - cairo, evas
+  - GLFBDev, EGL
+  - GLUT, SDL
+  - EFL/Elementary, Gtk, Qt
+  => all need linear framebuffers, VESA 1.x bank switching is a no-go
+  => framebuffer code is deprecated in the kernel and support drops out from
+     software
 - Xfbdev :0 -fp /share/X11/fonts
 - "Could not init font path element ../share/X11/fonts/, removing from list"
   https://www.x.org/releases/X11R7.5/doc/libXfont/fontlib.html
@@ -902,6 +922,7 @@ links
     - https://students.mimuw.edu.pl/SO/Linux/Kod/arch/i386/boot/bootsect.S.html
   - other minimal toolchains
     - https://github.com/pts/pts-tcc
+  - https://github.com/caramelli/higfxback: preservation of graphical rendering systems on Linux
 - C Compilers
   - https://repo.or.cz/w/tinycc.git
   - https://blog.stephencleary.com/2010/10/implementing-gccs-builtin-functions.html: on __builtin_clz
