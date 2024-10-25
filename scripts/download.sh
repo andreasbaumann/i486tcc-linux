@@ -237,6 +237,10 @@ if [ ! -f "${BASE}/downloads/mutt-${MUTT_VERSION}.tar.gz" ]; then
 	rm -rf "mutt-${MUTT_VERSION}"
 fi
 
+if [ ! -f "${BASE}/downloads/fbset-${FBSET_VERSION}.tar.gz" ]; then
+	wget -O "${BASE}/downloads/fbset-${FBSET_VERSION}.tar.gz" "https://src.fedoraproject.org/repo/pkgs/fbset/fbset-2.1.tar.gz/e547cfcbb8c1a4f2a6b8ba4acb8b7164/fbset-2.1.tar.gz"
+fi
+
 cd .. || exit 1
 
 trap - 0

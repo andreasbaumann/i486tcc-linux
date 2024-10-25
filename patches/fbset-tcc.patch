@@ -1,0 +1,48 @@
+diff -rauN fbset-2.1/fbset.h fbset-2.1-tcc-patch/fbset.h
+--- fbset-2.1/fbset.h	1999-06-23 16:12:28.000000000 +0200
++++ fbset-2.1-tcc-patch/fbset.h	2024-10-25 15:41:41.623377034 +0200
+@@ -12,6 +12,7 @@
+  */
+ 
+ 
++#include <stdint.h>
+ #include <stdio.h>
+ #include <sys/types.h>
+ 
+@@ -38,22 +39,22 @@
+     struct VideoMode *next;
+     const char *name;
+     /* geometry */
+-    __u32 xres;
+-    __u32 yres;
+-    __u32 vxres;
+-    __u32 vyres;
+-    __u32 depth;
+-    __u32 nonstd;
++    uint32_t xres;
++    uint32_t yres;
++    uint32_t vxres;
++    uint32_t vyres;
++    uint32_t depth;
++    uint32_t nonstd;
+     /* acceleration */
+-    __u32 accel_flags;
++    uint32_t accel_flags;
+     /* timings */
+-    __u32 pixclock;
+-    __u32 left;
+-    __u32 right;
+-    __u32 upper;
+-    __u32 lower;
+-    __u32 hslen;
+-    __u32 vslen;
++    uint32_t pixclock;
++    uint32_t left;
++    uint32_t right;
++    uint32_t upper;
++    uint32_t lower;
++    uint32_t hslen;
++    uint32_t vslen;
+     /* flags */
+     unsigned hsync : 1;
+     unsigned vsync : 1;

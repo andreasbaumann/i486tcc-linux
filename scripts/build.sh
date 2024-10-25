@@ -676,6 +676,18 @@ else
 	echo "stage1 mutt exists"
 fi
 
+if [ ! -f "${BASE}/build/stage1/bin/fbset" ]; then
+	rm -rf "fbset-${FBSET_VERSION}"
+	tar xf "${BASE}/downloads/fbset-${FBSET_VERSION}.tar.gz"
+	cd "fbset-${FBSET_VERSION}" || exit 1
+	patch -Np1 < "${BASE}/patches/fbset-tcc.patch"
+	make -j1 CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS="-static"
+	install fbset "${BASE}/build/stage1/bin"
+	cd .. || exit 1
+else
+	echo "stage1 fbset exists"
+fi
+
 
 #~ if [ ! -f "${BASE}/build/stage1/bin/wg" ]; then
 	#~ rm -rf "wordgrinder-${WORDGRINDER_VERSION}"
