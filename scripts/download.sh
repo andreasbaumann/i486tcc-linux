@@ -32,7 +32,7 @@ if [ ! -f "${BASE}/downloads/tinycc-${TINYCC_VERSION}.tar.gz" ]; then
 fi
 
 if [ ! -f "${BASE}/downloads/musl-${MUSL_VERSION}.tar.gz" ]; then
-	wget -O "${BASE}/downloads/musl-${MUSL_VERSION}.tar.gz" "https://musl.libc.org/releases/musl-1.2.3.tar.gz"
+	wget -O "${BASE}/downloads/musl-${MUSL_VERSION}.tar.gz" "https://musl.libc.org/releases/musl-${MUSL_VERSION}.tar.gz"
 fi
 
 if [ ! -f "${BASE}/downloads/oksh-${_OKSH_VERSION}.tar.gz" ]; then
