@@ -1010,6 +1010,8 @@ links
   - https://www.reddit.com/r/suckless/comments/n14xnq/can_sbase_replace_busybox/
   - https://exactcode.com/opensource/minised/ (Eroc S. Raymond, maintained by Rene Rebe)
   - https://stackoverflow.com/questions/4327942/non-buffering-stdin-reading
+- editors
+  - https://github.com/antirez/kilo
 - minimalism
   - https://wiki.installgentoo.com/wiki/Software_minimalism
   - https://suckless.org/philosophy
