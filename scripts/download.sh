@@ -121,6 +121,10 @@ if [ ! -f "${BASE}/downloads/samurai-${SAMURAI_VERSION}.tar.gz" ]; then
 	wget -O "${BASE}/downloads/samurai-${SAMURAI_VERSION}.tar.gz" "https://github.com/michaelforney/samurai/releases/download/${SAMURAI_VERSION}/samurai-${SAMURAI_VERSION}.tar.gz"
 fi
 
+if [ ! -f "${BASE}/downloads/muon-${MUON_VERSION}.tar.gz" ]; then
+	wget -O "${BASE}/downloads/muon-${MUON_VERSION}.tar.gz" "https://github.com/muon-build/muon/archive/refs/tags/${MUON_VERSION}.tar.gz"
+fi
+
 if [ ! -f "${BASE}/downloads/samurai-${SAMURAI_VERSION}.tar.gz" ]; then
 	wget -O "${BASE}/downloads/samurai-${SAMURAI_VERSION}.tar.gz" "https://github.com/michaelforney/samurai/releases/download/${SAMURAI_VERSION}/samurai-${SAMURAI_VERSION}.tar.gz"
 fi

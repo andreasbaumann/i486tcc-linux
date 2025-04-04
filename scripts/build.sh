@@ -385,6 +385,17 @@ else
 	echo "stage1 samurai exists"
 fi
 
+#if [ ! -f "${BASE}/build/stage1/bin/muon" ]; then
+#	rm -rf "samurai-${MUON_VERSION}"
+#	tar xf "${BASE}/downloads/muon-${MUON_VERSION}.tar.gz"
+#	cd "muon-${MUON_VERSION}" || exit 1
+#	CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS=-static \
+#	./bootstrap.sh build-stage1
+#	cd .. || exit 1
+#else
+#	echo "stage1 muon exists"
+#fi
+
 if [ ! -f "${BASE}/build/stage1/bin/joe" ]; then
 	rm -rf "joe-${JOE_VERSION}"
 	tar xf "${BASE}/downloads/joe-${JOE_VERSION}.tar.gz"
@@ -425,9 +436,10 @@ if [ ! -f "${BASE}/build/stage1/bin/dropbearmulti" ]; then
 	tar xf "${BASE}/downloads/dropbear-${DROPBEAR_VERSION}.tar.bz2"
 	cd "dropbear-${DROPBEAR_VERSION}" || exit
 	patch -Np1 < "${BASE}/patches/dropbear-path.patch"
+	patch -Np1 < "${BASE}/patches/dropbear-static-assert.patch"
 	CC="${BASE}/build/stage1/bin/i386-tcc" \
 	./configure --prefix="${BASE}/build/stage1" \
-		--enable-static --disable-shared \
+		--enable-static \
 		--host="i386-linux-musl"
 	make -j$CPUS STATIC=1 MULTI=1 SCPPROGRESS=1 PROGRAMS="dropbear dbclient dropbearkey scp ssh"
 	cp dropbearmulti "${BASE}/build/stage1/bin/."
