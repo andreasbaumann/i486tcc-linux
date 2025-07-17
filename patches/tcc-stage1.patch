@@ -1,86 +1,6 @@
-diff --git a/Makefile b/Makefile
-index f932edc..2e5114b 100644
---- a/Makefile
-+++ b/Makefile
-@@ -21,6 +21,7 @@ LIBTCC1 = libtcc1.a
- LINK_LIBTCC =
- LIBS =
- CFLAGS += -I$(TOP)
-+
- CFLAGS += $(CPPFLAGS)
- VPATH = $(TOPSRC)
- 
-@@ -33,10 +34,10 @@ ifdef CONFIG_WIN32
-  NATIVE_TARGET = $(ARCH)-win$(if $(findstring arm,$(ARCH)),ce,32)
- else
-  CFG = -unx
-- LIBS=-lm -lpthread
-- ifneq ($(CONFIG_ldl),no)
--  LIBS+=-ldl
-- endif
-+# LIBS= -lm -pthread
-+# ifneq ($(CONFIG_ldl),no)
-+#  LIBS+=-ldl
-+# endif
-  # make libtcc as static or dynamic library?
-  ifeq ($(CONFIG_static),no)
-   LIBTCC=libtcc$(DLLSUF)
-@@ -260,11 +261,13 @@ endif
- 
- # convert "include/tccdefs.h" to "tccdefs_.h"
- %_.h : include/%.h conftest.c
--	$S$(CC) -DC2STR $(filter %.c,$^) -o c2str.exe && ./c2str.exe $< $@
-+	gcc -DC2STR $(filter %.c,$^) -o c2str.exe \
-+	&& ./c2str.exe $< $@
- 
- # target specific object rule
- $(X)%.o : %.c $(LIBTCC_INC)
--	$S$(CC) -o $@ -c $< $(DEFINES) $(CFLAGS)
-+	$S$(CC) -o $@ -c $< $(DEFINES) $(CFLAGS) \
-+	-I@@BASE@@/build/stage0/include -nostdlib
- 
- # additional dependencies
- $(X)tcc.o : tcctools.c
-@@ -272,7 +276,9 @@ $(X)tcc.o : DEFINES += $(DEF_GITHASH) $(DEF_GITDATE)
- 
- # Host Tiny C Compiler
- tcc$(EXESUF): tcc.o $(LIBTCC)
--	$S$(CC) -o $@ $^ $(LIBS) $(LDFLAGS) $(LINK_LIBTCC)
-+	$S$(CC) -static -o $@ $^ $(LIBS) $(LDFLAGS) $(LINK_LIBTCC) \
-+	-nostdlib @@BASE@@/build/stage0/lib/crt1.o @@BASE@@/build/stage0/lib/libc.a \
-+	@@BASE@@/build/stage0/lib/tcc/i386-libtcc1.a
- 
- # Cross Tiny C Compilers
- # (the TCCDEFS_H dependency is only necessary for parallel makes,
-@@ -285,7 +291,9 @@ tcc$(EXESUF): tcc.o $(LIBTCC)
- 	@$(MAKE) --no-print-directory $@ CROSS_TARGET=$* ONE_SOURCE=$(or $(ONE_SOURCE),yes)
- 
- $(CROSS_TARGET)-tcc$(EXESUF): $(TCC_FILES)
--	$S$(CC) -o $@ $^ $(LIBS) $(LDFLAGS)
-+	$S$(CC) -static -o $@ $^ $(LIBS) $(LDFLAGS) \
-+	-nostdlib @@BASE@@/build/stage0/lib/crt1.o @@BASE@@/build/stage0/lib/libc.a \
-+	@@BASE@@/build/stage0/lib/tcc/i386-libtcc1.a
- 
- # profiling version
- tcc_p$(EXESUF): $($T_FILES)
-diff --git a/configure b/configure
-index bc0d3e5..3d9c90b 100755
---- a/configure
-+++ b/configure
-@@ -359,7 +359,7 @@ fi
- 
- if test -z "$cross_prefix" ; then
-   CONFTEST=./conftest$EXESUF
--  if ! $cc -o $CONFTEST $source_path/conftest.c ; then
-+  if ! $cc -nostdlib -I@@BASE@@/build/stage0/include -o ./conftest @@BASE@@/build/stage0/lib/crt1.o @@BASE@@/src/stage1/tinycc-@@TINYCC_VERSION@@/conftest.c @@BASE@@/build/stage0/lib/libc.a @@BASE@@/build/stage0/lib/tcc/i386-libtcc1.a; then
-     echo "configure: error: '$cc' failed to compile conftest.c."
-   else
-     cc_name="$($CONFTEST compiler)"
-diff --git a/config-extra.mak b/config-extra.mak
-new file mode 100644
-index 0000000..b74be45
---- /dev/null
-+++ b/config-extra.mak
+diff -rauN a/config-extra.mak b/config-extra.mak
+--- a/config-extra.mak	1970-01-01 01:00:00.000000000 +0100
++++ b/config-extra.mak	2025-07-17 15:44:55.758597384 +0200
 @@ -0,0 +1,6 @@
 +NATIVE_DEFINES += -march=i486 -mcpu=i486
 +ROOT-i386 = @@BASE@@/build/stage1
@@ -88,3 +8,76 @@ index 0000000..b74be45
 +LIB-i386  = @@BASE@@/build/stage1/lib
 +INC-i386  = @@BASE@@/build/stage1/include
 +DEF-i386  += -D__linux__
+diff -rauN a/configure b/configure
+--- a/configure	2025-07-17 09:43:32.000000000 +0200
++++ b/configure	2025-07-17 15:44:19.539586512 +0200
+@@ -440,7 +440,7 @@
+ 
+ CONFTEST=./conftest$EXESUF
+ if test -z "$cross_prefix" \
+-    && $cc -o $CONFTEST "$source_path/conftest.c" \
++    && $cc -nostdlib -I@@BASE@@/build/stage0/include -o $CONFTEST @@BASE@@/build/stage0/lib/crt1.o @@BASE@@/src/stage1/tinycc-@@TINYCC_VERSION@@/conftest.c @@BASE@@/build/stage0/lib/libc.a @@BASE@@/build/stage0/lib/tcc/i386-libtcc1.a \
+     && $CONFTEST 2>/dev/null; then
+   cc_name="$($CONFTEST compiler)"
+   gcc_major="$($CONFTEST version)"
+diff -rauN a/Makefile b/Makefile
+--- a/Makefile	2025-07-17 09:43:32.000000000 +0200
++++ b/Makefile	2025-07-17 15:51:28.016657573 +0200
+@@ -36,13 +36,13 @@
+  NATIVE_TARGET = $(ARCH)-win$(if $(findstring arm,$(ARCH)),ce,32)
+ else
+  CFG = -unx
+- LIBS+=-lm
+- ifneq ($(CONFIG_ldl),no)
+-  LIBS+=-ldl
+- endif
+- ifneq ($(CONFIG_pthread),no)
+-  LIBS+=-lpthread
+- endif
++# LIBS+=-lm
++# ifneq ($(CONFIG_ldl),no)
++#  LIBS+=-ldl
++# endif
++# ifneq ($(CONFIG_pthread),no)
++#  LIBS+=-lpthread
++# endif
+  # make libtcc as static or dynamic library?
+  ifeq ($(CONFIG_static),no)
+   LIBTCC=libtcc$(DLLSUF)
+@@ -256,11 +256,12 @@
+ 	$S./c2str.exe $< $@
+ 
+ c2str.exe : conftest.c
+-	$S$(CC) -DC2STR $< -o $@
++	gcc -DC2STR $< -o $@
+ 
+ # target specific object rule
+ $(X)%.o : %.c $(LIBTCC_INC)
+-	$S$(CC) -o $@ -c $< $(addsuffix ,$(DEFINES) $(CFLAGS))
++	$S$(CC) -o $@ -c $< $(addsuffix ,$(DEFINES) $(CFLAGS)) \
++	-I@@BASE@@/build/stage0/include -nostdlib
+ 
+ # additional dependencies
+ $(X)tcc.o : tcctools.c
+@@ -268,7 +269,9 @@
+ 
+ # Host Tiny C Compiler
+ tcc$(EXESUF): tcc.o $(LIBTCC)
+-	$S$(CC) -o $@ $^ $(addsuffix ,$(LIBS) $(LDFLAGS) $(LINK_LIBTCC))
++	$S$(CC) -o $@ $^ $(addsuffix ,$(LIBS) $(LDFLAGS) $(LINK_LIBTCC)) \
++	-nostdlib @@BASE@@/build/stage0/lib/crt1.o @@BASE@@/build/stage0/lib/libc.a \
++	@@BASE@@/build/stage0/lib/tcc/i386-libtcc1.a
+ 
+ # Cross Tiny C Compilers
+ # (the TCCDEFS_H dependency is only necessary for parallel makes,
+@@ -281,7 +284,9 @@
+ 	@$(MAKE) --no-print-directory $@ CROSS_TARGET=$* ONE_SOURCE=$(or $(ONE_SOURCE),yes)
+ 
+ $(CROSS_TARGET)-tcc$(EXESUF): $(TCC_FILES)
+-	$S$(CC) -o $@ $^ $(LIBS) $(LDFLAGS)
++	$S$(CC) -o $@ $^ $(LIBS) $(LDFLAGS) \
++	-nostdlib @@BASE@@/build/stage0/lib/crt1.o @@BASE@@/build/stage0/lib/libc.a \
++	@@BASE@@/build/stage0/lib/tcc/i386-libtcc1.a
+ 
+ # profiling version
+ tcc_p$(EXESUF): $($T_FILES)
