@@ -58,6 +58,8 @@ if [ ! -f "${BASE}/build/stage0/lib/libc.a" ]; then
 	rm -rf "musl-${MUSL_VERSION}"
 	tar xf "${BASE}/downloads/musl-${MUSL_VERSION}.tar.gz"
 	cd "musl-${MUSL_VERSION}" || exit 1
+	patch -Np1 < "${BASE}/patches/musl-iconv-euc-kr.patch"
+	patch -Np1 < "${BASE}/patches/musl-iconv-input-decoder.patch"
 	patch -Np1 < "${BASE}/patches/musl-tcc.patch"
 	CC="${BASE}/build/stage0/bin/i386-tcc" ./configure \
 		--prefix="${BASE}/build/stage0" \

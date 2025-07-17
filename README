@@ -45,6 +45,9 @@ patches
     version using stage0 libaries and header files
   * 'config.mak' sets correct pathes and CPU flags for the i386 architecure
 - musl
+  * official 1.2.5 patches:
+    * https://www.openwall.com/lists/musl/2025/02/13/1/1
+    * https://www.openwall.com/lists/musl/2025/02/13/1/2
   * tcc doesn't expand macro definitions in inline assembly:
     SYSCALL_INSNS in syscall stubs. Expanded them by hand.
   * tcc has no support for 'Complex', we just define it empty and
