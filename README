@@ -1142,6 +1142,9 @@ Unsorted links
   - https://benpfaff.org/projects.html: vga16fb
 - fonts
   - https://github.com/ntwk/vga-font
+- https://github.com/vvaltchev/tilck: syscall compatible to Linux kernel,
+  nice, but neeeds pentium2, probably not enough syscalls to run anything
+  close to what we currently run on i486tcclinux
 
 Real hardware
 -------------
