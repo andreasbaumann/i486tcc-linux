@@ -706,7 +706,7 @@ if [ ! -f "${BASE}/build/stage1/bin/lbforth" ]; then
 	rm -rf "lbforth-${LBFORTH_VERSION}"
 	tar xf "${BASE}/downloads/lbforth-${LBFORTH_VERSION}.tar.gz"
 	cd "lbforth-${LBFORTH_VERSION}/SRC" || exit 1
-	"${BASE}/build/stage1/bin/i386-tcc" -static -o lbforth lbforth.c
+	"${BASE}/build/stage1/bin/i386-tcc" -static -DBITS32 -o lbforth lbforth.c
 	cp "lbforth" "${BASE}/build/stage1/bin"
 	cd ../.. || exit 1
 else
