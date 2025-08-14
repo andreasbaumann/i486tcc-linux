@@ -213,7 +213,7 @@ if [ ! -x "${BASE}/build/stage1/bin/sdhcp" ]; then
 	cd "sdhcp-${SDHCP_VERSION}" || exit 1
 	make -j$CPUS CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS=-static
 	make -j$CPUS install PREFIX="${BASE}/build/stage1"
-	mv "${BASE}/build/stage1/sbin/sdhcp" "${BASE}/build/stage1/bin"
+	cp "${BASE}/build/stage1/sbin/sdhcp" "${BASE}/build/stage1/bin"
 	rmdir "${BASE}/build/stage1/sbin"
 	cd .. || exit 1
 else
@@ -700,6 +700,17 @@ if [ ! -f "${BASE}/build/stage1/bin/fbset" ]; then
 	cd .. || exit 1
 else
 	echo "stage1 fbset exists"
+fi
+
+if [ ! -f "${BASE}/build/stage1/bin/lbforth" ]; then
+	rm -rf "lbforth-${LBFORTH_VERSION}"
+	tar xf "${BASE}/downloads/lbforth-${LBFORTH_VERSION}.tar.gz"
+	cd "lbforth-${LBFORTH_VERSION}/SRC" || exit 1
+	"${BASE}/build/stage1/bin/i386-tcc" -static -o lbforth lbforth.c
+	cp "lbforth" "${BASE}/build/stage1/bin"
+	cd ../.. || exit 1
+else
+	echo "stage1 lbforth exists"
 fi
 
 

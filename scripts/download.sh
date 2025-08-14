@@ -245,6 +245,13 @@ if [ ! -f "${BASE}/downloads/fbset-${FBSET_VERSION}.tar.gz" ]; then
 	wget -O "${BASE}/downloads/fbset-${FBSET_VERSION}.tar.gz" "https://src.fedoraproject.org/repo/pkgs/fbset/fbset-2.1.tar.gz/e547cfcbb8c1a4f2a6b8ba4acb8b7164/fbset-2.1.tar.gz"
 fi
 
+if [ ! -f "${BASE}/downloads/lbforth-${LBFORTH_VERSION}.tar.gz" ]; then
+	git clone https://github.com/DosWorld/lbforth.git "lbforth-${LBFORTH_VERSION}"
+	git -C "lbforth-${LBFORTH_VERSION}" checkout "${LBFORTH_VERSION}"
+	tar zcf "${BASE}/downloads/lbforth-${LBFORTH_VERSION}.tar.gz" "lbforth-${LBFORTH_VERSION}"
+	rm -rf "lbforth-${LBFORTH_VERSION}"
+fi
+
 cd .. || exit 1
 
 trap - 0

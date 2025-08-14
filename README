@@ -112,6 +112,7 @@ patches
   * linker fix for -rdynamic
   * patches for building statically and doing a lua module preload
   * disabled Xinerama
+- lbforth
   
 dependencies
 ------------
@@ -623,6 +624,8 @@ Call Trace:
     separate binaries in Unix sense
   - sandy: not really stable and maintained, it seems
   - static: minial cgit version with static pages
+- lbforth:
+  - Configuration error: DCELL_SIZE != 2*CELL_SIZE
 
 tools
 -----
