@@ -387,16 +387,22 @@ else
 	echo "stage1 samurai exists"
 fi
 
-#if [ ! -f "${BASE}/build/stage1/bin/muon" ]; then
-#	rm -rf "samurai-${MUON_VERSION}"
-#	tar xf "${BASE}/downloads/muon-${MUON_VERSION}.tar.gz"
-#	cd "muon-${MUON_VERSION}" || exit 1
-#	CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS=-static \
-#	./bootstrap.sh build-stage1
-#	cd .. || exit 1
-#else
-#	echo "stage1 muon exists"
-#fi
+if [ ! -f "${BASE}/build/stage1/bin/muon" ]; then
+	rm -rf "muon-${MUON_VERSION}"
+	tar xf "${BASE}/downloads/muon-${MUON_VERSION}.tar.gz"
+	cd "muon-${MUON_VERSION}" || exit 1
+	CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS=-static \
+	./bootstrap.sh build
+	# building muon needs too many 3rdparty libraries, maybe bootstrapped muon is enough?
+	cp build/muon-bootstrap "${BASE}/build/stage1/bin/muon"
+#	build/muon-bootstrap setup build
+#	build/muon-bootstrap -C build samu
+#	build/muon-bootstrap -C build test
+#	build/muon-bootstrap -C build install
+	cd .. || exit 1
+else
+	echo "stage1 muon exists"
+fi
 
 if [ ! -f "${BASE}/build/stage1/bin/joe" ]; then
 	rm -rf "joe-${JOE_VERSION}"
