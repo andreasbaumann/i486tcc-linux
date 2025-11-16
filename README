@@ -702,6 +702,7 @@ Some todos to sort out
   - static lua bindings as for notion, so we can use it on i486linux
 - real Unisys machine
 - fix NE2000/NE1000 bug on real chip
+- sqlite3: locking missing
      
 other approaches
 ----------------

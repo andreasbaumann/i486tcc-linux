@@ -719,6 +719,21 @@ else
 	echo "stage1 lbforth exists"
 fi
 
+if [ ! -f "${BASE}/build/stage1/bin/sqlite3" ]; then
+	rm -rf "sqlite-src-${SQLITE_VERSION}"
+	unzip -q "${BASE}/downloads/sqlite-${SQLITE_VERSION}.zip"
+	cd "sqlite-src-${SQLITE_VERSION}" || exit 1
+	CC="${BASE}/build/stage1/bin/i386-tcc" ./configure \
+		--enable-static --prefix="${BASE}/build/stage0" \
+		--disable-shared --disable-readline \
+		--static-cli-shell --disable-tcl                    
+	make
+	cp "sqlite3" "${BASE}/build/stage1/bin"
+	cd .. || exit 1
+else
+	echo "stage1 sqlite3 exists"
+fi
+
 
 #~ if [ ! -f "${BASE}/build/stage1/bin/wg" ]; then
 	#~ rm -rf "wordgrinder-${WORDGRINDER_VERSION}"

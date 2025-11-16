@@ -252,6 +252,10 @@ if [ ! -f "${BASE}/downloads/lbforth-${LBFORTH_VERSION}.tar.gz" ]; then
 	rm -rf "lbforth-${LBFORTH_VERSION}"
 fi
 
+if [ ! -f "${BASE}/downloads/sqlite-${SQLITE_VERSION}.zip" ]; then
+	wget -O "${BASE}/downloads/sqlite-${SQLITE_VERSION}.zip" "https://www.sqlite.org/2025/sqlite-src-${SQLITE_VERSION}.zip"
+fi
+
 cd .. || exit 1
 
 trap - 0
