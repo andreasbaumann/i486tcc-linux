@@ -308,6 +308,8 @@ tinyx/framebuffer:
      SVGA case when using no modules for the framebuffer modules
   => works only if a vga=XXX parameter is passed on boot?
 
+- CONFIG_FILE_LOCKING=y
+  => sqlite3: locking missing, database always appears as locked
 
 TODO: CONFIG_FB_VGA16=m
   => for lowest VGA mode
@@ -702,7 +704,6 @@ Some todos to sort out
   - static lua bindings as for notion, so we can use it on i486linux
 - real Unisys machine
 - fix NE2000/NE1000 bug on real chip
-- sqlite3: locking missing
      
 other approaches
 ----------------
