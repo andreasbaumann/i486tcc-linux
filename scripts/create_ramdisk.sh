@@ -15,8 +15,8 @@ trap 'abort' 0
 
 set -e
 
-SCRIPT=$(readlink -f "$0")
-BASE=$(dirname ${SCRIPT})/..
+SCRIPT=`readlink -f "$0"`
+BASE=`dirname ${SCRIPT}`/..
 
 RAMDISK="${BASE}"/ramdisk
 LOCAL="${BASE}"/local

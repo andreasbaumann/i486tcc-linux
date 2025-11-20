@@ -1,7 +1,7 @@
 #!/bin/oksh
 
-SCRIPT=$(readlink -f "$0")
-BASE=$(dirname ${SCRIPT})/..
+SCRIPT=`readlink -f "$0"`
+BASE=`dirname ${SCRIPT}`/..
 
 echo "Cleaning up in base directory '$BASE'"
 

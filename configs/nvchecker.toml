@@ -1,0 +1,136 @@
+[LINUX_KERNEL]
+source = "git"
+git = "https://github.com/archlinux/linux.git"
+include_regex = 'v\d+(\.\d+)*-arch\d+'
+from_pattern = '-([a-z])'
+to_pattern = '.\1'
+prefix = "v"
+
+[TINYCC]
+
+[MUSL]
+source = "git"
+git = "https://git.musl-libc.org/git/musl"
+prefix = "v"
+
+[_OKSH]
+source = "git"
+git = "https://github.com/ibara/oksh.git"
+include_regex = "oksh-(.+)"
+prefix = "oksh-"
+
+[SBASE]
+
+[UBASE]
+
+[SMDEV]
+
+[SINIT]
+
+[SDHCP]
+
+[UFLBBL]
+
+[LIBEVENT]
+source = "git"
+git = "https://github.com/libevent/libevent.git"
+
+[VIS]
+source = "git"
+git = "https://github.com/martanne/vis.git"
+prefix = "v"
+
+[LIBTERMKEY]
+
+[NETBSD_NCURSES]
+
+[TMUX]
+source = "git"
+git = "https://github.com/tmux/tmux.git"
+
+[ZLIB]
+source = "git"
+git = "https://github.com/madler/zlib.git"
+prefix = "v"
+
+[MANDOC]
+source = "regex"
+url = "https://mandoc.bsd.lv/"
+regex = 'current version (\d+\.\d+\.\d+) '
+
+[ABASE]
+
+[NBD]
+source = "git"
+git = "https://github.com/NetworkBlockDevice/nbd.git"
+prefix = "v"
+
+[SAMURAI]
+source = "git"
+git = "https://github.com/michaelforney/samurai.git"
+
+[MUON]
+
+[JOE]
+
+[DROPBEAR]
+source = "github"
+github = "mkj/dropbear"
+use_latest_release = true
+prefix = "DROPBEAR_"
+
+[TINYXLIB]
+
+[TINYXSERVER]
+
+[BDFTOPCF]
+
+[FONT_CURSOR_MISC]
+[FONT_MISC_MISC]
+[FONT_UTIL]
+
+[RXVT]
+
+[XHOST_VERSION]
+source = "gitlab"
+gitlab = "xorg/app/xhost"
+host = "gitlab.freedesktop.org"
+use_max_tag = true
+include_regex = ".*xhost-.*"
+prefix = "xhost-"
+
+[XAUTH]
+source = "gitlab"
+gitlab = "xorg/app/xauth"
+host = "gitlab.freedesktop.org"
+include_regex = ".*xauth-.*"
+use_max_tag = true
+prefix = "xauth-"
+
+[MEH]
+
+[SLOCK]
+
+[LUA]
+
+[NOTION]
+
+[WORDGRINDER]
+
+[SC]
+
+[MUTT]
+source = "git"
+git = "https://gitlab.com/muttmua/mutt.git"
+exclude_regex = ".*(muttintl|patch).*"
+from_pattern = 'mutt-(\d+)-(\d+)-(\d+)-rel'
+to_pattern = '\1.\2.\3'
+
+[FBSET]
+
+[LBFORTH]
+
+[SQLITE]
+source = "regex"
+regex = "Version (\\d+.\\d+.\\d+)"
+url = "https://www.sqlite.org/index.html"
