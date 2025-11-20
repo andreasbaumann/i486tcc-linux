@@ -70,8 +70,13 @@ source = "git"
 git = "https://github.com/michaelforney/samurai.git"
 
 [MUON]
+source = "git"
+git = "https://github.com/muon-build/muon.git"
 
 [JOE]
+source = "regex"
+url = "https://joe-editor.sourceforge.io/"
+regex = 'Latest version: (\d+\.\d+)'
 
 [DROPBEAR]
 source = "github"
