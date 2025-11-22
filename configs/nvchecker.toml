@@ -87,6 +87,9 @@ to_pattern = '\1'
 use_tag = false
 
 [LIBTERMKEY]
+source = "regex"
+url = "https://www.leonerd.org.uk/code/libtermkey/"
+regex = 'libtermkey-(\d+\.\d+).tar.gz'
 
 [NETBSD_NCURSES]
 source = "github"
@@ -150,28 +153,30 @@ prefix = "DROPBEAR_"
 [TINYXSERVER]
 
 [BDFTOPCF]
+source = "regex"
+url = "https://xorg.freedesktop.org/archive/individual/util/"
+regex = 'bdftopcf-(\d+\.\d+.\d+).tar.gz'
 
 [FONT_CURSOR_MISC]
 [FONT_MISC_MISC]
 [FONT_UTIL]
 
 [RXVT]
+source = "regex"
+url = "https://sourceforge.net/projects/rxvt/files/rxvt/"
+regex = '/projects/rxvt/files/rxvt/(\d+\.\d+.\d+)/'
 
-[XHOST_VERSION]
-source = "gitlab"
-gitlab = "xorg/app/xhost"
-host = "gitlab.freedesktop.org"
-use_max_tag = true
-include_regex = ".*xhost-.*"
-prefix = "xhost-"
+[XHOST]
+source = "regex"
+url = "https://www.x.org/archive/individual/app/"
+# 1.0.10 has no static build option
+#regex = 'xhost-(\d+\.\d+.\d+).tar.gz'
+regex = '1.0.8'
 
 [XAUTH]
-source = "gitlab"
-gitlab = "xorg/app/xauth"
-host = "gitlab.freedesktop.org"
-include_regex = ".*xauth-.*"
-use_max_tag = true
-prefix = "xauth-"
+source = "regex"
+url = "https://www.x.org/archive/individual/app/"
+regex = 'xauth-(\d+\.\d+.\d+).tar.gz'
 
 [MEH]
 source = "git"
