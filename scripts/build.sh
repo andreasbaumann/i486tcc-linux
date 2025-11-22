@@ -213,7 +213,7 @@ if [ ! -x "${BASE}/build/stage1/bin/sdhcp" ]; then
 	cd "sdhcp-${SDHCP_VERSION}" || exit 1
 	make -j$CPUS CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS=-static
 	make -j$CPUS install PREFIX="${BASE}/build/stage1"
-	cp "${BASE}/build/stage1/sbin/sdhcp" "${BASE}/build/stage1/bin"
+	mv "${BASE}/build/stage1/sbin/sdhcp" "${BASE}/build/stage1/bin"
 	rmdir "${BASE}/build/stage1/sbin"
 	cd .. || exit 1
 else

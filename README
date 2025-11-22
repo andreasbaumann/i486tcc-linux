@@ -606,8 +606,6 @@ Call Trace:
   on the host
 - slock runs but cannot unlock the screen (shadow issue?), also we need
   a hard-coded nobody and nogroup user and group
-- sdhcp is in sbin
-rmdir: failed to remove '/data/work/i486tcclinux/i486tcc-linux/scripts/../build/stage1/sbin': Directory not empty
 - qemu on Arch fails to find a vgabios.bin in the local directory?
   => cp /usr/share/qemu/vgabios-isavga.bin vgabios.bin
 - some man pages are in /man, some in /share/man
