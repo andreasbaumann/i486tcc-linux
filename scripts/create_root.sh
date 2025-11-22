@@ -89,7 +89,7 @@ cp "${BASE}/build/stage1/boot/boot.img" "${ROOT}/boot"
 # default passwd is SHA-256 or SHA-512 which can take a minute to verify
 # on old machines! We are using unsafe MD5 crypt1, beware of hacks!
 HASH=$(openssl passwd -1 -salt '5RPVAd' 'xx')
-echo "root:${HASH}:17718::::::" >"${ROOT}/etc/shadow"
+echo "root:${HASH}:::::::" >"${ROOT}/etc/shadow"
 
 du -hs "${BASE}/root"
 ls -h "${BASE}/root.img"
