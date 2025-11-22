@@ -610,7 +610,7 @@ if [ ! -f "${BASE}/build/stage1/bin/slock" ]; then
 	rm -rf "slock-${SLOCK_VERSION}"
 	tar xf "${BASE}/downloads/slock-${SLOCK_VERSION}.tar.gz"
 	cd "slock-${SLOCK_VERSION}" || exit 1
-	cp config.def.h config.h
+	cp "${BASE}/configs/slock-config.h" config.h
 	patch -Np1 < "${BASE}/patches/slock-tcc.patch"
 	patch -Np1 < "${BASE}/patches/slock-no-xrandr.patch"
 	make -j$CPUS CC="${BASE}/build/stage1/bin/i386-tcc" \
