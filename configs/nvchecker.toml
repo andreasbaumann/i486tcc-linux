@@ -158,8 +158,19 @@ url = "https://xorg.freedesktop.org/archive/individual/util/"
 regex = 'bdftopcf-(\d+\.\d+.\d+).tar.gz'
 
 [FONT_CURSOR_MISC]
+source = "regex"
+url = "https://www.x.org/archive/individual/font/"
+regex = 'font-cursor-misc-(\d+\.\d+.\d+).tar.gz'
+
 [FONT_MISC_MISC]
+source = "regex"
+url = "https://www.x.org/archive/individual/font/"
+regex = 'font-misc-misc-(\d+\.\d+.\d+).tar.gz'
+
 [FONT_UTIL]
+source = "regex"
+url = "https://www.x.org/archive/individual/font/"
+regex = 'font-util-(\d+\.\d+.\d+).tar.gz'
 
 [RXVT]
 source = "regex"
