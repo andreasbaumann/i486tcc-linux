@@ -1,3 +1,6 @@
+[__config__]
+max_concurrency = 1
+
 [LINUX_KERNEL]
 source = "git"
 git = "https://github.com/archlinux/linux.git"
@@ -20,33 +23,81 @@ include_regex = "oksh-(.+)"
 prefix = "oksh-"
 
 [SBASE]
+source = "git"
+git = "git://git.suckless.org/sbase"
+use_commit = true
+from_pattern = "(.{5,5}).*"
+to_pattern = '\1'
+use_tag = false
 
 [UBASE]
+source = "git"
+git = "git://git.suckless.org/ubase"
+use_commit = true
+from_pattern = "(.{5,5}).*"
+to_pattern = '\1'
+use_tag = false
 
 [SMDEV]
+source = "git"
+git = "git://git.suckless.org/smdev"
+use_commit = true
+from_pattern = "(.{5,5}).*"
+to_pattern = '\1'
+use_tag = false
 
 [SINIT]
+source = "git"
+git = "git://git.suckless.org/sinit"
+use_commit = true
+from_pattern = "(.{5,5}).*"
+to_pattern = '\1'
+use_tag = false
 
 [SDHCP]
+source = "git"
+git = "git://git.2f30.org/sdhcp"
+use_commit = true
+from_pattern = "(.{5,5}).*"
+to_pattern = '\1'
+use_tag = false
 
 [UFLBBL]
+source = "git"
+git = "https://github.com/andreasbaumann/uflbbl.git"
+branch = "master"
+use_commit = true
+from_pattern = "(.{7,7}).*"
+to_pattern = '\1'
+use_tag = false
 
 [LIBEVENT]
-source = "git"
-git = "https://github.com/libevent/libevent.git"
+source = "github"
+github = "libevent/libevent"
+use_latest_release = true
+prefix = "release-"
 
 [VIS]
 source = "git"
 git = "https://github.com/martanne/vis.git"
-prefix = "v"
+branch = "master"
+use_commit = true
+from_pattern = "(.{7,7}).*"
+to_pattern = '\1'
+use_tag = false
 
 [LIBTERMKEY]
 
 [NETBSD_NCURSES]
+source = "github"
+github = "sabotage-linux/netbsd-curses"
+use_latest_release = true
+prefix = "v"
 
 [TMUX]
-source = "git"
-git = "https://github.com/tmux/tmux.git"
+source = "github"
+github = "tmux/tmux"
+use_latest_release = true
 
 [ZLIB]
 source = "git"
@@ -59,19 +110,29 @@ url = "https://mandoc.bsd.lv/"
 regex = 'current version (\d+\.\d+\.\d+) '
 
 [ABASE]
+source = "git"
+git = "https://github.com/andreasbaumann/abase.git"
+branch = "master"
+use_commit = true
+from_pattern = "(.{7,7}).*"
+to_pattern = '\1'
+use_tag = false
 
 [NBD]
-source = "git"
-git = "https://github.com/NetworkBlockDevice/nbd.git"
-prefix = "v"
+source = "github"
+github = "NetworkBlockDevice/nbd"
+use_latest_release = true
+prefix = "nbd-"
 
 [SAMURAI]
 source = "git"
 git = "https://github.com/michaelforney/samurai.git"
+use_latest_release = true
 
 [MUON]
 source = "git"
 git = "https://github.com/muon-build/muon.git"
+use_latest_release = true
 
 [JOE]
 source = "regex"
@@ -113,14 +174,35 @@ use_max_tag = true
 prefix = "xauth-"
 
 [MEH]
+source = "git"
+git = "https://github.com/andreasbaumann/meh.git"
+branch = "integration"
+use_commit = true
+from_pattern = "(.{7,7}).*"
+to_pattern = '\1'
+use_tag = false
 
 [SLOCK]
+source = "git"
+git = "git://git.suckless.org/slock"
+branch = "master"
+use_commit = true
+from_pattern = "(.{7,7}).*"
+to_pattern = '\1'
+use_tag = false
 
 [LUA]
+source = "regex"
+regex = "lua-(5.1.\\d+).tar.gz"
+url = "https://www.lua.org/ftp/"
 
 [NOTION]
 
 [WORDGRINDER]
+source = "git"
+git = "https://github.com/davidgiven/wordgrinder.git"
+branch = "master"
+use_tag = true
 
 [SC]
 
@@ -134,6 +216,13 @@ to_pattern = '\1.\2.\3'
 [FBSET]
 
 [LBFORTH]
+source = "git"
+git = "https://github.com/DosWorld/lbforth.git"
+branch = "master"
+use_commit = true
+from_pattern = "(.{7,7}).*"
+to_pattern = '\1'
+use_tag = false
 
 [SQLITE]
 source = "regex"
