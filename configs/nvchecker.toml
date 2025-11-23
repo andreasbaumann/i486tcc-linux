@@ -10,6 +10,12 @@ to_pattern = '.\1'
 prefix = "v"
 
 [TINYCC]
+source = "git"
+git = "https://repo.or.cz/tinycc.git"
+use_commit = true
+from_pattern = "(.{5,5}).*"
+to_pattern = '\1'
+use_tag = false
 
 [MUSL]
 source = "git"
@@ -149,8 +155,22 @@ use_latest_release = true
 prefix = "DROPBEAR_"
 
 [TINYXLIB]
+source = "git"
+git = "https://github.com/idunham/tinyxlib.git"
+branch = "master"
+use_commit = true
+from_pattern = "(.{7,7}).*"
+to_pattern = '\1'
+use_tag = false
 
 [TINYXSERVER]
+source = "git"
+git = "https://github.com/idunham/tinyxserver.git"
+branch = "master"
+use_commit = true
+from_pattern = "(.{7,7}).*"
+to_pattern = '\1'
+use_tag = false
 
 [BDFTOPCF]
 source = "regex"
@@ -180,9 +200,7 @@ regex = '/projects/rxvt/files/rxvt/(\d+\.\d+.\d+)/'
 [XHOST]
 source = "regex"
 url = "https://www.x.org/archive/individual/app/"
-# 1.0.10 has no static build option
-#regex = 'xhost-(\d+\.\d+.\d+).tar.gz'
-regex = '1.0.8'
+regex = 'xhost-(\d+\.\d+.\d+).tar.gz'
 
 [XAUTH]
 source = "regex"
@@ -213,6 +231,13 @@ regex = "lua-(5.1.\\d+).tar.gz"
 url = "https://www.lua.org/ftp/"
 
 [NOTION]
+source = "git"
+git = "https://github.com/raboof/notion.git"
+branch = "master"
+include_regex = "(3-\\d+)"
+use_tag = true
+use_commit = false
+#NOTION_VERSION="435631f"3-2019050101
 
 [WORDGRINDER]
 source = "git"
@@ -221,6 +246,9 @@ branch = "master"
 use_tag = true
 
 [SC]
+source = "github"
+github = "n-t-roff/sc"
+use_latest_release = true
 
 [MUTT]
 source = "git"
@@ -230,6 +258,9 @@ from_pattern = 'mutt-(\d+)-(\d+)-(\d+)-rel'
 to_pattern = '\1.\2.\3'
 
 [FBSET]
+source = "regex"
+url = "https://src.fedoraproject.org/repo/pkgs/fbset/"
+regex = "fbset-(\\d+.\\d+).tar.gz"
 
 [LBFORTH]
 source = "git"
