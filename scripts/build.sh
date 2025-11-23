@@ -563,7 +563,7 @@ if [ ! -f "${BASE}/build/stage1/bin/xauth" ]; then
 	cd "xauth-${XAUTH_VERSION}" || exit 1
 	patch -Np1 < "${BASE}/patches/xauth-ipv6.patch"
 	CC="${BASE}/build/stage1/bin/i386-tcc" \
-	./configure --enable-static --prefix="${BASE}/build/stage1" \
+	./configure --prefix="${BASE}/build/stage1" \
 		--x-includes="${BASE}/build/stage1/include" \
 		--x-libraries="${BASE}/build/stage1/lib" \
 		--host="i386-linux-musl"
@@ -580,7 +580,7 @@ if [ ! -f "${BASE}/build/stage1/bin/xhost" ]; then
 	cd "xhost-${XHOST_VERSION}" || exit 1
 	patch -Np1 < "${BASE}/patches/xhost-ipv6.patch"
 	CC="${BASE}/build/stage1/bin/i386-tcc" \
-	./configure --enable-static --prefix="${BASE}/build/stage1" \
+	./configure --prefix="${BASE}/build/stage1" \
 		--x-includes="${BASE}/build/stage1/include" \
 		--x-libraries="${BASE}/build/stage1/lib" \
 		--host="i386-linux-musl"
