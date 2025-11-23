@@ -720,9 +720,13 @@ else
 fi
 
 if [ ! -f "${BASE}/build/stage1/bin/sqlite3" ]; then
-	rm -rf "sqlite-src-${SQLITE_VERSION}"
+	MAJOR_SQLITE_VERSION=`echo "${SQLITE_VERSION}" | cut -d . -f 1`
+	MINOR_SQLITE_VERSION=`echo "${SQLITE_VERSION}" | cut -d . -f 2`
+	PATCH_SQLITE_VERSION=`echo "${SQLITE_VERSION}" | cut -d . -f 3`
+	_SQLITE_VERSION=`expr ${MAJOR_SQLITE_VERSION} \* 1000000 + ${MINOR_SQLITE_VERSION} \* 10000 + ${PATCH_SQLITE_VERSION}`
+	rm -rf "sqlite-src-${_SQLITE_VERSION}"
 	unzip -q "${BASE}/downloads/sqlite-${SQLITE_VERSION}.zip"
-	cd "sqlite-src-${SQLITE_VERSION}" || exit 1
+	cd "sqlite-src-${_SQLITE_VERSION}" || exit 1
 	CC="${BASE}/build/stage1/bin/i386-tcc" ./configure \
 		--enable-static --prefix="${BASE}/build/stage0" \
 		--disable-shared --disable-readline \

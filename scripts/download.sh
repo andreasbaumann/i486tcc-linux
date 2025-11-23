@@ -253,7 +253,11 @@ if [ ! -f "${BASE}/downloads/lbforth-${LBFORTH_VERSION}.tar.gz" ]; then
 fi
 
 if [ ! -f "${BASE}/downloads/sqlite-${SQLITE_VERSION}.zip" ]; then
-	wget -O "${BASE}/downloads/sqlite-${SQLITE_VERSION}.zip" "https://www.sqlite.org/2025/sqlite-src-${SQLITE_VERSION}.zip"
+	MAJOR_SQLITE_VERSION=`echo "${SQLITE_VERSION}" | cut -d . -f 1`
+	MINOR_SQLITE_VERSION=`echo "${SQLITE_VERSION}" | cut -d . -f 2`
+	PATCH_SQLITE_VERSION=`echo "${SQLITE_VERSION}" | cut -d . -f 3`
+	_SQLITE_VERSION=`expr ${MAJOR_SQLITE_VERSION} \* 1000000 + ${MINOR_SQLITE_VERSION} \* 10000 + ${PATCH_SQLITE_VERSION}`
+	wget -O "${BASE}/downloads/sqlite-${SQLITE_VERSION}.zip" "https://www.sqlite.org/2025/sqlite-src-${_SQLITE_VERSION}.zip"
 fi
 
 cd .. || exit 1
