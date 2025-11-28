@@ -685,6 +685,10 @@ to abase).
     Their definition of micro is quite different from mine in terms of
     size and library dependencies)
     I also doubt it works with tcc, needs python3 on the host to build
+  - lbforth: https://github.com/DosWorld/lbforth
+    Small nice FORTH written in C
+- minimal tools
+  - sqlite3: https://www.sqlite.org
 
 Some todos to sort out
 ----------------------
