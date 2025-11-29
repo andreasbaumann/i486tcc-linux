@@ -381,6 +381,7 @@ cd ../linux
 bugs
 ----
 
+- remove some man pages (lua)
 - mutt: no /var/mail/root or /var/mail/user
 - getpass in login needs legacy BSD ttys?
 - tcc cannot compile the linux kernel. Most likely this will remain
