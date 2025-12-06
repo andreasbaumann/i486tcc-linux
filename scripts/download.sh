@@ -260,6 +260,10 @@ if [ ! -f "${BASE}/downloads/sqlite-${SQLITE_VERSION}.zip" ]; then
 	wget -O "${BASE}/downloads/sqlite-${SQLITE_VERSION}.zip" "https://www.sqlite.org/2025/sqlite-src-${_SQLITE_VERSION}.zip"
 fi
 
+if [ ! -f "${BASE}/downloads/nasm-${NASM_VERSION}.tar.xz" ]; then
+	wget -O "${BASE}/downloads/nasm-${NASM_VERSION}.tar.xz" "https://www.nasm.us/pub/nasm/releasebuilds/${NASM_VERSION}/nasm-${NASM_VERSION}.tar.xz"
+fi
+
 cd .. || exit 1
 
 trap - 0

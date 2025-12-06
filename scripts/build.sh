@@ -738,6 +738,19 @@ else
 	echo "stage1 sqlite3 exists"
 fi
 
+if [ ! -f "${BASE}/build/stage1/bin/nasm" ]; then
+	rm -rf "nasm-${NASM_VERSION}.tar.xz"
+	tar xf "${BASE}/downloads/nasm-${NASM_VERSION}.tar.xz"
+	cd "nasm-${NASM_VERSION}" || exit 1
+	CC="${BASE}/build/stage1/bin/i386-tcc" \
+	./configure --prefix="${BASE}/build/stage1" \
+		--host="i386-linux-musl"
+	make -j$CPUS LDFLAGS="-static"
+	make -j$CPUS install
+	cd .. || exit 1
+else
+	echo "stage1 xhost exists"
+fi
 
 #~ if [ ! -f "${BASE}/build/stage1/bin/wg" ]; then
 	#~ rm -rf "wordgrinder-${WORDGRINDER_VERSION}"
