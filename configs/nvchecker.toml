@@ -275,3 +275,9 @@ use_tag = false
 source = "regex"
 regex = "Version (\\d+.\\d+.\\d+)"
 url = "https://www.sqlite.org/index.html"
+
+[NASM]
+source = "git"
+git = "https://github.com/netwide-assembler/nasm.git"
+include_regex = "nasm-[\\d\\.]+"
+prefix = "nasm-"
