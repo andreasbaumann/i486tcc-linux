@@ -109,9 +109,9 @@ github = "tmux/tmux"
 use_latest_release = true
 
 [ZLIB]
-source = "git"
-git = "https://github.com/madler/zlib.git"
-prefix = "v"
+source = "regex"
+url = "https://www.zlib.net/"
+regex = 'version (\d+\.\d+\.\d+)'
 
 [MANDOC]
 source = "regex"
