@@ -1,0 +1,14 @@
+diff -rauN a/scripts/mkproto b/scripts/mkproto
+--- a/scripts/mkproto	2025-12-19 09:26:38.000000000 +0100
++++ b/scripts/mkproto	2025-12-19 09:34:38.590300749 +0100
+@@ -15,8 +15,8 @@
+ (set -e
+ echo d $prefix/bin $prefix/bin 755
+ echo d $manprefix/man1 $manprefix/man1 755
+-echo d $prefix/share/misc 755
+-echo c bc.library $prefix/share/misc/bc.library
++echo d $prefix/share/misc $prefix/share/misc 755
++echo c bc.library $prefix/share/misc/bc.library 755
+ ls -ld * make/* |\
+ awk '
+ /^-/ && $1 ~ /x/ {
