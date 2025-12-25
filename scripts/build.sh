@@ -221,7 +221,7 @@ else
 	echo "stage1 sdhcp exists"
 fi
 
-# for vi
+# for vis
 if [ ! -f "${BASE}/build/stage1/lib/libncurses.a" ]; then
 	rm -rf "netbsd-curses-${NETBSD_NCURSES_VERSION}"
 	tar xf "${BASE}/downloads/netbsd-curses-${NETBSD_NCURSES_VERSION}.tar.gz"
@@ -285,6 +285,20 @@ if [ ! -x "${BASE}/build/stage1/bin/vi" ]; then
 	cd .. || exit 1
 else
 	echo "stage1 vis exists"
+fi
+
+if [ ! -x "${BASE}/build/stage1/bin/kilo" ]; then
+	rm -rf "kilo-${KILO_VERSION}"
+	tar xf "${BASE}/downloads/kilo-${KILO_VERSION}.tar.gz"
+	cd "kilo-${KILO_VERSION}" || exit 1
+	"${BASE}/build/stage1/bin/i386-tcc" \
+		-o kilo kilo.c -static -Wall -W -pedantic -std=c99 \
+		-I"${BASE}/build/stage1/include" \
+		-L"${BASE}/build/stage1/lib"		
+	cp kilo "${BASE}/build/stage1/bin/kilo"
+	cd .. || exit 1
+else
+	echo "stage1 kilo exists"
 fi
 
 if [ ! -x "${BASE}/build/stage1/bin/tmux" ]; then

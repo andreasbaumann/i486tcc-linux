@@ -93,6 +93,13 @@ if [ ! -f "${BASE}/downloads/vis-${VIS_VERSION}.tar.gz" ]; then
 	rm -rf "vis-${VIS_VERSION}"
 fi
 
+if [ ! -f "${BASE}/downloads/kilo-${KILO_VERSION}.tar.gz" ]; then
+	git clone https://github.com/antirez/kilo.git "kilo-${KILO_VERSION}"
+	git -C "kilo-${KILO_VERSION}" checkout "${KILO_VERSION}"
+	tar zcf "${BASE}/downloads/kilo-${KILO_VERSION}.tar.gz" "kilo-${KILO_VERSION}"
+	rm -rf "kilo-${KILO_VERSION}"
+fi
+
 if [ ! -f "${BASE}/downloads/tmux-${TMUX_VERSION}.tar.gz" ]; then
 	wget -O "${BASE}/downloads/tmux-${TMUX_VERSION}.tar.gz" "https://github.com/tmux/tmux/releases/download/${TMUX_VERSION}/tmux-${TMUX_VERSION}.tar.gz"
 fi
