@@ -700,7 +700,10 @@ Some todos to sort out
   - https://opensource.com/article/19/10/why-use-rxvt-terminal
   - st: requires a Xft implementation, tinyxserver has none
 - tmux/screen
-- joe/vis
+- joe/vis/nano/kilo/wily
+  - kilo and joe, vis added, nano is too big
+  - wily: http://www.cs.yorku.ca/~oz/wily/download.html, a little
+    bit too niche to use
 - vesa/framebuffer
   - real Unisys machine
     - fix VGA framebuffer vga16fb
