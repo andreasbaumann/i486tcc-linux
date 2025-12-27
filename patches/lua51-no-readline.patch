@@ -18,7 +18,7 @@ diff -rauN lua/src/Makefile lua-no-readline-patch/src/Makefile
  
  linux:
 -	$(MAKE) all MYCFLAGS=-DLUA_USE_LINUX MYLIBS="-Wl,-E -ldl -lreadline -lhistory -lncurses"
-+	$(MAKE) all MYCFLAGS=-DLUA_USE_LINUX MYLIBS="-rdynamic -ldl -lncurses"
++	$(MAKE) all MYCFLAGS=-DLUA_USE_LINUX MYLIBS="-rdynamic -ldl"
  
  macosx:
  	$(MAKE) all MYCFLAGS=-DLUA_USE_LINUX MYLIBS="-lreadline"

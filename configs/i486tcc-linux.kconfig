@@ -1,0 +1,244 @@
+mainmenu "i486 TCC Linux Configuration"
+
+comment "configuration for i486 TCC Linux"
+
+menu "Libraries"
+
+config NETBSD_NCURSES
+  bool "NetBSD ncurses"
+  default y
+  help
+  
+config LIBTERMKEY
+  bool "libtermkey"
+  default y
+  depends on NETBSD_NCURSES
+  help
+
+config LIBEVENT
+  bool "libevent"
+  default y
+  help
+
+config ZLIB
+  bool "zlib"
+  default y
+  help
+  
+endmenu
+
+menu "Development & Languages"
+
+config SAMURAI
+  bool "samurai"
+  default y
+  help
+
+config MUON
+  bool "muon"
+  default y
+  help
+
+config NASM
+  bool "nasm"
+  default y
+  help
+
+config LBFORTH
+  bool "lbforth"
+  default y
+  help
+  
+config LUA
+  bool "lua"
+  default y
+  help
+
+endmenu
+
+menu "Applications"
+
+menu "Editors"
+
+config VIS
+  bool "vis"
+  default y
+  depends on NETBSD_NCURSES && LIBTERMKEY && LIBEVENT
+  help
+    A vi-like editor based on Plan 9's structural regular expressions
+    (https://github.com/martanne/vis)
+
+config JOE
+  bool "joe"
+  default y
+  depends on NETBSD_NCURSES
+  help
+    Joe's own editor (https://joe-editor.sourceforge.io/)
+
+config KILO
+  bool "kilo"
+  default y
+  depends on LIBEVENT
+  help
+    The kilo editor (https://github.com/antirez/kilo)
+
+endmenu
+
+menu "Tools"
+
+config MANDOC
+  bool "mandoc"
+  default y
+  depends on ZLIB
+  help
+
+config SQLITE
+  bool "sqlite"
+  default y
+  help
+
+config SC
+  bool "sc"
+  default y
+  depends on NETBSD_NCURSES
+  help
+
+#config WORDGRINDER
+#  bool "wordgrinder"
+#  default n
+#  help
+
+config MUTT
+  bool "mutt"
+  default y
+  depends on NETBSD_NCURSES
+  help
+
+config TMUX
+  bool "tmux"
+  default y
+  depends LIBTERMKEY && LIBEVENT
+  help
+
+config FBSET
+  bool "fbset"
+  default y
+  help
+  
+endmenu #Tools
+
+menu "Networking"
+
+config SDHCP
+  bool "sdhcp"
+  default y
+  help
+    TODO: Currently required to get an IP for the root via NBD
+
+config NBD
+  bool "nbd"
+  default y
+  help
+    TODO: Currently required for the root via NBD
+
+config DROPBEAR
+  bool "dropbear"
+  default y
+  help
+
+endmenu # Networking
+
+endmenu # Applications
+
+menu "X"
+
+menu "X Server & Tools"
+
+config TINYXLIB
+  bool "tinyxlib"
+  default y
+  help
+
+config TINYXSERVER
+  bool "tinyxserver"
+  default y
+  depends on TINYXLIB
+  help
+
+config XHOST
+  bool "xhost"
+  default y
+  depends on TINYXLIB
+  help
+
+config XAUTH
+  bool "xauth"
+  default y
+  depends on TINYXLIB
+  help
+
+endmenu # X Server & Tools
+
+menu "X Terminals"
+
+config RXVT
+  bool "rxvt"
+  default y
+  depends on TINYXLIB
+  help
+
+endmenu # X Terminals 
+
+menu "X window managers"
+
+config NOTION
+  bool "notion"
+  default y
+  depends on TINYXLIB && LUA
+  help
+
+config SLOCK
+  bool "slock"
+  default y
+  depends on TINYXLIB
+  help
+
+endmenu # X window managers
+
+menu "X Applications"
+
+config MEH
+  bool "meh"
+  default y
+  depends on TINYXLIB
+  help
+
+endmenu # X Applications
+
+endmenu # X
+
+menu "Global settings"
+
+choice
+	prompt "Userland compiler"
+	default I486TCCLINUX_COMPILER_TCC
+	help
+	  Select the compiler to compile the userland (currently only TCC is
+	  supported)
+
+config I486TCCLINUX_COMPILER_TCC
+	bool "tcc"
+	help
+	  Use Tiny C Compiler to build the userland (https://bellard.org/tcc/).
+	  Note: the kernel has to be built with gcc or clang.
+
+config I486TCCLINUX_COMPILER_PCC	  
+	bool "pcc"
+	help
+	  Use the portable C compiler to build the userland (https://github.com/PortableCC/).
+	  Note: the kernel has to be built with gcc or clang.
+
+endchoice
+
+endmenu # Global settings
+

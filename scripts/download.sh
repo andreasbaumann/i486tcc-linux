@@ -18,6 +18,7 @@ set -e
 SCRIPT=$(readlink -f "$0")
 BASE=$(dirname ${SCRIPT})/..
 
+. "${BASE}/configs/config"
 . "${BASE}/configs/versions"
 
 echo "Downloading software to '$BASE'/downloads"

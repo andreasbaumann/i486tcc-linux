@@ -1107,7 +1107,10 @@ links
 - graphic programming
   - https://www.svgalib.org/
   - https://benpfaff.org/projects.html: BOGL graphics library for framebuffers
-
+- configuration
+  - lxdialog/kconfig
+  - https://github.com/jameswalmsley/kconfig-frontends
+  
 performance
 -----------
 
