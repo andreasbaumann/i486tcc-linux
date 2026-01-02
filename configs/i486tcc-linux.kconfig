@@ -2,223 +2,16 @@ mainmenu "i486 TCC Linux Configuration"
 
 comment "configuration for i486 TCC Linux"
 
-menu "Libraries"
-
-config NETBSD_NCURSES
-  bool "NetBSD ncurses"
-  default y
-  help
-  
-config LIBTERMKEY
-  bool "libtermkey"
-  default y
-  depends on NETBSD_NCURSES
-  help
-
-config LIBEVENT
-  bool "libevent"
-  default y
-  help
-
-config ZLIB
-  bool "zlib"
-  default y
-  help
-  
-endmenu
-
-menu "Development & Languages"
-
-config SAMURAI
-  bool "samurai"
-  default y
-  help
-
-config MUON
-  bool "muon"
-  default y
-  help
-
-config NASM
-  bool "nasm"
-  default y
-  help
-
-config LBFORTH
-  bool "lbforth"
-  default y
-  help
-  
-config LUA
-  bool "lua"
-  default y
-  help
-
-endmenu
-
-menu "Applications"
-
-menu "Editors"
-
-config VIS
-  bool "vis"
-  default y
-  depends on NETBSD_NCURSES && LIBTERMKEY && LIBEVENT
-  help
-    A vi-like editor based on Plan 9's structural regular expressions
-    (https://github.com/martanne/vis)
-
-config JOE
-  bool "joe"
-  default y
-  depends on NETBSD_NCURSES
-  help
-    Joe's own editor (https://joe-editor.sourceforge.io/)
-
-config KILO
-  bool "kilo"
-  default y
-  depends on LIBEVENT
-  help
-    The kilo editor (https://github.com/antirez/kilo)
-
-endmenu
-
-menu "Tools"
-
-config MANDOC
-  bool "mandoc"
-  default y
-  depends on ZLIB
-  help
-
-config SQLITE
-  bool "sqlite"
-  default y
-  help
-
-config SC
-  bool "sc"
-  default y
-  depends on NETBSD_NCURSES
-  help
-
-#config WORDGRINDER
-#  bool "wordgrinder"
-#  default n
-#  help
-
-config MUTT
-  bool "mutt"
-  default y
-  depends on NETBSD_NCURSES
-  help
-
-config TMUX
-  bool "tmux"
-  default y
-  depends LIBTERMKEY && LIBEVENT
-  help
-
-config FBSET
-  bool "fbset"
-  default y
-  help
-  
-endmenu #Tools
-
-menu "Networking"
-
-config SDHCP
-  bool "sdhcp"
-  default y
-  help
-    TODO: Currently required to get an IP for the root via NBD
-
-config NBD
-  bool "nbd"
-  default y
-  help
-    TODO: Currently required for the root via NBD
-
-config DROPBEAR
-  bool "dropbear"
-  default y
-  help
-
-endmenu # Networking
-
-endmenu # Applications
-
-menu "X"
-
-menu "X Server & Tools"
-
-config TINYXLIB
-  bool "tinyxlib"
-  default y
-  help
-
-config TINYXSERVER
-  bool "tinyxserver"
-  default y
-  depends on TINYXLIB
-  help
-
-config XHOST
-  bool "xhost"
-  default y
-  depends on TINYXLIB
-  help
-
-config XAUTH
-  bool "xauth"
-  default y
-  depends on TINYXLIB
-  help
-
-endmenu # X Server & Tools
-
-menu "X Terminals"
-
-config RXVT
-  bool "rxvt"
-  default y
-  depends on TINYXLIB
-  help
-
-endmenu # X Terminals 
-
-menu "X window managers"
-
-config NOTION
-  bool "notion"
-  default y
-  depends on TINYXLIB && LUA
-  help
-
-config SLOCK
-  bool "slock"
-  default y
-  depends on TINYXLIB
-  help
-
-endmenu # X window managers
-
-menu "X Applications"
-
-config MEH
-  bool "meh"
-  default y
-  depends on TINYXLIB
-  help
-
-endmenu # X Applications
-
-endmenu # X
-
 menu "Global settings"
 
+config ROOT_ON_NBD
+  bool "root filesystem on NBD (mandatory)"
+  default y
+  help
+    Serve the root filesystem from the host system via NBD. This
+    is currently the only option and is used for debugging and fast
+    testing.
+    
 choice
 	prompt "Userland compiler"
 	default I486TCCLINUX_COMPILER_TCC
@@ -242,3 +35,376 @@ endchoice
 
 endmenu # Global settings
 
+menu "Libraries"
+
+config NETBSD_NCURSES
+  bool "NetBSD ncurses"
+  default y
+  help
+    Provides basic terminal control functions for TUIs.
+    
+    This portable NetBSD Curses implementation can be found on
+    https://github.com/sabotage-linux/netbsd-curses/.
+  
+config LIBTERMKEY
+  bool "libtermkey"
+  default y
+  depends on NETBSD_NCURSES
+  help
+    Provides easy keyboard input for terminal programs.
+
+    https://www.leonerd.org.uk/code/libtermkey/
+    
+config LIBEVENT
+  bool "libevent"
+  default y
+  help
+    Provides event API for notification about signals, timeouts, etc.
+    
+    https://libevent.org/
+
+config ZLIB
+  bool "zlib"
+  default y
+  help
+    Compression library implementing the deflate compression method.
+    
+    https://www.zlib.net/
+  
+endmenu
+
+menu "Basic Userland"
+
+config OKSH
+  bool "oksh (mandatory)"
+  default y
+  help
+    Portable OpenBSD ksh, based on the Public Domain Korn Shell (pdksh).
+    
+    https://github.com/ibara/oksh/
+
+config SBASE
+  bool "sbase (mandatory)"
+  default y
+  help
+    Suckless base collection of unix tools that are portable across
+    unix-systems.
+
+    https://core.suckless.org/sbase/
+
+config UBASE
+  bool "ubase (mandatory)"
+  default y
+  help
+    Unportable base is a collection of unportable tools, 
+    similar in spirit to util-linux but much simpler.
+
+    https://core.suckless.org/ubase/
+
+config ABASE
+  bool "abase"
+  default y
+  help
+    Things missing in sbase/ubase (IMHO).
+    
+    Currently it contains extremely minimalistic versions of:
+    - hexdump
+    - more
+    - rmmod
+    - ifconfig and ping
+
+    https://github.com/andreasbaumann/abase
+
+config SMDEV
+  bool "smdev (mandatory)"
+  default y
+  help
+    suckless mdev is a mostly mdev-compatible suckless program to
+    manage device nodes.
+
+    https://core.suckless.org/smdev/
+
+config SINIT
+  bool "sinit (mandatory)"
+  default y
+  help
+    suckless init, initially based on Rich Felker's minimal init.
+
+    https://core.suckless.org/sinit/
+
+endmenu
+
+menu "Development & Languages"
+
+config SAMURAI
+  bool "samurai"
+  default y
+  help
+    A ninja-compatible build tool written in C.
+    
+    https://github.com/michaelforney/samurai
+
+config MUON
+  bool "muon"
+  default y
+  help
+    An implementation of the meson build system in C99.
+  
+    https://github.com/muon-build/muon
+
+config NASM
+  bool "nasm"
+  default y
+  help
+    The Netwide Assembler for the x86 CPU architecture.
+  
+    https://www.nasm.us
+
+config LBFORTH
+  bool "lbforth"
+  default y
+  help
+    Public-domain Forth in C by Leif Bruder.
+    
+    https://github.com/DosWorld/lbforth
+    
+config LUA
+  bool "lua"
+  default y
+  help
+    Lua Language. We stick to version 5.1 for compatibility to some
+    software and for keeping compatibility to LuaJIT.
+  
+    https://lua.org/
+
+endmenu
+
+menu "Applications"
+
+menu "Editors"
+
+config VIS
+  bool "vis"
+  default y
+  depends on NETBSD_NCURSES && LIBTERMKEY && LIBEVENT
+  help
+    A vi-like editor based on Plan 9's structural regular expressions
+    
+    https://github.com/martanne/vis
+
+config JOE
+  bool "joe"
+  default y
+  depends on NETBSD_NCURSES
+  help
+    Joe's own editor
+    
+    https://joe-editor.sourceforge.io/
+
+config KILO
+  bool "kilo"
+  default y
+  depends on LIBEVENT
+  help
+    The kilo editor
+    
+    https://github.com/antirez/kilo
+
+endmenu
+
+menu "Tools"
+
+config MANDOC
+  bool "mandoc"
+  default y
+  depends on ZLIB
+  help
+    Man page viewer from OpenBSD and a BSD.lv.
+
+    https://mandoc.bsd.lv/
+
+config SQLITE
+  bool "sqlite"
+  default y
+  help
+    Small SQL database engine in C.
+  
+    https://sqlite.org/
+
+config SC
+  bool "sc"
+  default y
+  depends on NETBSD_NCURSES
+  help
+    Terminal-based spreadsheed program.
+    
+    https://github.com/n-t-roff/sc
+
+#config WORDGRINDER
+#  bool "wordgrinder"
+#  default n
+#  help
+#     Terminal-based text editing suite.
+#
+#     https://cowlark.com/wordgrinder/
+
+config MUTT
+  bool "mutt"
+  default y
+  depends on NETBSD_NCURSES
+  help
+    Terminal-based email client.
+    
+    https://gitlab.com/muttmua/mutt
+
+config TMUX
+  bool "tmux"
+  default y
+  depends LIBTERMKEY && LIBEVENT
+  help
+    Terminal multiplexing application. Something like screen.
+    
+    https://github.com/tmux/tmux
+    
+config FBSET
+  bool "fbset"
+  default y
+  help
+    Tools to set framebuffer parameters.
+    
+    https://src.fedoraproject.org/repo/pkgs/fbset
+    
+endmenu #Tools
+
+menu "Networking"
+
+config SDHCP
+  bool "sdhcp"
+  default y
+  depends on ROOT_ON_NBD
+  help
+    suckless dhcp client.
+    
+    Note: Currently required to get an IP for the root via NBD
+
+    https://core.suckless.org/sdhcp/
+
+config NBD
+  bool "nbd"
+  default y
+  depends on ROOT_ON_NBD
+  help
+    Can mount a network block device as /dev/nbdX and use it as
+    normal block device.
+    
+    Note: Currently required to serve the root filesystem via NBD
+    
+    https://github.com/NetworkBlockDevice/nbd
+
+config DROPBEAR
+  bool "dropbear"
+  default y
+  help
+    Implementation of a small SSH server and client.
+
+    https://matt.ucc.asn.au/dropbear/dropbear.html
+    
+endmenu # Networking
+
+endmenu # Applications
+
+menu "X"
+
+menu "X Server & Tools"
+
+config TINYXLIB
+  bool "tinyxlib"
+  default y
+  help
+    Tiny version of xlib, based on goingnuts' modifications of
+    amigo's fork of an ancient xlib version
+    
+    https://github.com/idunham/tinyxlib
+
+config TINYXSERVER
+  bool "tinyxserver"
+  default y
+  depends on TINYXLIB
+  help
+    A small X server, based on Xorg 1.2 but with security fixes.
+    We use Xfbdev, the framebuffer version currently.
+  
+    https://github.com/idunham/tinyxserver
+
+config XHOST
+  bool "xhost"
+  default y
+  depends on TINYXLIB
+  help
+    Server access control program for X
+    
+    https://xorg.freedesktop.org/xorg/app/xhost
+
+config XAUTH
+  bool "xauth"
+  default y
+  depends on TINYXLIB
+  help
+    X.Org authorization settings program
+    
+    https://gitlab.freedesktop.org/xorg/app/xauth
+    
+config SLOCK
+  bool "slock"
+  default y
+  depends on TINYXLIB
+  help
+    Simple X display locker.
+    
+    https://tools.suckless.org/slock/
+
+endmenu # X Server & Tools
+
+menu "X Terminals"
+
+config RXVT
+  bool "rxvt"
+  default y
+  depends on TINYXLIB
+  help
+    Non-Unicode lightweight X terminal.
+    
+    https://rxvt.sourceforge.net/
+
+endmenu # X Terminals 
+
+menu "X window managers"
+
+config NOTION
+  bool "notion"
+  default y
+  depends on TINYXLIB && LUA
+  help
+    tiling, tabbed window manager, originally based on 
+    ion3 (https://tuomov.iki.fi/software/ion/).
+    
+    https://notionwm.net/
+
+endmenu # X window managers
+
+menu "X Applications"
+
+config MEH
+  bool "meh"
+  default y
+  depends on TINYXLIB
+  help
+    meh is a small, simple, super fast image viewer using raw XLib.
+    
+    We use a maintained fork version from https://github.com/andreasbaumann/meh
+  
+    https://www.johnhawthorn.com/meh/
+
+endmenu # X Applications
+
+endmenu # X

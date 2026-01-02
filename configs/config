@@ -1,12 +1,19 @@
 #
 # Automatically generated make config: don't edit
 # i486tcclinux version: KCONFIG_VERSION
-# Wed Dec 31 11:09:28 2025
+# Fri Jan  2 10:56:25 2026
 #
 
 #
 # configuration for i486 TCC Linux
 #
+
+#
+# Global settings
+#
+CONFIG_ROOT_ON_NBD=y
+CONFIG_I486TCCLINUX_COMPILER_TCC=y
+# CONFIG_I486TCCLINUX_COMPILER_PCC is not set
 
 #
 # Libraries
@@ -15,6 +22,16 @@ CONFIG_NETBSD_NCURSES=y
 CONFIG_LIBTERMKEY=y
 CONFIG_LIBEVENT=y
 CONFIG_ZLIB=y
+
+#
+# Basic Userland
+#
+CONFIG_OKSH=y
+CONFIG_SBASE=y
+CONFIG_UBASE=y
+CONFIG_ABASE=y
+CONFIG_SMDEV=y
+CONFIG_SINIT=y
 
 #
 # Development & Languages
@@ -64,6 +81,7 @@ CONFIG_TINYXLIB=y
 CONFIG_TINYXSERVER=y
 CONFIG_XHOST=y
 CONFIG_XAUTH=y
+CONFIG_SLOCK=y
 
 #
 # X Terminals
@@ -74,15 +92,8 @@ CONFIG_RXVT=y
 # X window managers
 #
 CONFIG_NOTION=y
-CONFIG_SLOCK=y
 
 #
 # X Applications
 #
 CONFIG_MEH=y
-
-#
-# Global settings
-#
-CONFIG_I486TCCLINUX_COMPILER_TCC=y
-# CONFIG_I486TCCLINUX_COMPILER_PCC is not set

@@ -145,68 +145,78 @@ fi
 
 # Now we build the rest of stage 1
 
-if [ ! -x "${BASE}/build/stage1/bin/oksh" ]; then
-	rm -rf "oksh-${_OKSH_VERSION}"
-	tar xf "${BASE}/downloads/oksh-${_OKSH_VERSION}.tar.gz"
-	cd "oksh-${_OKSH_VERSION}" || exit 1
-	CC="${BASE}/build/stage1/bin/i386-tcc" \
-	./configure \
-		--prefix="${BASE}/build/stage1" \
-		--disable-shared --enable-static
-	make -j$CPUS LDFLAGS=-static
-	make -j$CPUS install
-	ln -s oksh "${BASE}/build/stage1/bin/sh"
-	cd .. || exit 1
-else
-	echo "stage1 oksh exists"
+if [ "x${CONFIG_OKSH}" = "xy" ]; then
+	if [ ! -x "${BASE}/build/stage1/bin/oksh" ]; then
+		rm -rf "oksh-${_OKSH_VERSION}"
+		tar xf "${BASE}/downloads/oksh-${_OKSH_VERSION}.tar.gz"
+		cd "oksh-${_OKSH_VERSION}" || exit 1
+		CC="${BASE}/build/stage1/bin/i386-tcc" \
+		./configure \
+			--prefix="${BASE}/build/stage1" \
+			--disable-shared --enable-static
+		make -j$CPUS LDFLAGS=-static
+		make -j$CPUS install
+		ln -s oksh "${BASE}/build/stage1/bin/sh"
+		cd .. || exit 1
+	else
+		echo "stage1 oksh exists"
+	fi
 fi
 
-if [ ! -x "${BASE}/build/stage1/bin/sbase-box" ]; then
-	rm -rf "sbase-${SBASE_VERSION}"
-	tar xf "${BASE}/downloads/sbase-${SBASE_VERSION}.tar.gz"
-	cd "sbase-${SBASE_VERSION}" || exit 1
-	patch -Np1 < "${BASE}/patches/sbase-mkproto-misc-dir.patch"
-	make -j$CPUS sbase-box CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS=-static
-	make -j$CPUS sbase-box-install PREFIX="${BASE}/build/stage1"
-	cd .. || exit 1
-else
-	echo "stage1 sbase exists"
+if [ "x${CONFIG_SBASE}" = "xy" ]; then
+	if [ ! -x "${BASE}/build/stage1/bin/sbase-box" ]; then
+		rm -rf "sbase-${SBASE_VERSION}"
+		tar xf "${BASE}/downloads/sbase-${SBASE_VERSION}.tar.gz"
+		cd "sbase-${SBASE_VERSION}" || exit 1
+		patch -Np1 < "${BASE}/patches/sbase-mkproto-misc-dir.patch"
+		make -j$CPUS sbase-box CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS=-static
+		make -j$CPUS sbase-box-install PREFIX="${BASE}/build/stage1"
+		cd .. || exit 1
+	else
+		echo "stage1 sbase exists"
+	fi
 fi
 
-if [ ! -x "${BASE}/build/stage1/bin/ubase-box" ]; then
-	rm -rf "ubase-${UBASE_VERSION}"
-	tar xf "${BASE}/downloads/ubase-${UBASE_VERSION}.tar.gz"
-	cd "ubase-${UBASE_VERSION}" || exit 1
-	patch -Np1 < "${BASE}/patches/ubase-sysmacros.patch"
-	make -j$CPUS ubase-box CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS=-static
-	make -j$CPUS ubase-box-install PREFIX="${BASE}/build/stage1"
-	cd .. || exit 1
-else
-	echo "stage1 ubase exists"
+if [ "x${CONFIG_UBASE}" = "xy" ]; then
+	if [ ! -x "${BASE}/build/stage1/bin/ubase-box" ]; then
+		rm -rf "ubase-${UBASE_VERSION}"
+		tar xf "${BASE}/downloads/ubase-${UBASE_VERSION}.tar.gz"
+		cd "ubase-${UBASE_VERSION}" || exit 1
+		patch -Np1 < "${BASE}/patches/ubase-sysmacros.patch"
+		make -j$CPUS ubase-box CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS=-static
+		make -j$CPUS ubase-box-install PREFIX="${BASE}/build/stage1"
+		cd .. || exit 1
+	else
+		echo "stage1 ubase exists"
+	fi
 fi
 
-if [ ! -x "${BASE}/build/stage1/bin/smdev" ]; then
-	rm -rf "smdev-${SMDEV_VERSION}"
-	tar xf "${BASE}/downloads/smdev-${SMDEV_VERSION}.tar.gz"
-	cd "smdev-${SMDEV_VERSION}" || exit 1
-	patch -Np1 < "${BASE}/patches/smdev-sysmacros.patch"
-	make -j$CPUS CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS=-static
-	make -j$CPUS install PREFIX="${BASE}/build/stage1"
-	cd .. || exit 1
-else
-	echo "stage1 smdev exists"
+if [ "x${CONFIG_SMDEV}" = "xy" ]; then
+	if [ ! -x "${BASE}/build/stage1/bin/smdev" ]; then
+		rm -rf "smdev-${SMDEV_VERSION}"
+		tar xf "${BASE}/downloads/smdev-${SMDEV_VERSION}.tar.gz"
+		cd "smdev-${SMDEV_VERSION}" || exit 1
+		patch -Np1 < "${BASE}/patches/smdev-sysmacros.patch"
+		make -j$CPUS CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS=-static
+		make -j$CPUS install PREFIX="${BASE}/build/stage1"
+		cd .. || exit 1
+	else
+		echo "stage1 smdev exists"
+	fi
 fi
 
-if [ ! -x "${BASE}/build/stage1/bin/sinit" ]; then
-	rm -rf "sinit-${SINIT_VERSION}"
-	tar xf "${BASE}/downloads/sinit-${SINIT_VERSION}.tar.gz"
-	cd "sinit-${SINIT_VERSION}" || exit 1
-	cp "${BASE}/configs/sinit-config.h" config.h
-	make -j$CPUS CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS=-static
-	make -j$CPUS install PREFIX="${BASE}/build/stage1"
-	cd .. || exit 1
-else
-	echo "stage1 smdev exists"
+if [ "x${CONFIG_SINIT}" = "xy" ]; then
+	if [ ! -x "${BASE}/build/stage1/bin/sinit" ]; then
+		rm -rf "sinit-${SINIT_VERSION}"
+		tar xf "${BASE}/downloads/sinit-${SINIT_VERSION}.tar.gz"
+		cd "sinit-${SINIT_VERSION}" || exit 1
+		cp "${BASE}/configs/sinit-config.h" config.h
+		make -j$CPUS CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS=-static
+		make -j$CPUS install PREFIX="${BASE}/build/stage1"
+		cd .. || exit 1
+	else
+		echo "stage1 smdev exists"
+	fi
 fi
 
 if [ "x${CONFIG_SDHCP}" = "xy" ]; then
@@ -378,15 +388,17 @@ EOF
 	fi
 fi
 
-if [ ! -x "${BASE}/build/stage1/bin/abase-box" ]; then
-	rm -rf "abase-${ABASE_VERSION}"
-	tar xf "${BASE}/downloads/abase-${ABASE_VERSION}.tar.gz"
-	cd "abase-${ABASE_VERSION}" || exit 1
-	make -j$CPUS abase-box CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS=-static
-	make -j$CPUS abase-box-install PREFIX="${BASE}/build/stage1"
-	cd .. || exit 1
-else
-	echo "stage1 abase exists"
+if [ "x${CONFIG_ABASE}" = "xy" ]; then
+	if [ ! -x "${BASE}/build/stage1/bin/abase-box" ]; then
+		rm -rf "abase-${ABASE_VERSION}"
+		tar xf "${BASE}/downloads/abase-${ABASE_VERSION}.tar.gz"
+		cd "abase-${ABASE_VERSION}" || exit 1
+		make -j$CPUS abase-box CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS=-static
+		make -j$CPUS abase-box-install PREFIX="${BASE}/build/stage1"
+		cd .. || exit 1
+	else
+		echo "stage1 abase exists"
+	fi
 fi
 
 if [ "x${CONFIG_NBD}" = "xy" ]; then
@@ -547,9 +559,6 @@ if [ "x${CONFIG_TINYXSERVER}" = "xy" ]; then
 	fi
 fi
 
-# TODO: needed?
-#~ cd "${BASE}/src/stage1" || exit 1
-
 if [ "x${CONFIG_TINYXSERVER}" = "xy" ]; then
 	if [ ! -f "${BASE}/tools/bdftopcf" ]; then
 		rm -rf "bdftopcf-${BDFTOPCF_VERSION}"
@@ -557,7 +566,7 @@ if [ "x${CONFIG_TINYXSERVER}" = "xy" ]; then
 		cd "bdftopcf-${BDFTOPCF_VERSION}" || exit 1
 		patch -Np1 < "${BASE}/patches/bdftopcf-tcc.patch"
 		"${BASE}/build/stage1/bin/i386-tcc" -static -I. -DPACKAGE_STRING='"bdftopdf ${BDFTOPCF_VERSION}"' -o "${BASE}/tools/bdftopcf" *.c
-		cd ..
+		cd .. || exit 1
 	else
 		echo "tool bdftopcf exists"
 	fi
@@ -567,14 +576,11 @@ if [ "x${CONFIG_TINYXSERVER}" = "xy" ]; then
 		tar xf "${BASE}/downloads/font-util-${FONT_UTIL_VERSION}.tar.gz"
 		cd "font-util-${FONT_UTIL_VERSION}" || exit
 		"${BASE}/build/stage1/bin/i386-tcc" -static -I. -o "${BASE}/tools/ucs2any" ucs2any.c
-		cd ..
+		cd .. || exit 1
 	else
 		echo "tool bdftopcf exists"
 	fi
 fi
-
-# TODO: needed?
-#~ cd "${BASE}/src/stage1" || exit 1
 
 # generate fonts and install them
 if [ "x${CONFIG_TINYXSERVER}" = "xy" ]; then
