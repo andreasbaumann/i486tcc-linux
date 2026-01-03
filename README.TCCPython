@@ -1,0 +1,42 @@
+- stdatomic and a pyatomic_tcc.h
+- In file included from Objects/obmalloc.c:23:
+  In file included from Objects/mimalloc/static.c:23:
+  In file included from Objects/mimalloc/alloc.c:14:
+  ./Include/internal/mimalloc/mimalloc/prim.h:129: error: ';' expected (got 'mi_heap_t')
+  => --without-mimalloc
+- no thread local data
+static inline PyThreadState *
+current_fast_get(void)
+{
+#ifdef HAVE_THREAD_LOCAL
+    return _Py_tss_tstate;
+#else
+    // XXX Fall back to the PyThread_tss_*() API.
+#  error "no supported thread-local variable storage classifier"
+#endif
+}
+=> ac_cv_pthread=no, no effect
+HAVE_THREAD_LOCAL=0 WITH_THREAD
+#ifndef WITH_THREAD
+#  define WITH_THREAD
+#endif
+=> ok, threading is more or less required now, stubs are marked with 'XXX',
+   nice, no fallbacks
+https://github.com/python/cpython/issues/127865
+https://peps.python.org/pep-0011/#no-longer-supported-platforms
+=> Include/pyport.h
+#    elif define(__TINYC__)
+#      define _Py_thread_local _Thread_local
+=> nope, we don't have support for thread local, this means
+Python/pystate.c has to implement the XXX parts
+    return (PyThreadState *)_PyThread_tss_get(&_PyRuntime.tstate_key);
+=> fast hacking it to return 0;
+./Programs/_freeze_module getpath ./Modules/getpath.py Python/frozen_modules/getpath.h
+_freeze_module: Objects/unicodeobject.c:15897: intern_static: Assertion `r == NULL' fai
+make: *** [Makefile:1928: Python/frozen_modules/getpath.h] Aborted (core dumped)
+=> https://bugs.python.org/issue45886 (cross-compilation is unknown to python people, it seems)
+
+CFLAGS='-Og -g' CC=tcc ./configure --without-ensurepip \
+	--disable-test-modules --without-pymalloc --disable-ipv6 \
+	--without-static-libpython --disable-shared --without-mimalloc \
+	--without-pymalloc --without-pydebug --disable-optimizations
