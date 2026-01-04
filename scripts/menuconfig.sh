@@ -24,6 +24,12 @@ if test ! -x kconfig/mconf; then
 		-DKCONFIG_VERSION=1 \
 		-DKBUILD_NO_NLS=1 -DPROJECT_NAME=\"i486tcclinux\"
 fi
+if test ! -x kconfig/conf; then
+	gcc -o kconfig/conf kconfig/conf.c kconfig/zconf.tab.c \
+		-DKCONFIG_VERSION=1 \
+		-DKBUILD_NO_NLS=1 -DPROJECT_NAME=\"i486tcclinux\"
+fi
+
 KCONFIG_CONFIG=configs/config \
 	kconfig/mconf configs/i486tcc-linux.kconfig
 
