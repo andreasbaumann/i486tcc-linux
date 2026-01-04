@@ -25,12 +25,6 @@ config I486TCCLINUX_COMPILER_TCC
 	  Use Tiny C Compiler to build the userland (https://bellard.org/tcc/).
 	  Note: the kernel has to be built with gcc or clang.
 
-config I486TCCLINUX_COMPILER_PCC	  
-	bool "pcc"
-	help
-	  Use the portable C compiler to build the userland (https://github.com/PortableCC/).
-	  Note: the kernel has to be built with gcc or clang.
-
 endchoice
 
 endmenu # Global settings

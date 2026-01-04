@@ -17,21 +17,22 @@ requirements
 directory layout
 ----------------
 
-scripts/   build scripts
-lib/       libraries for build scripts
-dowloads/  downloaded software (tarballs or git/svn/cvs checkouts)
-src/       contains all unpacked sources for building
-../stage0  host toolchain building
-../stage1  ramdisk first native build
-configs/   configurations used during building, e.g. suckless config.h files
-build/     the binary artifacts of each stage
+scripts/        build scripts
+scripts/kconfig sources of the Linux kernel config tool
+lib/            libraries for build scripts
+dowloads/       downloaded software (tarballs or git/svn/cvs checkouts)
+src/            contains all unpacked sources for building
+../stage0       host toolchain building
+../stage1       ramdisk first native build
+configs/        configurations used during building, e.g. suckless config.h files
+build/          the binary artifacts of each stage
 ../stage0
 ../stage1
-local/     local adaptions and configurations which go into the ramdisk
-ramdisk/   the ramdisk being later compressed to ramdisk.img
-root/      the root filesystem later being used via NBD or directly as image
-tests/     test programs to test sanity of stages
-tools/     various tools needed on the host to build the distro
+local/          local adaptions and configurations which go into the ramdisk
+ramdisk/        the ramdisk being later compressed to ramdisk.img
+root/           the root filesystem later being used via NBD or directly as image
+tests/          test programs to test sanity of stages
+tools/          various tools needed on the host to build the distro
 
 patches
 -------
@@ -717,7 +718,12 @@ Some todos to sort out
   - static lua bindings as for notion, so we can use it on i486linux
 - real Unisys machine
 - fix NE2000/NE1000 bug on real chip
-     
+- kconfig
+  - busybox-1.36.1
+  - toybox-0.8.12 <- we went for this one
+  - crosstool-ng-1.28.0
+  - https://github.com/jameswalmsley/kconfig-frontends
+  
 other approaches
 ----------------
 
