@@ -272,6 +272,11 @@ if [ ! -f "${BASE}/downloads/nasm-${NASM_VERSION}.tar.xz" ]; then
 	wget -O "${BASE}/downloads/nasm-${NASM_VERSION}.tar.xz" "https://www.nasm.us/pub/nasm/releasebuilds/${NASM_VERSION}/nasm-${NASM_VERSION}.tar.xz"
 fi
 
+if [ ! -f "${BASE}/downloads/Python-${PYTHON_VERSION}.tgz" ]; then
+	wget -O "${BASE}/downloads/Python-${PYTHON_VERSION}.tgz" \
+		"https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz"
+fi
+
 cd .. || exit 1
 
 trap - 0

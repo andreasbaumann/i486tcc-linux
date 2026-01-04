@@ -171,6 +171,15 @@ config LUA
   
     https://lua.org/
 
+config PYTHON
+  bool "python"
+  default y
+  help
+    Python Language. This is just the interpreter, no modules.
+    And it is an older version which still builds with tcc (3.8.20).
+  
+    https://www.python.org/
+
 endmenu
 
 menu "Applications"

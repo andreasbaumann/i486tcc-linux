@@ -1,3 +1,5 @@
+Python 3.14.2
+
 - stdatomic and a pyatomic_tcc.h
 - In file included from Objects/obmalloc.c:23:
   In file included from Objects/mimalloc/static.c:23:
@@ -36,7 +38,17 @@ _freeze_module: Objects/unicodeobject.c:15897: intern_static: Assertion `r == NU
 make: *** [Makefile:1928: Python/frozen_modules/getpath.h] Aborted (core dumped)
 => https://bugs.python.org/issue45886 (cross-compilation is unknown to python people, it seems)
 
-CFLAGS='-Og -g' CC=tcc ./configure --without-ensurepip \
+CFLAGS='-Og -g' LDFLAGS='-g' CC=tcc ./configure --without-ensurepip \
 	--disable-test-modules --without-pymalloc --disable-ipv6 \
 	--without-static-libpython --disable-shared --without-mimalloc \
-	--without-pymalloc --without-pydebug --disable-optimizations
+	--without-pydebug --disable-optimizations \
+	--disable-shared
+CFLAGS='-Og -g' LDFLAGS='-g -static' CC=tcc make
+
+Pyhton 3.8.0
+
+autoreconf -v
+CFLAGS='-Og -g' LDFLAGS='-g' CC=tcc ./configure --without-ensurepip \
+	--without-pymalloc --disable-ipv6 \
+	--disable-shared --without-pydebug --disable-optimizations
+make

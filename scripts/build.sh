@@ -834,7 +834,27 @@ if [ "x${CONFIG_NASM}" = "xy" ]; then
 		make -j$CPUS install
 		cd .. || exit 1
 	else
-		echo "stage1 xhost exists"
+		echo "stage1 nasm exists"
+	fi
+fi
+
+if [ "x${CONFIG_PYTHON}" = "xy" ]; then
+	if [ ! -f "${BASE}/build/stage1/bin/python" ]; then
+		rm -rf "Python-${PYTHON_VERSION}.tgz"
+		tar xf "${BASE}/downloads/Python-${PYTHON_VERSION}.tgz"
+		cd "Python-${PYTHON_VERSION}" || exit 1
+		patch -Np1 < "${BASE}/patches/python-tcc.patch"
+		autoreconf -v
+		CC="${BASE}/build/stage1/bin/i386-tcc" \
+		./configure --prefix="${BASE}/build/stage1" \
+			--without-ensurepip \
+			--without-pymalloc --disable-ipv6 \
+			--disable-shared --without-pydebug --disable-optimizations
+		make -j$CPUS LDFLAGS="-static"
+		cp python "${BASE}/build/stage1/bin/python"
+		cd .. || exit 1
+	else
+		echo "stage1 python exists"
 	fi
 fi
 

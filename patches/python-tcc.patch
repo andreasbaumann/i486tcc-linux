@@ -1,0 +1,12 @@
+diff -rauN python/configure.ac python-tcc-patch/configure.ac
+--- python/configure.ac	2024-09-06 22:41:55.000000000 +0200
++++ python-tcc-patch/configure.ac	2026-01-04 20:20:54.452541203 +0100
+@@ -2724,7 +2724,7 @@
+ 	    LINKFORSHARED="-Wl,-E -Wl,+s";;
+ #	    LINKFORSHARED="-Wl,-E -Wl,+s -Wl,+b\$(BINLIBDEST)/lib-dynload";;
+ 	Linux-android*) LINKFORSHARED="-pie -Xlinker -export-dynamic";;
+-	Linux*|GNU*) LINKFORSHARED="-Xlinker -export-dynamic";;
++	Linux*|GNU*) LINKFORSHARED="";;
+ 	# -u libsys_s pulls in all symbols in libsys
+ 	Darwin/*)
+ 		LINKFORSHARED="$extra_undefs -framework CoreFoundation"

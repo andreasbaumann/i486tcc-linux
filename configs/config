@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # i486tcclinux version: KCONFIG_VERSION
-# Sun Jan  4 10:51:27 2026
+# Sun Jan  4 20:27:37 2026
 #
 
 #
@@ -40,6 +40,7 @@ CONFIG_MUON=y
 CONFIG_NASM=y
 CONFIG_LBFORTH=y
 CONFIG_LUA=y
+CONFIG_PYTHON=y
 
 #
 # Applications
