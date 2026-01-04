@@ -682,10 +682,15 @@ to abase).
     https://www.foo.be/docs/tpj/issues/vol5_3/tpj0503-0003.html
     seems not really be working anymore after perl 5.20
     microperl 5.20 segfaults
-  - micropython: https://github.com/micropython/micropython
-    Their definition of micro is quite different from mine in terms of
-    size and library dependencies)
-    I also doubt it works with tcc, needs python3 on the host to build
+  - python
+    - cpython: has issues to compile, see README.TCCPython
+    - micropython: https://github.com/micropython/micropython
+      Their definition of micro is quite different from mine in terms of
+      size and library dependencies)
+      I also doubt it works with tcc, needs python3 on the host to build
+      It defined different standard libraries, so limited usability
+    - tinypy: builds, but is Python2 and really limited
+    - python-on-a-chip: https://code.google.com/archive/p/python-on-a-chip/
   - lbforth: https://github.com/DosWorld/lbforth
     Small nice FORTH written in C
 - minimal tools
