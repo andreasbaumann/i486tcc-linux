@@ -290,3 +290,10 @@ source = "git"
 git = "https://github.com/netwide-assembler/nasm.git"
 include_regex = "nasm-[\\d\\.]+"
 prefix = "nasm-"
+
+[PYTHON]
+source = "git"
+git = "https://github.com/python/cpython.git"
+prefix = "v"
+include_regex = "^v3\\.8\\.[0-9]+$"
+exclude_regex = ".*(a|b|rc).*"
