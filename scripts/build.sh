@@ -840,12 +840,13 @@ fi
 
 if [ "x${CONFIG_PYTHON}" = "xy" ]; then
 	if [ ! -f "${BASE}/build/stage1/bin/python" ]; then
-		rm -rf "Python-${PYTHON_VERSION}.tgz"
+		rm -rf "Python-${PYTHON_VERSION}"
 		tar xf "${BASE}/downloads/Python-${PYTHON_VERSION}.tgz"
 		cd "Python-${PYTHON_VERSION}" || exit 1
 		patch -Np1 < "${BASE}/patches/python-tcc.patch"
 		autoreconf -v
 		CC="${BASE}/build/stage1/bin/i386-tcc" \
+		CXX="${BASE}/build/stage1/bin/i386-tcc" \
 		./configure --prefix="${BASE}/build/stage1" \
 			--without-ensurepip \
 			--without-pymalloc --disable-ipv6 \

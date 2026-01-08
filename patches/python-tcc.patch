@@ -10,3 +10,12 @@ diff -rauN python/configure.ac python-tcc-patch/configure.ac
  	# -u libsys_s pulls in all symbols in libsys
  	Darwin/*)
  		LINKFORSHARED="$extra_undefs -framework CoreFoundation"
+diff -rauN python/Modules/Setup.local python-tcc-patch/Modules/Setup.local
+--- python/Modules/Setup.local	1970-01-01 01:00:00.000000000 +0100
++++ python-tcc-patch/Modules/Setup.local	2026-01-08 10:06:08.294060795 +0100
+@@ -0,0 +1,5 @@
++_bisect _bisectmodule.c
++array arraymodule.c
++#math mathmodule.c
++errno errnomodule.c
++itertools itertoolsmodule.c
