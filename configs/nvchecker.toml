@@ -32,7 +32,7 @@ prefix = "oksh-"
 source = "git"
 git = "git://git.suckless.org/sbase"
 use_commit = true
-from_pattern = "(.{7,7}).*"
+from_pattern = "(.{5,5}).*"
 to_pattern = '\1'
 use_tag = false
 
