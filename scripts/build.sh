@@ -168,7 +168,6 @@ if [ "x${CONFIG_SBASE}" = "xy" ]; then
 		rm -rf "sbase-${SBASE_VERSION}"
 		tar xf "${BASE}/downloads/sbase-${SBASE_VERSION}.tar.gz"
 		cd "sbase-${SBASE_VERSION}" || exit 1
-		patch -Np1 < "${BASE}/patches/sbase-mkproto-misc-dir.patch"
 		make -j$CPUS sbase-box CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS=-static
 		make -j$CPUS sbase-box-install PREFIX="${BASE}/build/stage1"
 		cd .. || exit 1
