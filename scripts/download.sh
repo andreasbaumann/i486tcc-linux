@@ -265,7 +265,7 @@ if [ ! -f "${BASE}/downloads/sqlite-${SQLITE_VERSION}.zip" ]; then
 	MINOR_SQLITE_VERSION=`echo "${SQLITE_VERSION}" | cut -d . -f 2`
 	PATCH_SQLITE_VERSION=`echo "${SQLITE_VERSION}" | cut -d . -f 3`
 	_SQLITE_VERSION=`expr ${MAJOR_SQLITE_VERSION} \* 1000000 + ${MINOR_SQLITE_VERSION} \* 10000 + ${PATCH_SQLITE_VERSION} \* 100`
-	wget -O "${BASE}/downloads/sqlite-${SQLITE_VERSION}.zip" "https://www.sqlite.org/2025/sqlite-src-${_SQLITE_VERSION}.zip"
+	wget -O "${BASE}/downloads/sqlite-${SQLITE_VERSION}.zip" "https://www.sqlite.org/2026/sqlite-src-${_SQLITE_VERSION}.zip"
 fi
 
 if [ ! -f "${BASE}/downloads/nasm-${NASM_VERSION}.tar.xz" ]; then
