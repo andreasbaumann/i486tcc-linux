@@ -382,6 +382,7 @@ cd ../linux
 bugs
 ----
 
+- dropbear: sh: /usr/libexec/sftp-server: not found
 - remove some man pages (lua)
 - mutt: no /var/mail/root or /var/mail/user
 - getpass in login needs legacy BSD ttys?
@@ -411,6 +412,14 @@ bugs
   Does recompiling it help?
   It's just search pathes presumably still being hard-coded to root/stage1,
   this works for now (as workaround):
+   cat > test.c <<EOF
+#include <stdio.h>
+#include <stdlib.h>
+int main( int argc, char *argv[] ) {
+  puts( "hello" );
+  exit( 0 );
+}
+EOF
     i386-tcc -vv -static -L/lib -I/include -nostdlib -c  -o test.o test.c
     i386-tcc -vv -static -L/lib -I/include -nostdlib -o test /lib/crt1.o test.o /lib/libc.a
   so recompiling it inside the chroot might work (though it needs patching

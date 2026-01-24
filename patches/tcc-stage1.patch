@@ -1,6 +1,6 @@
-diff -rauN a/config-extra.mak b/config-extra.mak
---- a/config-extra.mak	1970-01-01 01:00:00.000000000 +0100
-+++ b/config-extra.mak	2025-07-17 15:44:55.758597384 +0200
+diff -rauN tinycc/config-extra.mak tinycc-stage1-patches/config-extra.mak
+--- tinycc/config-extra.mak	1970-01-01 01:00:00.000000000 +0100
++++ tinycc-stage1-patches/config-extra.mak	2026-01-22 13:08:03.324377191 +0100
 @@ -0,0 +1,6 @@
 +NATIVE_DEFINES += -march=i486 -mcpu=i486
 +ROOT-i386 = @@BASE@@/build/stage1
@@ -8,10 +8,10 @@ diff -rauN a/config-extra.mak b/config-extra.mak
 +LIB-i386  = @@BASE@@/build/stage1/lib
 +INC-i386  = @@BASE@@/build/stage1/include
 +DEF-i386  += -D__linux__
-diff -rauN a/configure b/configure
---- a/configure	2025-07-17 09:43:32.000000000 +0200
-+++ b/configure	2025-07-17 15:44:19.539586512 +0200
-@@ -440,7 +440,7 @@
+diff -rauN tinycc/configure tinycc-stage1-patches/configure
+--- tinycc/configure	2026-01-22 12:48:40.000000000 +0100
++++ tinycc-stage1-patches/configure	2026-01-22 13:08:03.324599428 +0100
+@@ -446,7 +446,7 @@
  
  CONFTEST=./conftest$EXESUF
  if test -z "$cross_prefix" \
@@ -20,10 +20,10 @@ diff -rauN a/configure b/configure
      && $CONFTEST 2>/dev/null; then
    cc_name="$($CONFTEST compiler)"
    gcc_major="$($CONFTEST version)"
-diff -rauN a/Makefile b/Makefile
---- a/Makefile	2025-07-17 09:43:32.000000000 +0200
-+++ b/Makefile	2025-07-17 15:51:28.016657573 +0200
-@@ -36,13 +36,13 @@
+diff -rauN tinycc/Makefile tinycc-stage1-patches/Makefile
+--- tinycc/Makefile	2026-01-22 12:48:40.000000000 +0100
++++ tinycc-stage1-patches/Makefile	2026-01-22 13:08:03.324967991 +0100
+@@ -41,13 +41,13 @@
   NATIVE_TARGET = $(ARCH)-win$(if $(findstring arm,$(ARCH)),ce,32)
  else
   CFG = -unx
@@ -44,7 +44,7 @@ diff -rauN a/Makefile b/Makefile
   # make libtcc as static or dynamic library?
   ifeq ($(CONFIG_static),no)
    LIBTCC=libtcc$(DLLSUF)
-@@ -256,11 +256,12 @@
+@@ -261,11 +261,12 @@
  	$S./c2str.exe $< $@
  
  c2str.exe : conftest.c
@@ -59,7 +59,7 @@ diff -rauN a/Makefile b/Makefile
  
  # additional dependencies
  $(X)tcc.o : tcctools.c
-@@ -268,7 +269,9 @@
+@@ -273,7 +274,9 @@
  
  # Host Tiny C Compiler
  tcc$(EXESUF): tcc.o $(LIBTCC)
@@ -70,7 +70,7 @@ diff -rauN a/Makefile b/Makefile
  
  # Cross Tiny C Compilers
  # (the TCCDEFS_H dependency is only necessary for parallel makes,
-@@ -281,7 +284,9 @@
+@@ -286,7 +289,9 @@
  	@$(MAKE) --no-print-directory $@ CROSS_TARGET=$* ONE_SOURCE=$(or $(ONE_SOURCE),yes)
  
  $(CROSS_TARGET)-tcc$(EXESUF): $(TCC_FILES)

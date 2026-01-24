@@ -90,9 +90,10 @@ if [ ! -x "${BASE}/build/stage1/bin/i386-tcc" ]; then
 		--cc="${BASE}/build/stage0/bin/i386-tcc" --config-musl \
 		--ar="${BASE}/build/stage0/bin/i386-tcc -ar" \
 		--enable-cross
-	make -j$CPUS
+	make -j$CPUS LDFLAGS=-static
 	make -j$CPUS install
 	ln -fs tcc/i386-libtcc1.a "${BASE}/build/stage1/lib/."
+	echo patchelf --remove-interpreter "${BASE}/build/stage1/bin/i386-tcc"
 	cd .. || exit 1
 else
 	echo "stage1 tcc-i386 binary exists"

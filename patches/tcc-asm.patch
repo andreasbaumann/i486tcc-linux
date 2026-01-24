@@ -1,7 +1,7 @@
 diff -rauN tinycc/i386-asm.c tinycc-asm-hint-patches/i386-asm.c
---- tinycc/i386-asm.c	2023-04-07 20:25:37.000000000 +0200
-+++ tinycc-asm-hint-patches/i386-asm.c	2022-12-10 20:05:48.352133191 +0100
-@@ -1197,6 +1197,8 @@
+--- tinycc/i386-asm.c	2026-01-22 12:48:40.000000000 +0100
++++ tinycc-asm-hint-patches/i386-asm.c	2026-01-22 13:05:42.585825009 +0100
+@@ -1214,6 +1214,8 @@
          case 'i':
          case 'm':
          case 'g':
@@ -10,7 +10,7 @@ diff -rauN tinycc/i386-asm.c tinycc-asm-hint-patches/i386-asm.c
              pr = 4;
              break;
          default:
-@@ -1441,6 +1443,12 @@
+@@ -1465,6 +1467,12 @@
                  }
              }
              break;
