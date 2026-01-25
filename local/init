@@ -21,7 +21,7 @@ insmod /lib/modules/crypto/crypto_algapi.ko
 insmod /lib/modules/crypto/crypto_hash.ko
 insmod /lib/modules/fs/jbd2/jbd2.ko
 insmod /lib/modules/fs/mbcache.ko
-insmod /lib/modules/lib/crc16.ko
+insmod /lib/modules/lib/crc/crc16.ko
 insmod /lib/modules/crypto/crc32c_generic.ko
 insmod /lib/modules/fs/ext4/ext4.ko
 insmod /lib/modules/drivers/block/nbd.ko
@@ -31,7 +31,7 @@ nbd-client -N ROOT 10.0.0.2 /dev/nbd0
 # 86Box
 #nbd-client -N ROOT 10.0.2.2 /dev/nbd0
 # Unisys
-#nbd-client -N ROOT 192.168.1.31 /dev/nbd0
+#nbd-client -N ROOT 192.168.1.44 /dev/nbd0
 mount -t ext4 /dev/nbd0 /mnt
 
 #echo "Loading additional modules.."
