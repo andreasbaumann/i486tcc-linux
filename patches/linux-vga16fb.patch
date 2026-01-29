@@ -1,0 +1,120 @@
+diff -rauN linux-6.18.7/drivers/video/fbdev/vga16fb.c linux-6.18.7-vga16fb-patch/drivers/video/fbdev/vga16fb.c
+--- linux-6.18.7/drivers/video/fbdev/vga16fb.c	2026-01-23 11:21:37.000000000 +0100
++++ linux-6.18.7-vga16fb-patch/drivers/video/fbdev/vga16fb.c	2026-01-29 16:33:52.587773357 +0100
+@@ -188,14 +188,18 @@
+ 	unsigned int type = screen_info_video_type(si);
+ 
+ 	/* only EGA and VGA in 16 color graphic mode are supported */
+-	if (type != VIDEO_TYPE_EGAC && type != VIDEO_TYPE_VGAC)
++	if (type != VIDEO_TYPE_EGAC && type != VIDEO_TYPE_VGAC) {
++		printk(KERN_ERR "vga16fb: video type is %d and not VIDEO_TYPE_EGAC/VIDEO_TYPE_VGAC\n", type);
+ 		return -ENODEV;
++	}
+ 
+ 	if (si->orig_video_mode != 0x0D &&	/* 320x200/4 (EGA) */
+ 	    si->orig_video_mode != 0x0E &&	/* 640x200/4 (EGA) */
+ 	    si->orig_video_mode != 0x10 &&	/* 640x350/4 (EGA) */
+-	    si->orig_video_mode != 0x12)	/* 640x480/4 (VGA) */
++	    si->orig_video_mode != 0x12) {	/* 640x480/4 (VGA) */
++		printk(KERN_ERR "vga16fb: video mode is %x and not one of 0x0D, 0x0E, 0x10 or 0x12C\n", si->orig_video_mode);
+ 		return -ENODEV;
++	}
+ 
+ 	return 0;
+ }
+@@ -1303,23 +1307,38 @@
+ 	__FB_DEFAULT_IOMEM_OPS_MMAP,
+ };
+ 
++static struct screen_info vga16fb_screen_info;
++
+ static int vga16fb_probe(struct platform_device *dev)
+ {
+-	struct screen_info *si;
++	struct screen_info *si = &vga16fb_screen_info;
+ 	struct fb_info *info;
+ 	struct vga16fb_par *par;
+ 	int i;
+ 	int ret = 0;
+ 
+-	si = dev_get_platdata(&dev->dev);
+-	if (!si)
+-		return -ENODEV;
++	printk(KERN_ERR "vga16fb: started probing\n");
++
++	// fake a standard color VGA for now
++	si->orig_x = 0;
++	si->orig_y = 0;
++	si->ext_mem_k = 0;
++	si->flags = 0;
++	si->orig_video_isVGA = 1;
++	si->orig_video_page = 0;
++	si->orig_video_mode = 0x12; // 640×480x, 0x12
++	si->orig_video_cols = 80;
++	si->orig_video_lines = 26;
++	si->orig_video_points = 4;
++	si->orig_video_ega_bx = 0;
+ 
+ 	ret = check_mode_supported(si);
+-	if (ret)
++	if (ret) {
++		printk(KERN_ERR "vga16fb: no supported mode found, forcing initialization\n");
+ 		return ret;
++	}
+ 
+-	printk(KERN_DEBUG "vga16fb: initializing\n");
++	printk(KERN_ERR "vga16fb: initializing\n");
+ 	info = framebuffer_alloc(sizeof(struct vga16fb_par), &dev->dev);
+ 
+ 	if (!info) {
+@@ -1336,7 +1355,7 @@
+ 		goto err_ioremap;
+ 	}
+ 
+-	printk(KERN_INFO "vga16fb: mapped to 0x%p\n", info->screen_base);
++	printk(KERN_ERR "vga16fb: mapped to 0x%p\n", info->screen_base);
+ 	par = info->par;
+ 
+ 	par->isVGA = screen_info_video_type(si) == VIDEO_TYPE_VGAC;
+@@ -1412,6 +1431,7 @@
+ static const struct platform_device_id vga16fb_driver_id_table[] = {
+ 	{"ega-framebuffer", 0},
+ 	{"vga-framebuffer", 0},
++	{"vga16fb", 0},
+ 	{ }
+ };
+ MODULE_DEVICE_TABLE(platform, vga16fb_driver_id_table);
+@@ -1425,7 +1445,32 @@
+ 	.id_table = vga16fb_driver_id_table,
+ };
+ 
+-module_platform_driver(vga16fb_driver);
++//~ module_platform_driver(vga16fb_driver);
+ 
+ MODULE_DESCRIPTION("Legacy VGA framebuffer device driver");
+ MODULE_LICENSE("GPL");
++
++static struct platform_device *vga16fb_device;
++
++static int __init vga16fb_module_init(void)
++{
++    /* Create a dummy platform device named "vga16fb" */
++    vga16fb_device = 
++        platform_device_register_simple("vga16fb", -1, NULL, 0);
++    if (!vga16fb_device)
++        pr_warn("vga16fb: failed to register platform device\n");
++    /* Register the platform driver */
++    return platform_driver_register(&vga16fb_driver);
++}
++
++static void __exit vga16fb_module_exit(void)
++{
++    /* Unregister the driver and the dummy device */
++    platform_driver_unregister(&vga16fb_driver);
++
++    if (vga16fb_device)
++        platform_device_unregister(vga16fb_device);
++}
++
++module_init(vga16fb_module_init);
++module_exit(vga16fb_module_exit);

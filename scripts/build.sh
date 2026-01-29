@@ -938,6 +938,7 @@ if [ ! -f "${BASE}/build/stage1/boot/bzImage" ]; then
 	rm -rf "linux-${LINUX_KERNEL_VERSION}"
 	tar xf "${BASE}/downloads/linux-${LINUX_KERNEL_VERSION}.tar.gz"
 	cd "linux-${LINUX_KERNEL_VERSION}" || exit 1
+	patch -Np1 < "${BASE}/patches/linux-vga16fb.patch"
 	# this configuration is based on tinyconfig, then enabling things as
 	# specified in the README
 	cp "${BASE}/configs/linux-config" .config
@@ -1006,7 +1007,8 @@ if [ ! -f "${BASE}/floppy.img" ]; then
 	touch EOF
 	cp "${BASE}/build/stage1/boot/bzImage" .
 	# old way of setting video mode on boot into real mode (0x317)
-	tools/rdev -v bzImage 792
+	#tools/rdev -v bzImage 792
+	tools/rdev -v bzImage 3
 	tar cvf data.tar -b1 bzImage ramdisk.img EOF
 	cat "${BASE}/build/stage1/boot/boot.img" data.tar > "${BASE}/floppy.img"
 	split -d -b 1474560 floppy.img floppy

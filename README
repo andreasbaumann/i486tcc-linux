@@ -382,6 +382,13 @@ cd ../linux
 bugs
 ----
 
+- vga16fb:
+  vga16fb: failed to get platform data, forcing initialization
+  BUG: kernel NULL pointer dereference, address: 0000000f
+- booting in 86Box:
+  - [0060:C011F332] Illegal instruction 0000C931 (32)
+  - PCI: Fatal: No config space access function found
+  - sporadic nbd0: Possibly stuck request
 - dropbear: sh: /usr/libexec/sftp-server: not found
 - remove some man pages (lua)
 - mutt: no /var/mail/root or /var/mail/user

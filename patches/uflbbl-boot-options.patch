@@ -20,7 +20,7 @@ diff -rauN uflbbl/src/boot.asm uflbbl-boot-options/src/boot.asm
  
  KERNEL_CMD_LINE:
 -	db "debug loglevel=7 earlycon=uart8250,io,0x3f8,9600n8 console=tty0 console=ttyS0,9600n8 rdinit=/bin/sinit root=/dev/ram0 rootfstype=ramfs iommu=off", 0
-+	db "debug loglevel=7 earlycon=vga earlycon=uart8250,io,0x3f8,9600n8 console=tty0 console=ttyS0,9600n8 init=/init iommu=off vga=ask", 0
++	db "debug loglevel=7 earlycon=vga earlycon=uart8250,io,0x3f8,9600n8 console=tty0 console=ttyS0,9600n8 init=/init iommu=off vga=ask loglevel=7", 0
  
  KERNEL_CMD_SIZE equ $-KERNEL_CMD_LINE
  

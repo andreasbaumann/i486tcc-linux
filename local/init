@@ -7,6 +7,16 @@ mount -n -t proc -o nosuid,noexec,nodev proc /proc
 mount -n -t sysfs -o nosuid,noexec,nodev,ro sys /sys
 mount -n -t devtmpfs -o mode=0755,nosuid udev /dev
 
+echo "Loading modules for VGA framebuffer.."
+insmod /lib/modules/lib/fonts/font.ko
+insmod /lib/modules/drivers/video/fbdev/core/fb.ko
+insmod /lib/modules/drivers/video/fbdev/core/fb_io_fops.ko
+insmod /lib/modules/drivers/video/fbdev/core/cfbcopyarea.ko
+insmod /lib/modules/drivers/video/fbdev/core/cfbfillrect.ko
+insmod /lib/modules/drivers/video/fbdev/core/cfbimgblt.ko
+insmod /lib/modules/drivers/video/vgastate.ko
+insmod /lib/modules/drivers/video/fbdev/vga16fb.ko
+
 echo "Starting network via DHCP.."
 # TODO: replace modprobe with samurai script
 #modprobe ne io=0x300
@@ -15,7 +25,7 @@ insmod /lib/modules/drivers/net/ethernet/8390/ne.ko io=0x300
 ifconfig eth0 up
 sdhcp
 
-echo "Loading root filesystem.."
+echo "Loading modules for root filesystem on NBD.."
 insmod /lib/modules/crypto/crypto.ko
 insmod /lib/modules/crypto/crypto_algapi.ko
 insmod /lib/modules/crypto/crypto_hash.ko
