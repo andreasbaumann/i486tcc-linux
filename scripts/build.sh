@@ -551,6 +551,7 @@ if [ "x${CONFIG_TINYXSERVER}" = "xy" ]; then
 		tar xf "${BASE}/downloads/tinyxserver-${TINYXSERVER_VERSION}.tar.gz"
 		cd "tinyxserver-${TINYXSERVER_VERSION}" || exit 1
 		patch -Np1 < "${BASE}/patches/tinyxserver-tcc.patch"	
+		patch -Np1 < "${BASE}/patches/tinyxserver-fbdev.patch"	
 		make -j$CPUS BASE="${BASE}" core Xfbdev xinit
 		make -j$CPUS BASE="${BASE}" DESTDIR="${BASE}/build/stage1" PREDIR=/ -j$CPUS install
 		cd .. || exit 1

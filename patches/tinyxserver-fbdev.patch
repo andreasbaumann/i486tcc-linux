@@ -1,0 +1,18 @@
+diff -rauN tinyxserver/hw/kdrive/fbdev/fbdev.c tinyxserver-fbdev-patch/hw/kdrive/fbdev/fbdev.c
+--- tinyxserver/hw/kdrive/fbdev/fbdev.c	2025-12-18 13:54:38.000000000 +0100
++++ tinyxserver-fbdev-patch/hw/kdrive/fbdev/fbdev.c	2026-01-29 20:00:24.423104883 +0100
+@@ -33,8 +33,12 @@
+ {
+     int		    k;
+     unsigned long   off;
+-    if ((priv->fd = open("/dev/fb0", O_RDWR)) < 0) {
+-	perror("Error opening /dev/fb0\n");
++    const char *fb_device = getenv("FBDEVICE");
++	if (!fb_device) {
++	fb_device = "/dev/fb0";  // default
++	}
++    if ((priv->fd = open(fb_device, O_RDWR)) < 0) {
++	perror("Error opening /dev/fb\n");
+ 	return FALSE;
+     }
+     if ((k=ioctl(priv->fd, FBIOGET_FSCREENINFO, &priv->fix)) < 0) {
