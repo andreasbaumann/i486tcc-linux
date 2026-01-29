@@ -383,12 +383,18 @@ bugs
 ----
 
 - vga16fb:
-  vga16fb: failed to get platform data, forcing initialization
-  BUG: kernel NULL pointer dereference, address: 0000000f
+  - normally we get both vesafb (/dev/fb0), vga16fb (/dev/fb1), if we
+    set FBDEVICE=/dev/fb1 in .xserverrc we get a text cursor (so the
+    vga16fb driver cannot switch to graphic mode/timing because /dev/fb0
+    is vesafb?)
+  - video=vesafb:off
+    /dev/fb0 is vga16fb
+    shows distorted in Xfbdev (might be a non-planar, non-linear buffer
+    or some color-encoding issue)
 - booting in 86Box:
   - [0060:C011F332] Illegal instruction 0000C931 (32)
   - PCI: Fatal: No config space access function found
-  - sporadic nbd0: Possibly stuck request
+- sporadic nbd0: Possibly stuck request
 - dropbear: sh: /usr/libexec/sftp-server: not found
 - remove some man pages (lua)
 - mutt: no /var/mail/root or /var/mail/user
