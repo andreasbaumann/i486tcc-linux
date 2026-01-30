@@ -3,4 +3,5 @@
 insmod /lib/modules/drivers/input/mouse/psmouse.ko
 insmod /lib/modules/drivers/input/mousedev.ko
 
-exec Xfbdev :0 -fp /share/X11/fonts
+#exec Xfbdev :0 -fp /share/X11/fonts
+exec Xvesa :0 -screen 640x480x8 -fp /share/X11/fonts

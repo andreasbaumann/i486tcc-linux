@@ -16,3 +16,14 @@ diff -rauN tinyxserver/hw/kdrive/fbdev/fbdev.c tinyxserver-fbdev-patch/hw/kdrive
  	return FALSE;
      }
      if ((k=ioctl(priv->fd, FBIOGET_FSCREENINFO, &priv->fix)) < 0) {
+diff -rauN tinyxserver/hw/kdrive/fbdev/fbdev.h tinyxserver-fbdev-patch/hw/kdrive/fbdev/fbdev.h
+--- tinyxserver/hw/kdrive/fbdev/fbdev.h	2025-12-18 13:54:38.000000000 +0100
++++ tinyxserver-fbdev-patch/hw/kdrive/fbdev/fbdev.h	2026-01-30 09:52:36.617877702 +0100
+@@ -29,6 +29,7 @@
+ #include <linux/fb.h>
+ #include <unistd.h>
+ #include <sys/mman.h>
++#include <sys/ioctl.h>
+ #include "../kdrive.h"
+ #include "layer.h"
+ 

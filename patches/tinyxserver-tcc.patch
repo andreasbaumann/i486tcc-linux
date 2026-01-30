@@ -1,18 +1,174 @@
+diff -rauN tinyxserver/hw/kdrive/fbdev/fbdev.c tinyxserver-tcc-patch/hw/kdrive/fbdev/fbdev.c
+--- tinyxserver/hw/kdrive/fbdev/fbdev.c	2025-12-18 13:54:38.000000000 +0100
++++ tinyxserver-tcc-patch/hw/kdrive/fbdev/fbdev.c	2026-01-30 10:46:33.042150014 +0100
+@@ -530,6 +530,12 @@
+     return WT_WALKCHILDREN;
+ }
+ 
++#ifdef RANDR
++Bool
++fbdevRandRGetInfo (ScreenPtr pScreen, Rotation *rotations);
++Bool RRScreenInit(ScreenPtr pScreen);
++#endif
++
+ fbdevRandRSetConfig (ScreenPtr		pScreen,
+ 		     Rotation		rotateKind,
+ 		     RRScreenSizePtr	pSize,
+diff -rauN tinyxserver/hw/kdrive/fbdev/fbinit.c tinyxserver-tcc-patch/hw/kdrive/fbdev/fbinit.c
+--- tinyxserver/hw/kdrive/fbdev/fbinit.c	2025-12-18 13:54:38.000000000 +0100
++++ tinyxserver-tcc-patch/hw/kdrive/fbdev/fbinit.c	2026-01-30 10:40:46.569259901 +0100
+@@ -48,6 +48,8 @@
+ #endif
+ }
+ 
++int KdProcessArgument(int argc, char **argv, int i);
++
+ int
+ ddxProcessArgument (int argc, char **argv, int i)
+ {
+diff -rauN tinyxserver/hw/kdrive/vesa/vbe.c tinyxserver-tcc-patch/hw/kdrive/vesa/vbe.c
+--- tinyxserver/hw/kdrive/vesa/vbe.c	2025-12-18 13:54:38.000000000 +0100
++++ tinyxserver-tcc-patch/hw/kdrive/vesa/vbe.c	2026-01-30 10:56:58.415946706 +0100
+@@ -510,7 +510,7 @@
+ };
+ 
+ Bool
+-VbeDPMS(Vm86InfoPtr vi, VbeInfoBlock *vib, int mode)
++VbeDPMS(Vm86InfoPtr vi, VbeInfoBlock *_vib, int mode)
+ {
+     int	code;
+     
+diff -rauN tinyxserver/hw/kdrive/vesa/vesa.c tinyxserver-tcc-patch/hw/kdrive/vesa/vesa.c
+--- tinyxserver/hw/kdrive/vesa/vesa.c	2025-12-18 13:54:38.000000000 +0100
++++ tinyxserver-tcc-patch/hw/kdrive/vesa/vesa.c	2026-01-30 10:59:47.267891908 +0100
+@@ -79,6 +79,9 @@
+     return vesaModeSupportable (mode, complain);
+ }
+ 
++int
++vesaDepth (VesaModePtr mode);
++
+ void
+ vesaReportMode (VesaModePtr mode)
+ {
+@@ -291,7 +294,10 @@
+ 	vesaDepth (a) >= screen->fb[0].depth)
+     {
+ 	return TRUE;
+-    }
++    } else
++    {
++	return FALSE;
++	}
+ }
+ 
+ #define vabs(a)	((a) >= 0 ? (a) : -(a))
+@@ -363,6 +369,9 @@
+ 	    best = i;
+     return &priv->modes[best];
+ }   
++
++Bool
++vesaMapFramebuffer (KdScreenInfo    *screen);
+     
+ Bool
+ vesaScreenInitialize (KdScreenInfo *screen, VesaScreenPrivPtr pscr)
+@@ -1150,6 +1159,10 @@
+ }
+ 
+ Bool
++vesaSetMode (ScreenPtr	    pScreen,
++	     VesaModePtr    mode);
++
++Bool
+ vesaRandRSetConfig (ScreenPtr		pScreen,
+ 		    Rotation		rotation,
+ 		    RRScreenSizePtr	pSize,
+@@ -1347,6 +1360,8 @@
+     return FALSE;
+ }
+ 
++Bool RRScreenInit(ScreenPtr pScreen);
++
+ Bool
+ vesaRandRInit (ScreenPtr pScreen)
+ {
+@@ -1564,6 +1579,9 @@
+ #endif /* TOSHIBA_SMM */
+ 
+ Bool
++VbeDPMS(Vm86InfoPtr vi, VbeInfoBlock *vib, int mode);
++
++Bool
+ vesaDPMS (ScreenPtr pScreen, int mode)
+ {
+     KdScreenPriv(pScreen);
+@@ -1575,7 +1593,7 @@
+ 	return TRUE;
+ #endif
+     if (pscr->mode.vbe)
+-	return VbeDPMS (priv->vi, priv->vbeInfo, mode);
++	return VbeDPMS (priv->vi, NULL /*priv->vbeInfo*/, mode);
+     return FALSE;
+ }
+ 
+@@ -1673,6 +1691,9 @@
+ }
+ 
+ void
++VbeCleanup (Vm86InfoPtr vi, VbeInfoPtr vbe);
++
++void
+ vesaCardFini(KdCardInfo *card)
+ {
+     VesaCardPrivPtr priv = card->driver;
+diff -rauN tinyxserver/hw/kdrive/vesa/vesainit.c tinyxserver-tcc-patch/hw/kdrive/vesa/vesainit.c
+--- tinyxserver/hw/kdrive/vesa/vesainit.c	2025-12-18 13:54:38.000000000 +0100
++++ tinyxserver-tcc-patch/hw/kdrive/vesa/vesainit.c	2026-01-30 10:43:38.805206767 +0100
+@@ -72,6 +72,8 @@
+     KdInitInput(&LinuxMouseFuncs, &LinuxKeyboardFuncs);
+ }
+ 
++int KdProcessArgument(int argc, char **argv, int i);
++
+ int
+ ddxProcessArgument (int argc, char **argv, int i)
+ {
+diff -rauN tinyxserver/hw/kdrive/vesa/vga.c tinyxserver-tcc-patch/hw/kdrive/vesa/vga.c
+--- tinyxserver/hw/kdrive/vesa/vga.c	2025-12-18 13:54:38.000000000 +0100
++++ tinyxserver-tcc-patch/hw/kdrive/vesa/vga.c	2026-01-30 10:21:34.924591698 +0100
+@@ -117,6 +117,7 @@
+ {
+     asm volatile ("outb %b0,%w1" : : "a" (2), "d" (0x3c4));
+     asm volatile ("outb %b0,%w1" : : "a" (mask), "d" (0x3c5));
++    return 0;
+ }
+ 
+ int
+@@ -124,6 +125,7 @@
+ {
+     asm volatile ("outb %b0,%w1" : : "a" (4), "d" (0x3ce));
+     asm volatile ("outb %b0,%w1" : : "a" (map), "d" (0x3cf));
++    return 0;
+ }
+ 
+ int 
 diff -rauN tinyxserver/Makefile tinyxserver-tcc-patch/Makefile
---- tinyxserver/Makefile	2023-07-14 09:31:20.000000000 +0200
-+++ tinyxserver-tcc-patch/Makefile	2023-07-14 10:14:19.897926578 +0200
-@@ -61,7 +61,7 @@
+--- tinyxserver/Makefile	2025-12-18 13:54:38.000000000 +0100
++++ tinyxserver-tcc-patch/Makefile	2026-01-30 11:49:16.667740326 +0100
+@@ -61,7 +61,8 @@
  install:
  	install -D -m 755 Xfbdev $(DESTDIR)/$(BINDIR)/Xfbdev
  	install -m 755 xinit $(DESTDIR)/$(BINDIR)/xinit
 -	ln -s $(BINDIR)/Xfbdev $(DESTDIR)/$(BINDIR)/X
-+	ln -fs $(BINDIR)/Xfbdev $(DESTDIR)/$(BINDIR)/X
++	install -D -m 755 Xvesa $(DESTDIR)/$(BINDIR)/Xvesa
++	ln -fs $(BINDIR)/Xvesa $(DESTDIR)/$(BINDIR)/X
  	install -D -m 644 init/xinit.1 $(DESTDIR)/$(MANDIR)/man1/xinit.1
  	install -D -m 644 README $(DESTDIR)/$(DOCDIR)/tinyxserver/README
  	install -m 644 changelog $(DESTDIR)/$(DOCDIR)/tinyxserver/changelog
 diff -rauN tinyxserver/standard_definitions.mk tinyxserver-tcc-patch/standard_definitions.mk
---- tinyxserver/standard_definitions.mk	2023-07-14 09:31:21.000000000 +0200
-+++ tinyxserver-tcc-patch/standard_definitions.mk	2023-07-21 17:23:14.589816273 +0200
+--- tinyxserver/standard_definitions.mk	2025-12-18 13:54:38.000000000 +0100
++++ tinyxserver-tcc-patch/standard_definitions.mk	2026-01-30 10:05:20.414160583 +0100
 @@ -2,12 +2,16 @@
  ####compiler####
  CC=/usr/bin/gcc

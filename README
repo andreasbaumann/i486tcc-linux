@@ -339,6 +339,11 @@ which cards and have performace benefits (Cirrus for instance should
 have BtBlt functions)
 - CONFIG_FB_TILEBLITTING=y
 
+TODO: for Xvesa and non-linear, pre 2.0 VBE VESA modes (as the Cirrus on Unisys)
+- CONFIG_X86_LEGACY_VM86=y
+- CONFIG_VM86=y
+- CONFIG_DEVMEM=y
+
 TODO: what happens when we have multiple framebuffer drivers, which one
 takes precedence (for instance SVGA over VGA16 over CIRRUS?).
   

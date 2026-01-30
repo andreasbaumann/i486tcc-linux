@@ -1,0 +1,142 @@
+diff -rauN tinyxserver/hw/kdrive/vesa/vm86.c tinyxserver-xvesa-vm86-patch/hw/kdrive/vesa/vm86.c
+--- tinyxserver/hw/kdrive/vesa/vm86.c	2025-12-18 13:54:38.000000000 +0100
++++ tinyxserver-xvesa-vm86-patch/hw/kdrive/vesa/vm86.c	2026-01-30 11:27:12.516291490 +0100
+@@ -134,7 +134,7 @@
+     memset(&vi->vms, 0, sizeof(struct vm86_struct));
+     vi->vms.flags = 0;
+     vi->vms.screen_bitmap = 0;
+-    vi->vms.cpu_type = CPU_586;
++    vi->vms.cpu_type = CPU_486;
+     memcpy(&vi->vms.int_revectored, rev_ints, sizeof(rev_ints));
+ 
+     iopl(3);
+@@ -537,6 +537,7 @@
+         return HM(vi, i);
+     else {
+         ErrorF("Reading unmapped memory at 0x%08X\n", i);
++        return 0;
+     }
+ }
+ 
+@@ -654,7 +655,7 @@
+ 	"movl %1,%%eax\n\t"
+ 	"int $0x80\n\t"
+ 	"popl %%ebx"
+-	: "=a" (res)  : "n" (113), "r" (vm));
++	: "=a" (res)  : "i" (113), "r" (vm));
+     if(res < 0) {
+ 	errno = -res;
+ 	res = -1;
+diff -rauN tinyxserver/hw/kdrive/vesa/vm86.h tinyxserver-xvesa-vm86-patch/hw/kdrive/vesa/vm86.h
+--- tinyxserver/hw/kdrive/vesa/vm86.h	2025-12-18 13:54:38.000000000 +0100
++++ tinyxserver-xvesa-vm86-patch/hw/kdrive/vesa/vm86.h	2026-01-30 11:22:31.382416298 +0100
+@@ -51,7 +51,6 @@
+ #include <unistd.h>
+ #include <fcntl.h>
+ #include <sys/mman.h>
+-#include <sys/vm86.h>
+ #include <sys/io.h>
+ 
+ #ifdef NOT_IN_X_SERVER
+@@ -90,9 +89,34 @@
+ #ifdef  X86_EFLAGS_IF
+ #define IF_MASK		X86_EFLAGS_IF
+ #define IOPL_MASK 	X86_EFLAGS_IOPL
++#else
++#define IF_MASK		0x200
++#define IOPL_MASK	0x00003000
+ #endif
+ #endif
+ 
++/* things missing when compiling without the glibc shim of older
++ * versions of glibc or when using something like musl (where there
++ * is no vm86 shim)
++ */
++
++// from uapi/asm/vm86.h for vm86_struct.cpu_type
++#define CPU_086			0
++#define CPU_186			1
++#define CPU_286			2
++#define CPU_386			3
++#define CPU_486			4
++#define CPU_586			5
++
++#define VM86_SIGNAL		0
++#define VM86_UNKNOWN	1
++
++#define VM86_INTx		2
++#define VM86_STI		3
++
++#define VM86_TYPE(retval)	((retval) & 0xff)
++#define VM86_ARG(retval)	((retval) >> 8)
++
+ /* The low memory, allocated privately from /dev/zero */
+ /* 64KB should be enough for anyone, as they used to say */
+ #define LOMEM_BASE 0x10000
+@@ -114,6 +138,66 @@
+ #define MAKE_POINTER_1(lw) MAKE_POINTER(((lw)&0xFFFF0000)/0x10000, (lw)&0xFFFF)
+ #define ALLOC_FAIL ((U32)-1)
+ 
++/*
++ * #ifndef _SYS_VM86_H
++#define _SYS_VM86_H
++
++
++
++
++
++int vm86(int flags, struct vm86_struct *);
++
++#endif
++*/
++
++struct vm86_regs {
++/*
++ * normal regs, with special meaning for the segment descriptors..
++ */
++	long ebx;
++	long ecx;
++	long edx;
++	long esi;
++	long edi;
++	long ebp;
++	long eax;
++	long __null_ds;
++	long __null_es;
++	long __null_fs;
++	long __null_gs;
++	long orig_eax;
++	long eip;
++	unsigned short cs, __csh;
++	long eflags;
++	long esp;
++	unsigned short ss, __ssh;
++/*
++ * these are specific to v86 mode:
++ */
++	unsigned short es, __esh;
++	unsigned short ds, __dsh;
++	unsigned short fs, __fsh;
++	unsigned short gs, __gsh;
++};
++
++/*
++struct vm86_regs {
++    unsigned long eax, ebx, ecx, edx, esi, edi, ebp;
++    unsigned short ds, es, fs, gs;
++    unsigned short eflags;
++    unsigned short ip, cs, sp, ss;
++};
++*/
++
++struct vm86_struct {
++    struct vm86_regs regs;
++    unsigned long flags;
++    unsigned long screen_bitmap;
++    int cpu_type;
++    int int_revectored;
++};
++
+ typedef struct _Vm86InfoRec {
+     void		*magicMem, *loMem, *hiMem;
+     U32			brk;
