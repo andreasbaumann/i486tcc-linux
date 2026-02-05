@@ -459,10 +459,8 @@ bugs
      doesn't work yet
      https://gitlab.archlinux.org/grawlinson/libx86
      lrmi, libx86emu, vm86 syscall
-    and ~/projects/i486-tcclinux/bug 
-    and ~/projects/i486-tcclinux/bug 
-    does the vesafb fall back to VGA mode?
-    video:vesafb=on vga=ask
+  - does the vesafb fall back to VGA mode?
+    - video:vesafb=on vga=ask
     - https://www.fysnet.net/modex.htm
 - vga16fb:
   - normally we get both vesafb (/dev/fb0), vga16fb (/dev/fb1), if we
