@@ -387,6 +387,83 @@ cd ../linux
 bugs
 ----
 
+- fbset -xres 320 -yres 200 -depth 8
+  ioctl FBIOPUT_VSCREENINFO: Out of memory
+- fbvga16: cat /sys/class/graphics/fb0/modes
+  U:640x480p-59
+- we should do this with debugging symbols enabled:
+  <3>vga16fb: started probing
+  <3>vga16fb: initializing
+  <3>vga16fb: mapped to 0x(ptrval)
+  <6>Console: switching to colour frame buffer device 80x30
+  <6>fb0: VGA16 VGA frame buffer device
+  <3>vga16fb: started probing
+  <3>vga16fb: initializing
+  <3>vga16fb: mapped to 0x(ptrval)
+  <4>------------[ cut here ]------------
+  <4>WARNING: CPU: 0 PID: 31 at arch/x86/mm/ioremap.c:460 0xc0129213
+  <4>Modules linked in: vga16fb(+) vgastate
+  <4>CPU: 0 UID: 0 PID: 31 Comm: insmod Not tainted 6.18.7 #1 VOLUNTARY 
+  <4>EIP: 0xc0129213
+  <4>Code: f0 b9 4a c0 8d 91 00 00 80 00 39 d0 72 1c 8b 3d 44 e0 3f c0 8d 97 00 00 dc ff 81 e2 00 00 c0 ff 81 ea 00 20 40 00 39 d0 72 07 <0f> 0b e9 82 00 00 00 8d 90 00 00 f6 3f 81 fa ff ff 05 00 77 0f 68
+  <4>EAX: c00a0000 EBX: c051e800 ECX: c1800000 EDX: c2000000
+  <4>ESI: fffffff0 EDI: c051e9bc EBP: c11cbcf0 ESP: c11cbce0
+  <4>DS: 007b ES: 007b FS: 0000 GS: 0033 SS: 0068 EFLAGS: 00010287
+  <4>CR0: 80050033 CR2: b7f5d000 CR3: 00486000 CR4: 00000010
+  <4>Call Trace:
+  <4> 0xc2013a33
+  <4> 0xc027e660
+  <4> 0xc027ce4c
+  <4> 0xc027d028
+  <4> ? 0xc015673d
+  <4> 0xc027d0a9
+  <4> 0xc027d23c
+  <4> 0xc027b81e
+  <4> 0xc027c8d7
+  <4> ? 0xc027d190
+  <4> 0xc027c374
+  <4> ? 0xc2019000
+  <4> 0xc027d84d
+  <4> ? 0xc2019000
+  <4> 0xc027e4f5
+  <4> 0xc2019051
+  <4> 0xc0105058
+  <4> 0xc0167860
+  <4> 0xc0168bea
+  <4> 0xc0168e30
+  <4> 0xc0105c22
+  <4> 0xc0350339
+  <4> 0xc0100b1f
+  <4>EIP: 0x080638ec
+  <4>Code: c9 c3 55 89 e5 81 ec 04 00 00 00 53 56 57 8b 45 08 8b 5d 0c 8b 4d 10 8b 55 14 8b 75 18 8b 7d 1c ff 75 20 55 8b 6c 24 04 cd 80 <5d> 83 c4 04 89 45 fc 5f 5e 5b 8b 45 fc c9 c3 00 55 89 e5 81 ec 00
+  <4>EAX: ffffffda EBX: b7f5b020 ECX: 00003a74 EDX: 080847a0
+  <4>ESI: bf95af90 EDI: 08077fd0 EBP: 080907a0 ESP: bf95aefc
+  <4>DS: 007b ES: 007b FS: 0000 GS: 0033 SS: 007b EFLAGS: 00000282
+  <4>---[ end trace 0000000000000000 ]---
+  <3>vga16fb vga16fb: probe with driver vga16fb failed with error -16
+- i486tcclinux:
+  - fbdev, vga16fb
+    - 320x200 with 256 colors would probably be simpler, 1 byte per pixel,
+      linear buffer. The one we use for abaos. The terminal in X will look
+      terrible though. How to switch to this mode during boot and then in
+      Xfbdev?
+     vga16fb driver doesn’t support 8-bit modes. It’s strictly 4-bit (16 colors).
+     So it could easily be that 4 planar VGA was never supported by Xfbdev and
+     vga16fb was never able to do something different, especially not
+     320x200x256, it was used for text mode graphical mode and penguins only
+     during boot.
+     https://web.archive.org/web/20140218012818/http://atschool.eduweb.co.uk/camdean/pupils/amac/vga.htm
+     https://www.microwindows.org/, Nano-X
+     try xvesa: Xvesa :0 -screen 640x480x8
+     sys/vm86.h is gone in modern kernels, made a patch and port which
+     doesn't work yet
+     https://gitlab.archlinux.org/grawlinson/libx86
+     lrmi, libx86emu, vm86 syscall
+    and ~/projects/i486-tcclinux/bug 
+    and ~/projects/i486-tcclinux/bug 
+    does the vesafb fall back to VGA mode?
+    video:vesafb=on vga=ask
+    - https://www.fysnet.net/modex.htm
 - vga16fb:
   - normally we get both vesafb (/dev/fb0), vga16fb (/dev/fb1), if we
     set FBDEVICE=/dev/fb1 in .xserverrc we get a text cursor (so the
@@ -1028,6 +1105,9 @@ links
     - https://github.com/shiftypenguin/uinit
   - service/daemon management
     - http://r-36.net/scm/svc/log.html
+  - boot config embeddable into kernel or initrd
+    - https://www.kernel.org/doc/html/v5.8/admin-guide/bootconfig.html
+    - this is almost the BOOT file idea read by uffbl
 - minimal userland
   - shells
      - POSIX compliant
