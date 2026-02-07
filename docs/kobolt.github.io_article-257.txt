@@ -1,0 +1,80 @@
+   Kjetil's Information Center: A Blog About My Projects
+
+   Index:
+
+   [1]Index By Topic
+   [2]Index By Date
+   [3]RSS Feed
+     __________________________________________________________________
+
+   Contact:
+
+   [4]https://github.com/kobolt
+   [5]https://gitlab.com/kobolt
+   kobolt.anarion (at) gmail.com
+     __________________________________________________________________
+
+   Quality assurance:
+
+   [6]Valid XHTML 1.0 Strict
+   [7]Valid CSS
+   [8]Valid RSS
+     __________________________________________________________________
+
+   Except where otherwise noted, content on this site is licensed under
+   [9]CC BY-SA 4.0
+   Creative Commons Attribution-ShareAlike 4.0 International
+
+Linux 6.15 for 486
+
+   Rumors were circulating that [10]i486 support would be dropped for the
+   Linux kernel with [11]version 6.15 that was released some days ago. It
+   seems the support still remains, since I was able to build and run a
+   6.15 kernel on a 486DX system.
+   I used nearly the same steps as in my [12]earlier experiments. Once
+   again using Slackware 15.0 with GCC 11.2 as the base for building the
+   toolchain. One important thing I needed to include this time was system
+   wide support for 64-bit time_t. Initially using 32-bit time_t with this
+   setup was a source of some strange bugs and weird behaviour.
+   I tried to use up-to-date versions of software for the toolchain and
+   ended up with the following specific versions for everything:
+   * linux-6.15
+   * gcc-15.1.0
+   * busybox-1.37.0
+   * uClibc-ng-1.0.52
+   * binutils-2.44
+   The necessary scripts and configuration to build everything can be
+   downloaded [13]here. This time I have also included a script to build
+   [14]ncurses version 6.5 and the [15]snake game I made a long time ago.
+   There is also a script to conveniently launch QEMU for test.
+   The scripts should be executed in the following order:
+./build-base.sh
+./ncurses-build.sh
+./snake-build.sh
+./rootfs-cramfs.sh
+./qemu-test.sh
+
+   Here is a screenshot:
+   Linux 6.15 on an emulated 486 in QEMU.
+
+   Topic: [16]Configuration, by Kjetil @ 01/06-2025, [17]Article Link
+
+References
+
+   1. https://kobolt.github.io/index-topic.html
+   2. https://kobolt.github.io/index.html
+   3. https://kobolt.github.io/rss.xml
+   4. https://github.com/kobolt
+   5. https://gitlab.com/users/kobolt/projects
+   6. http://validator.w3.org/check?uri=referer
+   7. http://jigsaw.w3.org/css-validator/
+   8. https://validator.w3.org/feed/
+   9. https://creativecommons.org/licenses/by-sa/4.0/
+  10. https://en.wikipedia.org/wiki/I486
+  11. https://lkml.org/lkml/2025/5/25/345
+  12. https://kobolt.github.io/article-249.html
+  13. https://kobolt.github.io/supplies/linux-6.15-486-scripts.tar.gz
+  14. https://invisible-island.net/ncurses/announce.html
+  15. https://kobolt.github.io/article-50.html
+  16. https://kobolt.github.io/index-topic.html#configuration
+  17. https://kobolt.github.io/article-257.html

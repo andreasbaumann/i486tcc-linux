@@ -1275,6 +1275,8 @@ Unsorted links
 - https://github.com/vvaltchev/tilck: syscall compatible to Linux kernel,
   nice, but neeeds pentium2, probably not enough syscalls to run anything
   close to what we currently run on i486tcclinux
+- others doing things on i486
+  - https://kobolt.github.io/article-257.html
 
 Real hardware
 -------------
