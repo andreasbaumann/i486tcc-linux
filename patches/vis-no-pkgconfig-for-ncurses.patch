@@ -1,8 +1,7 @@
-diff --git a/configure b/configure
-index 1e72e2b..0403a22 100755
---- a/configure
-+++ b/configure
-@@ -190,8 +190,8 @@ tmpo="./conf$$-$PPID-$i.o"
+diff -rauN a/configure b/configure
+--- a/configure	2026-03-04 19:38:20.000000000 +0100
++++ b/configure	2026-03-04 19:43:22.445630267 +0100
+@@ -195,8 +195,8 @@
  test "$i" -gt 50 && fail "$0: cannot create temporary file $tmpc"
  done
  set +C
@@ -13,16 +12,16 @@ index 1e72e2b..0403a22 100755
  
  #
  # Find a C compiler to use
-@@ -285,7 +285,7 @@ fi
- 
+@@ -302,7 +302,7 @@
+ : ${PKG_CONFIG:=pkg-config}
  have_pkgconfig=no
- printf "checking for pkg-config... "
--cmdexists pkg-config && have_pkgconfig=yes
-+#cmdexists pkg-config && have_pkgconfig=yes
+ printf "checking for $PKG_CONFIG... "
+-cmdexists $PKG_CONFIG && have_pkgconfig=yes
++#cmdexists $PKG_CONFIG && have_pkgconfig=yes
  printf "%s\n" "$have_pkgconfig"
  
- if test "$help" = "yes" ; then
-@@ -325,7 +325,7 @@ EOF
+ if test "$curses" != "no" ; then
+@@ -334,7 +334,7 @@
  		fi
  
  		CFLAGS_CURSES=""
