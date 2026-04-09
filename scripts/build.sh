@@ -404,6 +404,7 @@ if [ "x${CONFIG_NBD}" = "xy" ]; then
 		rm -rf "nbd-${NBD_VERSION}"
 		tar xf "${BASE}/downloads/nbd-${NBD_VERSION}.tar.gz"
 		cd "nbd-${NBD_VERSION}" || exit 1
+		patch -Np1 < "${BASE}/patches/nbd-persist_mode_main.patch"
 		CC="${BASE}/build/stage1/bin/i386-tcc" \
 		./configure --prefix="${BASE}/build/stage1" \
 			--enable-static --disable-shared \
