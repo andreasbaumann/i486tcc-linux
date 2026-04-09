@@ -260,8 +260,8 @@ use_latest_release = true
 source = "git"
 git = "https://gitlab.com/muttmua/mutt.git"
 exclude_regex = ".*(muttintl|patch).*"
-from_pattern = 'mutt-(\d+)-(\d+)-rel'
-to_pattern = '\1.\2'
+from_pattern = 'mutt-(\d+)-(\d+)-(\d+)-rel'
+to_pattern = '\1.\2.\3'
 
 [FBSET]
 source = "regex"
