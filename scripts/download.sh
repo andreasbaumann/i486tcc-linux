@@ -138,7 +138,7 @@ if [ ! -f "${BASE}/downloads/samurai-${SAMURAI_VERSION}.tar.gz" ]; then
 fi
 
 if [ ! -f "${BASE}/downloads/joe-${JOE_VERSION}.tar.gz" ]; then
-	wget -O "${BASE}/downloads/joe-${JOE_VERSION}.tar.gz" "https://netcologne.dl.sourceforge.net/project/joe-editor/JOE%20sources/joe-${JOE_VERSION}/joe-${JOE_VERSION}.tar.gz"
+	wget -O "${BASE}/downloads/joe-${JOE_VERSION}.tar.gz" "https://downloads.sourceforge.net/joe-editor/JOE%20sources/joe-${JOE_VERSION}/joe-${JOE_VERSION}.tar.gz"
 fi
 
 if [ ! -f "${BASE}/downloads/tinyxlib-${TINYXLIB_VERSION}.tar.gz" ]; then
