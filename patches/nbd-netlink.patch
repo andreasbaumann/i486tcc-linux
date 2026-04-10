@@ -1,7 +1,7 @@
-diff -rauN nbd/nbd-client.c nbd-persist_mode_main-patch/nbd-client.c
---- nbd/nbd-client.c	2026-02-23 10:31:55.000000000 +0100
-+++ nbd-persist_mode_main-patch/nbd-client.c	2026-04-09 11:04:04.078512169 +0200
-@@ -1719,9 +1719,11 @@
+diff -rauN nbd/nbd-client.c nbd-netlink-patch/nbd-client.c
+--- nbd/nbd-client.c	2026-04-09 17:47:57.000000000 +0200
++++ nbd-netlink-patch/nbd-client.c	2026-04-10 09:51:48.804936229 +0200
+@@ -1545,9 +1545,11 @@
  		netlink_configure(index, sockfds, flags, identifier);
  		
  		/* If persist mode is enabled, start the monitoring loop */

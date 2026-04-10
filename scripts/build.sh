@@ -404,7 +404,7 @@ if [ "x${CONFIG_NBD}" = "xy" ]; then
 		rm -rf "nbd-${NBD_VERSION}"
 		tar xf "${BASE}/downloads/nbd-${NBD_VERSION}.tar.gz"
 		cd "nbd-${NBD_VERSION}" || exit 1
-		patch -Np1 < "${BASE}/patches/nbd-persist_mode_main.patch"
+		patch -Np1 < "${BASE}/patches/nbd-netlink.patch"
 		CC="${BASE}/build/stage1/bin/i386-tcc" \
 		./configure --prefix="${BASE}/build/stage1" \
 			--enable-static --disable-shared \
@@ -414,7 +414,7 @@ if [ "x${CONFIG_NBD}" = "xy" ]; then
 		# libtool links wrongly dynamically with static archives?
 		${BASE}/build/stage1/bin/i386-tcc -static -g \
 			-DNOTLS -DPROG_NAME=\"nbd-client\" \
-			-o nbd-client nbd_client-nbd-client.o ./.libs/libcliserv.a ./.libs/libnbdclt.a
+			-o nbd-client nbd_client-nbd-client.o nbd_client-args.o ./.libs/libcliserv.a ./.libs/libnbdclt.a
 		cp nbd-client "${BASE}/build/stage1/bin/."
 		cd .. || exit 1
 	else

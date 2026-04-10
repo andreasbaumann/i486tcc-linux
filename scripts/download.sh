@@ -122,7 +122,15 @@ if [ ! -f "${BASE}/downloads/abase-${ABASE_VERSION}.tar.gz" ]; then
 fi
 
 if [ ! -f "${BASE}/downloads/nbd-${NBD_VERSION}.tar.gz" ]; then
-	wget -O "${BASE}/downloads/nbd-${NBD_VERSION}.tar.gz" "https://github.com/NetworkBlockDevice/nbd/releases/download/nbd-${NBD_VERSION}/nbd-${NBD_VERSION}.tar.xz"
+	wget -O "${BASE}/downloads/nbd-nbd-${NBD_VERSION}.tar.gz" "https://github.com/NetworkBlockDevice/nbd/archive/refs/tags/nbd-${NBD_VERSION}.tar.gz"
+	tar zxf "${BASE}/downloads/nbd-nbd-${NBD_VERSION}.tar.gz"
+	mv "nbd-nbd-${NBD_VERSION}" "nbd-${NBD_VERSION}"
+	cd "nbd-${NBD_VERSION}" || exit 1
+	./autogen.sh
+	cd ..
+	tar zcf "${BASE}/downloads/nbd-${NBD_VERSION}.tar.gz" "nbd-${NBD_VERSION}"
+	rm -f "${BASE}/downloads/nbd-nbd-${NBD_VERSION}.tar.gz"	
+	rm -rf "nbd-${NBD_VERSION}"
 fi
 
 if [ ! -f "${BASE}/downloads/samurai-${SAMURAI_VERSION}.tar.gz" ]; then
