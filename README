@@ -387,6 +387,7 @@ cd ../linux
 bugs
 ----
 
+- endbr32, illegal instruction in 86Box in kernel?
 - fbset -xres 320 -yres 200 -depth 8
   ioctl FBIOPUT_VSCREENINFO: Out of memory
 - fbvga16: cat /sys/class/graphics/fb0/modes
