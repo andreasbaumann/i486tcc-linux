@@ -1,0 +1,42 @@
+diff -Naur oksh-7.9.orig/emacs.c oksh-7.9/emacs.c
+--- oksh-7.9.orig/emacs.c	2026-08-10 17:41:30.757003657 +0200
++++ oksh-7.9/emacs.c	2026-08-10 17:41:51.096629861 +0200
+@@ -1040,7 +1040,7 @@
+ 	x_adj_ok = 0;
+ 	if (limit == -2) {
+ 		int cleared = 0;
+-#ifndef SMALL
++#if !defined(SMALL) && !defined(NO_CURSES)
+ 		if (cur_term == NULL && Flag(FTALKING))
+ 			initcurses();
+ 		if (cur_term != NULL && clear_screen != NULL) {
+diff -Naur oksh-7.9.orig/var.c oksh-7.9/var.c
+--- oksh-7.9.orig/var.c	2026-08-10 17:41:30.757076432 +0200
++++ oksh-7.9/var.c	2026-08-10 17:42:02.990684081 +0200
+@@ -1239,7 +1239,7 @@
+ 	}
+ }
+ 
+-#ifndef SMALL
++#if !defined(SMALL) && !defined(NO_CURSES)
+ void
+ initcurses(void)
+ {
+@@ -1252,4 +1252,4 @@
+ 			del_curterm(cur_term);
+ 	}
+ }
+-#endif /* SMALL */
++#endif /* !SMALL && !NO_CURSES */
+diff -Naur oksh-7.9.orig/vi.c oksh-7.9/vi.c
+--- oksh-7.9.orig/vi.c	2026-08-10 17:41:30.756608066 +0200
++++ oksh-7.9/vi.c	2026-08-10 17:42:25.355785948 +0200
+@@ -1747,7 +1747,7 @@
+ {
+ 	int neednl = 1;
+ 
+-#ifndef SMALL
++#if !defined(SMALL) && !defined(NO_CURSES)
+ 	if (cur_term == NULL && Flag(FTALKING))
+ 		initcurses();
+ 	if (cur_term != NULL && clear_screen != NULL) {

@@ -149,6 +149,7 @@ if [ "x${CONFIG_OKSH}" = "xy" ]; then
 		rm -rf "oksh-${_OKSH_VERSION}"
 		tar xf "${BASE}/downloads/oksh-${_OKSH_VERSION}.tar.gz"
 		cd "oksh-${_OKSH_VERSION}" || exit 1
+		patch -Np1 < "${BASE}/patches/oksh-nocurses.patch"
 		CC="${BASE}/build/stage1/bin/i386-tcc" \
 		./configure \
 			--prefix="${BASE}/build/stage1" \
