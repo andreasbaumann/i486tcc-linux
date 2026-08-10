@@ -41,35 +41,35 @@ if [ ! -f "${BASE}/downloads/oksh-${_OKSH_VERSION}.tar.gz" ]; then
 fi
 
 if [ ! -f "${BASE}/downloads/sbase-${SBASE_VERSION}.tar.gz" ]; then
-	git clone git://git.suckless.org/sbase "sbase-${SBASE_VERSION}"
+	git clone https://git.suckless.org/sbase "sbase-${SBASE_VERSION}"
 	git -C "sbase-${SBASE_VERSION}" checkout "${SBASE_VERSION}"
 	tar zcf "${BASE}/downloads/sbase-${SBASE_VERSION}.tar.gz" "sbase-${SBASE_VERSION}"
 	rm -rf "sbase-${SBASE_VERSION}"
 fi
 
 if [ ! -f "${BASE}/downloads/ubase-${UBASE_VERSION}.tar.gz" ]; then
-	git clone git://git.suckless.org/ubase "ubase-${UBASE_VERSION}"
+	git clone https://git.suckless.org/ubase "ubase-${UBASE_VERSION}"
 	git -C "ubase-${UBASE_VERSION}" checkout "${UBASE_VERSION}"
 	tar zcf "${BASE}/downloads/ubase-${UBASE_VERSION}.tar.gz" "ubase-${UBASE_VERSION}"
 	rm -rf "ubase-${UBASE_VERSION}"
 fi
 
 if [ ! -f "${BASE}/downloads/smdev-${SMDEV_VERSION}.tar.gz" ]; then
-	git clone git://git.suckless.org/smdev "smdev-${SMDEV_VERSION}"
+	git clone https://git.suckless.org/smdev "smdev-${SMDEV_VERSION}"
 	git -C "smdev-${SMDEV_VERSION}" checkout "${SMDEV_VERSION}"
 	tar zcf "${BASE}/downloads/smdev-${SMDEV_VERSION}.tar.gz" "smdev-${SMDEV_VERSION}"
 	rm -rf "smdev-${SMDEV_VERSION}"
 fi
 
 if [ ! -f "${BASE}/downloads/sinit-${SINIT_VERSION}.tar.gz" ]; then
-	git clone git://git.suckless.org/sinit "sinit-${SINIT_VERSION}"
+	git clone https://git.suckless.org/sinit "sinit-${SINIT_VERSION}"
 	git -C "sinit-${SINIT_VERSION}" checkout "${SINIT_VERSION}"
 	tar zcf "${BASE}/downloads/sinit-${SINIT_VERSION}.tar.gz" "sinit-${SINIT_VERSION}"
 	rm -rf "sinit-${SINIT_VERSION}"
 fi
 
 if [ ! -f "${BASE}/downloads/sdhcp-${SDHCP_VERSION}.tar.gz" ]; then
-	git clone git://git.2f30.org/sdhcp "sdhcp-${SDHCP_VERSION}"
+	git clone https://git.2f30.org/sdhcp "sdhcp-${SDHCP_VERSION}"
 	git -C "sdhcp-${SDHCP_VERSION}" checkout "${SDHCP_VERSION}"
 	tar zcf "${BASE}/downloads/sdhcp-${SDHCP_VERSION}.tar.gz" "sdhcp-${SDHCP_VERSION}"
 	rm -rf "sdhcp-${SDHCP_VERSION}"
@@ -186,7 +186,7 @@ if [ ! -f "${BASE}/downloads/meh-${MEH_VERSION}.tar.gz" ]; then
 fi
 
 if [ ! -f "${BASE}/downloads/slock-${SLOCK_VERSION}.tar.gz" ]; then
-	git clone git://git.suckless.org/slock "slock-${SLOCK_VERSION}"
+	git clone https://git.suckless.org/slock "slock-${SLOCK_VERSION}"
 	git -C "slock-${SLOCK_VERSION}" checkout "${SLOCK_VERSION}"
 	tar zcf "${BASE}/downloads/slock-${SLOCK_VERSION}.tar.gz" "slock-${SLOCK_VERSION}"
 	rm -rf "slock-${SLOCK_VERSION}"

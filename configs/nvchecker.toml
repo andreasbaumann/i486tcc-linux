@@ -27,7 +27,7 @@ prefix = "oksh-"
 
 [SBASE]
 source = "git"
-git = "git://git.suckless.org/sbase"
+git = "https://git.suckless.org/sbase"
 use_commit = true
 from_pattern = "(.{5,5}).*"
 to_pattern = '\1'
@@ -35,7 +35,7 @@ use_tag = false
 
 [UBASE]
 source = "git"
-git = "git://git.suckless.org/ubase"
+git = "https://git.suckless.org/ubase"
 use_commit = true
 from_pattern = "(.{5,5}).*"
 to_pattern = '\1'
@@ -43,7 +43,7 @@ use_tag = false
 
 [SMDEV]
 source = "git"
-git = "git://git.suckless.org/smdev"
+git = "https://git.suckless.org/smdev"
 use_commit = true
 from_pattern = "(.{5,5}).*"
 to_pattern = '\1'
@@ -51,7 +51,7 @@ use_tag = false
 
 [SINIT]
 source = "git"
-git = "git://git.suckless.org/sinit"
+git = "https://git.suckless.org/sinit"
 use_commit = true
 from_pattern = "(.{5,5}).*"
 to_pattern = '\1'
@@ -59,7 +59,8 @@ use_tag = false
 
 [SDHCP]
 source = "git"
-git = "git://git.2f30.org/sdhcp"
+git = "https://git.2f30.org/sdhcp"
+branch = "master"
 use_commit = true
 from_pattern = "(.{5,5}).*"
 to_pattern = '\1'
@@ -224,7 +225,7 @@ use_tag = false
 
 [SLOCK]
 source = "git"
-git = "git://git.suckless.org/slock"
+git = "https://git.suckless.org/slock"
 branch = "master"
 use_commit = true
 from_pattern = "(.{7,7}).*"
