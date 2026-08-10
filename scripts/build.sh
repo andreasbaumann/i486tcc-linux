@@ -577,7 +577,8 @@ if [ "x${CONFIG_TINYXSERVER}" = "xy" ]; then
 		rm -rf "font-util-${FONT_UTIL_VERSION}"
 		tar xf "${BASE}/downloads/font-util-${FONT_UTIL_VERSION}.tar.gz"
 		cd "font-util-${FONT_UTIL_VERSION}" || exit
-		"${BASE}/build/stage1/bin/i386-tcc" -static -I. -o "${BASE}/tools/ucs2any" ucs2any.c
+		patch -Np1 < "${BASE}/patches/font-util-noconfig.patch"
+		"${BASE}/build/stage1/bin/i386-tcc" -static -I. -DPACKAGE_STRING='"font-util ${FONT_UTIL_VERSION}"' -o "${BASE}/tools/ucs2any" ucs2any.c
 		cd .. || exit 1
 	else
 		echo "tool bdftopcf exists"
@@ -596,7 +597,7 @@ if [ "x${CONFIG_TINYXSERVER}" = "xy" ]; then
 		mkdir -p "${BASE}/build/stage1/share/X11/fonts"
 		cp -dR "${BASE}/local/share/X11/fonts/"* "${BASE}/build/stage1/share/X11/fonts/."
 		"${BASE}/tools/bdftopcf" -t "font-cursor-misc-${FONT_CURSOR_MISC_VERSION}/cursor.bdf" | gzip -n -9 > "${BASE}/build/stage1/share/X11/fonts/cursor.pcf.gz"
-		"${BASE}/tools/ucs2any" "font-misc-misc-${FONT_MISC_MISC_VERSION}/6x13.bdf" "${BASE}/src/stage1/font-util-1.4.1/map-ISO8859-1" ISO8859-1
+		"${BASE}/tools/ucs2any" "font-misc-misc-${FONT_MISC_MISC_VERSION}/6x13.bdf" "${BASE}/src/stage1/font-util-${FONT_UTIL_VERSION}/map-ISO8859-1" ISO8859-1
 		"${BASE}/tools/bdftopcf" -t "6x13-ISO8859-1.bdf" | gzip -n -9 > "${BASE}/build/stage1/share/X11/fonts/6x13-ISO8859-1.pcf.gz"
 	else
 		echo "stage1 X11 fonts exist"

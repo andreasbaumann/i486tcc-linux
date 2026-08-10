@@ -1,0 +1,12 @@
+diff -Naur font-util-1.4.2.orig/ucs2any.c font-util-1.4.2/ucs2any.c
+--- font-util-1.4.2.orig/ucs2any.c	2026-08-10 18:46:26.360773084 +0200
++++ font-util-1.4.2/ucs2any.c	2026-08-10 18:47:06.689278686 +0200
+@@ -37,8 +37,6 @@
+  * a waste of storage capacity).
+ */
+ 
+-#include "config.h"
+-
+ #include <ctype.h>
+ #include <errno.h>
+ #include <fcntl.h>
