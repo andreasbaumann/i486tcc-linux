@@ -300,6 +300,9 @@ tinyx/framebuffer:
 - CONFIG_FRAMEBUFFER_CONSOLE_LEGACY_ACCELERATION=y
 - CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY=y
 
+- CONFIG_FRAMEBUFFER_CONSOLE_DEFERRED_TAKEOVER=y
+  => avoid logos and firmware messages to be wiped
+
 - CONFIG_FONTS
   => do we need them, at least fk.ko complains about font functions otherwise
 
