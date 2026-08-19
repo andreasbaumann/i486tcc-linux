@@ -255,7 +255,7 @@ The starting point of the Linux kernel configuration is 'make tinyconfig'.
 - CONFIG_UNIX (networking options, as module), unix domain sockets
   - tmux
 
-- CONFIG_PCI_QUIRKS=y
+- CONFIG_PCI_QUIRKS
   "8139cp: 8139cp: 10/100 PCI Ethernet driver v1.3 (Mar 22, 2004)
    8139cp 0000:00:03.0: found PCI INT A -> IRQ 11
    8139cp: probe of 0000:00:03.0 failed with error -22"
@@ -264,6 +264,9 @@ The starting point of the Linux kernel configuration is 'make tinyconfig'.
 - CONFIG_VGA_ARB
   => might be needed for PCI not to choke on VGA cards
 
+- CONFIG_X86_IOPL_IOPERM
+  => needed by Xfb to access VGA sequencer map mask register
+  
 - CONFIG_BLK_DEV_FD=m
   => we might want to use floppies for confugration or files
   
