@@ -941,7 +941,6 @@ if [ ! -f "${BASE}/build/stage1/boot/bzImage" ]; then
 	rm -rf "linux-${LINUX_KERNEL_VERSION}"
 	tar xf "${BASE}/downloads/linux-${LINUX_KERNEL_VERSION}.tar.gz"
 	cd "linux-${LINUX_KERNEL_VERSION}" || exit 1
-	patch -Np1 < "${BASE}/patches/linux-vga16fb.patch"
 	# this configuration is based on tinyconfig, then enabling things as
 	# specified in the README
 	cp "${BASE}/configs/linux-config" .config
