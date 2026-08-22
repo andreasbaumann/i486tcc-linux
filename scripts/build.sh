@@ -182,6 +182,7 @@ if [ "x${CONFIG_UBASE}" = "xy" ]; then
 		tar xf "${BASE}/downloads/ubase-${UBASE_VERSION}.tar.gz"
 		cd "ubase-${UBASE_VERSION}" || exit 1
 		patch -Np1 < "${BASE}/patches/ubase-sysmacros.patch"
+		patch -Np1 < "${BASE}/patches/ubase-killall5-omit-pid.patch"
 		make -j$CPUS ubase-box CC="${BASE}/build/stage1/bin/i386-tcc" LDFLAGS=-static
 		make -j$CPUS ubase-box-install PREFIX="${BASE}/build/stage1"
 		cd .. || exit 1
