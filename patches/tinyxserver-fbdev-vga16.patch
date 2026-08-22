@@ -1,0 +1,183 @@
+diff -rauN tinyxserver/hw/kdrive/fbdev/fbdev.c tinyxserver-fbdev-vga16-patch/hw/kdrive/fbdev/fbdev.c
+--- tinyxserver/hw/kdrive/fbdev/fbdev.c	2026-08-22 16:47:48.523264952 +0200
++++ tinyxserver-fbdev-vga16-patch/hw/kdrive/fbdev/fbdev.c	2026-08-22 16:45:32.604884581 +0200
+@@ -52,6 +52,16 @@
+ 	return FALSE;
+     }
+ 
++    /* 4-plane 16 colour EGA/VGA memory (vga16fb) is not packed pixels:
++     * writes need to go through the shadow layer, converting to real
++     * planar memory via the VGA Sequencer's Map Mask register. */
++    priv->planar = (priv->fix.type == FB_TYPE_VGA_PLANES);
++    if (priv->planar && ioperm (0x3c4, 2, 1) < 0) {
++	perror ("Error getting I/O privilege for VGA sequencer ports (need to run as root)");
++	close (priv->fd);
++	return FALSE;
++    }
++
+     priv->fb_base = (unsigned char *) mmap ((caddr_t) NULL,
+ 					    priv->fix.smem_len,
+ 					    PROT_READ|PROT_WRITE,
+@@ -208,13 +218,28 @@
+     }
+     else
+ #endif
++    if (priv->planar)
++    {
++	/* 4-plane 16 colour EGA/VGA memory: expose it to X as an 8bpp
++	 * depth-4 StaticColor/PseudoColor buffer and let the shadow layer
++	 * (shadowUpdatePlanar4x8, see fbdevLayerCreate) convert into the
++	 * real planar hardware memory. screen->fb[0].{byteStride,
++	 * pixelStride,frameBuffer} are irrelevant here: the shadow layer
++	 * allocates and owns its own linear scratch pixmap. */
++	screen->fb[0].depth = 4;
++	screen->fb[0].bitsPerPixel = 8;
++	screen->width = priv->var.xres;
++	screen->height = priv->var.yres;
++	screen->softCursor = TRUE;
++    }
++    else
+     {
+ 	screen->fb[0].depth = depth;
+ 	screen->fb[0].bitsPerPixel = priv->var.bits_per_pixel;
+         screen->width = priv->var.xres;
+         screen->height = priv->var.yres;
+         screen->fb[0].byteStride = priv->fix.line_length;
+-        screen->fb[0].pixelStride = (priv->fix.line_length * 8 / 
++        screen->fb[0].pixelStride = (priv->fix.line_length * 8 /
+     				 priv->var.bits_per_pixel);
+         screen->fb[0].frameBuffer = (CARD8 *) (priv->fb);
+     }
+@@ -256,6 +281,51 @@
+     return (CARD8 *) priv->fb + row * priv->fix.line_length + offset;
+ }
+ 
++/*
++ * Select which of the 4 VGA bitplanes subsequent writes to the aperture
++ * go to, via the Sequencer's Map Mask register (index 2 at 0x3c4/0x3c5).
++ * All 4 planes live at the same address range (e.g. 0xa0000), so this is
++ * the only thing that distinguishes writes to one plane from another.
++ */
++static void
++fbdevSetPlane (int plane)
++{
++    outb (0x02, 0x3c4);
++    outb (1 << plane, 0x3c5);
++}
++
++/*
++ * Window callback for shadowUpdatePlanar4/shadowUpdatePlanar4x8
++ * (miext/shadow/shplanar{,8}.c): they encode the target plane in the
++ * low 4 bits of "offset". The remaining bits are NOT a byte offset: both
++ * routines do their pointer arithmetic ("winBase + (scr - scrBase)") in
++ * units of the CARD32 words they write (each word holds 32 pixels' worth
++ * of 1bpp data for one plane), so "offset >> 4" must be multiplied by 4 to
++ * get the real byte offset. Getting this wrong doesn't show up at all for
++ * the first 32-pixel-wide word of a scanline (offset>>4 == 0 either way),
++ * only once damage starts at x >= 32 - which is what made it look fine in
++ * quick testing but corrupt real text.
++ */
++void *
++fbdevWindowPlanar (ScreenPtr	pScreen,
++		    CARD32	row,
++		    CARD32	offset,
++		    int		mode,
++		    CARD32	*size,
++		    void	*closure)
++{
++    KdScreenPriv(pScreen);
++    FbdevPriv	    *priv = pScreenPriv->card->driver;
++    int		    plane = offset & 0xf;
++    CARD32	    byteOffset = (offset >> 4) << 2;
++
++    if (!pScreenPriv->enabled)
++	return 0;
++    fbdevSetPlane (plane);
++    *size = priv->fix.line_length - byteOffset;
++    return (CARD8 *) priv->fb + row * priv->fix.line_length + byteOffset;
++}
++
+ #ifdef FAKE24_ON_16
+ void
+ fbdevUpdateFake24 (ScreenPtr pScreen,
+@@ -390,24 +460,37 @@
+ 	m.matrix[1][0] = -1; m.matrix[1][1] = 0; m.matrix[1][2] = screen->width - 1;
+ 	break;
+     }
++    /* 4-plane 16 colour EGA/VGA memory can never be handed to X directly,
++     * whatever the rotation: it always needs the shadow layer to convert
++     * from packed pixels into real planar memory. */
++    if (priv->planar)
++	scrpriv->shadow = TRUE;
+     KdSetMouseMatrix (&m);
+-    
++
+     if (scrpriv->shadow)
+     {
+-        window = fbdevWindowLinear;
+-	update = 0;
+-#ifdef FAKE24_ON_16
+-	if (pScreenPriv->screen->fb[0].bitsPerPixel == 24 && priv->var.bits_per_pixel == 16)
++	if (priv->planar)
+ 	{
+-	    update = fbdevUpdateFake24;
++	    window = fbdevWindowPlanar;
++	    update = shadowUpdatePlanar4x8;
+ 	}
+ 	else
+-#endif /* FAKE24_ON_16 */
+ 	{
+-	    if (scrpriv->rotation)
+-		update = shadowUpdateRotatePacked;
++	    window = fbdevWindowLinear;
++	    update = 0;
++#ifdef FAKE24_ON_16
++	    if (pScreenPriv->screen->fb[0].bitsPerPixel == 24 && priv->var.bits_per_pixel == 16)
++	    {
++		update = fbdevUpdateFake24;
++	    }
+ 	    else
+-		update = shadowUpdatePacked;
++#endif /* FAKE24_ON_16 */
++	    {
++		if (scrpriv->rotation)
++		    update = shadowUpdateRotatePacked;
++		else
++		    update = shadowUpdatePacked;
++	    }
+ 	}
+ 	if (!update)
+ 	    abort ();
+@@ -792,7 +875,9 @@
+ {
+     int	k;
+     FbdevPriv	*priv = card->driver;
+-    
++
++    if (priv->planar)
++	ioperm (0x3c4, 2, 0);
+     munmap (priv->fb_base, priv->fix.smem_len);
+     close (priv->fd);
+     xfree (priv);
+diff -rauN tinyxserver/hw/kdrive/fbdev/fbdev.h tinyxserver-fbdev-vga16-patch/hw/kdrive/fbdev/fbdev.h
+--- tinyxserver/hw/kdrive/fbdev/fbdev.h	2026-08-12 21:17:37.000000000 +0200
++++ tinyxserver-fbdev-vga16-patch/hw/kdrive/fbdev/fbdev.h	2026-08-22 16:43:52.114558867 +0200
+@@ -29,6 +29,8 @@
+ #include <linux/fb.h>
+ #include <unistd.h>
+ #include <sys/mman.h>
++#include <sys/ioctl.h>
++#include <sys/io.h>
+ #include "../kdrive.h"
+ #include "layer.h"
+ 
+@@ -45,6 +47,9 @@
+     int				fd;
+     char			*fb;
+     char			*fb_base;
++    /* TRUE for classic 4-plane 16 colour EGA/VGA memory (e.g. vga16fb),
++     * which is not packed pixels and needs shadow-buffer conversion. */
++    Bool			planar;
+ } FbdevPriv;
+     
+ typedef struct _fbdevScrPriv {

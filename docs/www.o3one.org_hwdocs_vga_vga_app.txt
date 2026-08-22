@@ -1,0 +1,3477 @@
+                        Appendix A VGA Programming Model
+
+A.1 Introduction
+
+   IBM introduced the Video Graphics Array (VGA) display standard in 1987
+   to provide a higher resolution color graphics capability to its PS/2
+   line of personal computers. VGA BIOS was provided to control the VGA
+   hardware, but programming directly to the hardware has become the more
+   common approach for performance reasons. Since its introduction, VGA
+   has been "cloned" by many manufacturers, claiming register-level
+   compatibility. If a software developer is programming the hardware
+   directly, 100 percent compatibility is imperative; unfortunately, this
+   is not always the case.
+
+   The VGA function includes a video buffer, a video digital-to-analog
+   converter (DAC), a CRT controller, a sequencer unit, a graphics
+   controller, and an attribute controller.
+
+   Video memory consists of at least 256KB; its use and mapping depend on
+   the mode selected. It is configured as four 64KB memory maps:
+
+   The video DAC contains the color palette that is used to convert the
+   video data into the video signal that is sent to the display. Three
+   analog signals (red, green, and blue) are output from the DAC.
+
+   The CRT controller generates horizontal and vertical synchronization
+   signal timings, addressing for the regenerative buffer, cursor and
+   underline timings, and refresh addressing for the video memory.
+
+   The sequencer generates basic memory timings for the video memory and
+   the character clock for controlling regenerative buffer fetches. It
+   allows the system to access memory during active display intervals by
+   periodically inserting dedicated system microprocessor memory cycles
+   between the display memory cycles. Map mask registers in the sequencer
+   are available to protect entire memory maps from being changed.
+
+   The graphics controller is the interface between the video memory and
+   the attribute controller during active display times, and between video
+   memory and the system microprocessor during memory accesses.
+
+   During active display times, memory data is latched and sent to the
+   attribute controller. In graphics modes, the memory data is converted
+   from parallel to serial bit-plane data before being sent; in
+   alphanumeric modes, the parallel attribute data is sent.
+
+   During system accesses of video memory, the graphics controller can
+   perform logical operations on the memory data before it reaches video
+   memory or the system data bus. These logical operations are composed of
+   four logical write modes and two logical read modes. The logical
+   operators allow enhanced operations, such as a color compare in the
+   read mode, individual bit masking during write modes, internal 32-bit
+   writes in a single memory cycle, and writing to the display buffer on
+   non-byte boundaries.
+
+   The attribute controller takes in data from video memory through the
+   graphics controller and formats it for display. Attribute data in
+   alphanumeric mode and serialized bit-plane data in graphics mode are
+   converted to an 8-bit color value. Each color value is selected from an
+   internal color palette of 64 possible colors (except in 256-color
+   mode). The color value is used as a pointer into the video DAC where it
+   is converted to the analog signals that drive the display.
+
+A.2 VGA Modes
+
+   VGA provides alphanumeric modes for text processing and graphics modes
+   for graphics processing. The following table describes the alphanumeric
+   (A/N) and all points addressable (APA) graphics modes available in
+   standard VGA monitors. Each color is selected from 256K possibilities,
+   and gray shades from 64 possibilities. The variations within these
+   modes are selected by setting the number of scan lines. The scan line
+   count is set before the mode set is executed. In the 200-scan-line
+   modes, the data for each scan line is scanned twice. This double
+   scanning allows the 200-scan-line image to be displayed in 400 scan
+   lines.
+
+Table 353. VGA Video Modes
+================================================================================
+========
+Mode  |Type |Colors |Alpha  |Buffer  |Box  |Max.  |Freq |Resolution   |Double  |
+Border
+(Hex) |     |       |Format |Start   |Size |Pages |     |(hxv Pixels) |Scan    |
+Support
+======|=====|=======|=======|========|=====|======|=====|=============|========|
+========
+0,1   |A/N  |16     |40x25  |B8000   |8x8  |8     |70Hz |320x200      |Yes     |
+No
+------|-----|-------|-------|--------|-----|------|-----|-------------|--------|
+--------
+0*,1* |A/N  |16     |40x25  |B8000   |8x14 |8     |70Hz |320x350      |No      |
+No
+------|-----|-------|-------|--------|-----|------|-----|-------------|--------|
+--------
+0+,1+ |A/N  |16     |40x25  |B8000   |9x16 |8     |70Hz |360x400      |No      |
+No
+------|-----|-------|-------|--------|-----|------|-----|-------------|--------|
+--------
+2,3   |A/N  |16     |80x25  |B8000   |8x8  |8     |70Hz |640x200      |Yes     |
+Yes
+------|-----|-------|-------|--------|-----|------|-----|-------------|--------|
+--------
+2-,3- |A/N  |16     |80x25  |B8000   |8x14 |8     |70Hz |640x350      |No      |
+Yes
+------|-----|-------|-------|--------|-----|------|-----|-------------|--------|
+--------
+2+,3+ |A/N  |16     |80x25  |B8000   |9x16 |8     |70Hz |720x400      |No      |
+Yes
+------|-----|-------|-------|--------|-----|------|-----|-------------|--------|
+--------
+4,5   |APA  |4      |40x25  |B8000   |8x8  |1     |70Hz |320x200      |Yes     |
+No
+------|-----|-------|-------|--------|-----|------|-----|-------------|--------|
+--------
+6     |APA  |2      |80x25  |B8000   |8x8  |1     |70Hz |640x200      |Yes     |
+Yes
+------|-----|-------|-------|--------|-----|------|-----|-------------|--------|
+--------
+7     |A/N  |-      |80x25  |B0000   |9x14 |8     |70Hz |720x350      |No      |
+Yes
+------|-----|-------|-------|--------|-----|------|-----|-------------|--------|
+--------
+7+    |A/N  |-      |80x25  |B0000   |9x16 |8     |70Hz |720x400      |No      |
+Yes
+------|-----|-------|-------|--------|-----|------|-----|-------------|--------|
+--------
+D     |APA  |16     |40x25  |A0000   |8x8  |8     |70Hz |320x200      |Yes     |
+No
+------|-----|-------|-------|--------|-----|------|-----|-------------|--------|
+--------
+E     |APA  |16     |80x25  |A0000   |8x8  |4     |70Hz |640x200      |Yes     |
+Yes
+------|-----|-------|-------|--------|-----|------|-----|-------------|--------|
+--------
+F     |APA  |-      |80x25  |A0000   |8x14 |2     |70Hz |640x350      |No      |
+Yes
+------|-----|-------|-------|--------|-----|------|-----|-------------|--------|
+--------
+10    |APA  |16     |80x25  |A0000   |8x14 |2     |70Hz |640x350      |No      |
+Yes
+------|-----|-------|-------|--------|-----|------|-----|-------------|--------|
+--------
+11    |APA  |2      |80x30  |A0000   |8x16 |1     |60Hz |640x480      |No      |
+Yes
+------|-----|-------|-------|--------|-----|------|-----|-------------|--------|
+--------
+12    |APA  |16     |80x30  |A0000   |8x16 |1     |60Hz |640x480      |No      |
+Yes
+------|-----|-------|-------|--------|-----|------|-----|-------------|--------|
+--------
+13    |APA  |256    |40x25  |A0000   |8x8  |1     |70Hz |320x200      |Yes     |
+Yes
+================================================================================
+========
+Note: * or +   indicate enhanced modes
+
+
+
+================================================================================
+========
+
+   Mode 3+ is the default mode with a color display attached and mode 7 is
+   the default mode with a monochrome display attached. The graphics
+   controller senses whether the display is monochrome or color and
+   initializes itself to the appropriate mode.
+
+  A.2.1 Alphanumeric Modes
+
+   The alphanumeric modes are modes 0 through 3 and 7. The mode chart
+   lists the variations of these modes. The data format for alphanumeric
+   modes is the same as the data format on the IBM Color/Graphics Monitor
+   Adapter, the IBM Monochrome Display Adapter. and the IBM Enhanced
+   Graphics Adapter.
+
+   The video subsystem is initialized according to the selected mode and
+   the color values are loaded into the video DAC. These color values can
+   be changed to give a different color set to select from. Bit 3 of the
+   attribute byte may be redefined by the Character Map Select register to
+   act as a switch between character sets, giving the Programmer access to
+   512 characters at one time.
+
+   When an alphanumeric mode is selected, the character font patterns are
+   transferred from the ROM to map 2. The system stores the character data
+   in map 0, and the attribute data in map 1. In the alphanumeric modes,
+   the programmer views maps 0 and 1 as a single buffer. The CRT
+   controller generates sequential addresses, and fetches one character
+   code byte and one attribute byte at a time. The character code and row
+   scan count are combined to make up the address into map 2, which
+   contains the character font. The appropriate dot patterns are then sent
+   to the attribute controller, where color is assigned according to the
+   attribute data.
+
+   Every display character position in the alphanumeric mode is defined by
+   two bytes in the display buffer. Both the color/graphics and the
+   monochrome emulation modes use the following 2-byte character/attribute
+   format.
+
+   ----------------------------- | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+   ----------------------------- | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+   -----------------------------
+
+   Figure 12. Character/Attribute Format
+
+   The functions of the attribute byte are defined in the following table.
+   Bit 7 can be redefined in the Attribute Mode Control register to give
+   16 possible background colors; its default is to control character
+   blinking. Bit 3 can be redefined in the Character Map Select register
+   to select between two character fonts; its default is to control
+   foreground color selection
+
+   .
+
+Table 354. Attribute Byte Definitions
+==========================================================
+Bit |Color |Function
+====|======|==============================================
+7   | B/I  |Blinking or Background Intensity
+----|------|----------------------------------------------
+6   | R    |Background Color
+----|------|----------------------------------------------
+5   | G    |Background Color
+----|------|----------------------------------------------
+4   | B    |Background Color
+----|------|----------------------------------------------
+3   | I/CS |Foreground Intensity or Character Font Select
+----|------|----------------------------------------------
+2   | R    |Foreground Color
+----|------|----------------------------------------------
+1   | G    |Foreground Color
+----|------|----------------------------------------------
+0   | B    |Foreground Color
+==========================================================
+
+   The following are the color values loaded for the 16-color modes.
+
+Table 355. Firmware Color Initialization
+=============================
+IRGB |Color
+=====|=======================
+0000 |Black
+-----|-----------------------
+0001 |Blue
+-----|-----------------------
+0010 |Green
+-----|-----------------------
+0011 |Cyan
+-----|-----------------------
+0100 |Red
+-----|-----------------------
+0101 |Magenta
+-----|-----------------------
+0110 |Brown
+-----|-----------------------
+0111 |White
+-----|-----------------------
+1000 |Gray
+-----|-----------------------
+1001 |Light Blue
+-----|-----------------------
+1010 |Light Green
+-----|-----------------------
+1011 |Light Cyan
+-----|-----------------------
+1100 |Light Red
+-----|-----------------------
+1101 |Light Magenta
+-----|-----------------------
+1110 |Yellow
+-----|-----------------------
+1111 |White (High Intensity)
+     |
+=============================
+
+   Both 40-column and 80-column alphanumeric modes are supported. The
+   features of the 40-column alphanumeric modes (all variations of modes 0
+   and 1) are:
+
+     * 25 rows of 40 characters
+     * 2,000 bytes of video memory per page
+     * One character byte and one attribute byte per character.
+
+   The features of the 80-column alphanumeric modes (all variations of
+   modes 2, 3, and 7) are:
+
+     * 25 rows of 80 characters
+     * 4,000 bytes of video memory per page
+     * One character byte and one attribute byte per character.
+
+  A.2.2 Graphics Modes
+
+   This section describes the graphics modes supported. The colors in this
+   section are generated when the BIOS is used to set the mode. BIOS
+   initializes the video subsystem and the DAC palette to generate these
+   colors. If the DAC palette is changed, different colors are generated.
+
+    A.2.2.1 320 x 200 Four Color Graphics (Modes 4 and 5)
+
+   Addressing, mapping, and data format are the same as the 320 x 200 PEL
+   mode of the IBM Color/Graphics Monitor Adapter. The display buffer is
+   configured at 0xB8000. Bit image data is stored in memory maps 0 and 1.
+   The two bit planes (C0 and C1) are each formed from bits from both
+   memory maps.
+
+   Features of this mode are:
+
+     * A maximum of 200 rows of 320 pels
+     * Double-scanned to display as 400 rows
+     * Memory-mapped graphics
+     * Four colors for each PEL
+     * Four pels per byte
+     * 16,000 bytes of read/write memory.
+
+   The video memory is organized into two banks of 8,000 bytes each using
+   the following format. Address 0xB8000 contains the PEL information for
+   the upper left corner of the display area.
+
+   The following figure shows the format for each byte.
+
+Table 356. PEL Format, Modes 4 and 5
+==============================
+Bit |Function
+====|=========================
+7   | C1- First Display PEL
+----|-------------------------
+6   | C0 - First Display PEL
+----|-------------------------
+5   | C1- Second Display PEL
+----|-------------------------
+4   | C0 - Second Display PEL
+----|-------------------------
+3   | C1 - Third Display PEL
+----|-------------------------
+2   | C0 - Third Display PEL
+----|-------------------------
+1   | C1- Fourth Display PEL
+----|-------------------------
+0   | C0 - Fourth Display PEL
+    |
+==============================
+
+    A.2.2.2 640 x 200 Two Color Graphics (Mode 6)
+
+   Addressing, scan-line mapping, and data format are the same as the 640
+   x 200 PEL black and white mode of the IBM Color/Graphics Monitor
+   Adapter. The display buffer is configured at 0xB8000. Bit image data is
+   stored in memory map 0 and comprises a single bit plane (C0). Features
+   of this mode are:
+
+   A maximum of 200 rows of 640 pels
+
+   Double scanned to display as 400 rows
+
+   Same addressing and scan-line mapping as 320 x 200 graphics
+
+   Two colors for each PEL
+
+   Eight pels per byte
+
+   16,000 bytes of read/write memory.
+
+   The following shows the format for each byte. The bit definition for
+   each PEL is 0 equals black and 1 equals intensified white.
+
+Table 357. PEL Format, mode 6
+=========================
+Bit |Function
+====|====================
+7   |First Display PEL
+----|--------------------
+6   |Second Display PEL
+----|--------------------
+5   |Third Display PEL
+----|--------------------
+4   |Forth Display PEL
+----|--------------------
+3   |Fifth Display PEL
+----|--------------------
+2   |Sixth Display PEL
+----|--------------------
+1   |Seventh Display PEL
+----|--------------------
+0   |Eighth Display PEL
+    |
+=========================
+
+    A.2.2.3 640 x 350 Graphics (mode F)
+
+   This mode emulates the EGA graphics with the monochrome display and the
+   following attributes: black, video, blinking video, and intensified
+   video. A resolution of 640 x 350 uses 56,000 bytes of video memory to
+   support the four attributes. This mode uses maps 0 and 2; map 0 is the
+   video bit plane (C0), and map 2 is the intensity bit plane (C2). Both
+   planes reside at address 0xA0000.
+
+   The two bits, one from each bit plane, define one PEL. The bit
+   definitions are given in the following table.
+
+Table 358. Bit Definitions C2,C0
+=========================
+C2 C0 |PEL Color
+======|==================
+0 0   |Black
+------|------------------
+01    |White
+------|------------------
+1 0   |Blinking White
+------|------------------
+1 1   |Intensified White
+      |
+=========================
+
+   Memory is organized with successive bytes defining successive pels. The
+   first eight pels displayed are defined by the byte at 0xA0000, the
+   second eight pels at 0xA0001, and so on. The most significant bit in
+   each byte defines the first PEL for that byte.
+
+   Since both bit planes reside at address 0xA0000, the user must select
+   the plane to update through the Map Mask register of the sequencer.
+
+    A.2.2.4 640 x 480 Two Color Graphics (mode 11 hex)
+
+   This mode provides two color graphics with the same data format as mode
+   6.
+
+   The bit image data is stored in map 0 and comprises a single bit plane
+   (C0). The video buffer starts at 0xA0000. The first byte contains the
+   first eight pels; the second byte at 0xA0001 contains the second eight
+   pels, and so on. The bit definition for each PEL is 0 equals black and
+   1 equals intensified white.
+
+    A.2.2.5 16-Color Graphics Modes (Modes 10 hex, D, E, and 12 hex)
+
+   These modes support 16 colors. For all modes, the bit image data is
+   stored in all four memory maps. Each memory map contains the data for
+   one bit plane. The bit planes are C0 through C3 and represent the
+   following colors:
+
+   C0= Blue
+
+   C1 = Green
+
+   C2 = Red
+
+   C3 = Intensified
+
+   The four bits define each PEL on the screen by acting as an address
+   (pointer) into the internal palette in the Type 2 video.
+
+   The display buffer resides at address 0xA0000. The Map Mask register
+   selects any or all of the maps to be updated when the system writes to
+   the display buffer.
+
+    A.2.2.6 256-Color Graphics Mode (mode 13 hex)
+
+   This mode provides graphics with the capability of displaying 256
+   colors at one time
+
+   The display buffer is sequential, starts at address 0xA0000, and is
+   64,000 bytes long. The first byte contains the color information for
+   the upper-left PEL. The second byte contains the second PEL, and so on,
+   for 64,000 pels (320 x 200). The bit image data is stored in all four
+   memory maps and comprises four bit planes. The four bit planes are
+   sampled twice to produce eight bit-plane values that address the video
+   DAC.
+
+   In this mode, the internal palette of the video subsystem is loaded by
+   BIOS and should not be changed. The first 16 locations in the external
+   palette, which is in the video DAC, contain the colors compatible with
+   the alphanumeric modes. The second 16 locations contain 16 evenly
+   spaced gray shades. The next 216 locations contain values based on a
+   hue-saturation-intensity model tuned to provide a usable, generic color
+   set that covers a wide range of color values.
+
+   The following figure shows the color information that is compatible
+   with the colors in other modes:
+
+Table 359. Compatible Color Coding
+=================================
+PEL Bits |Color Output
+76543210 |
+=========|=======================
+00000000 |Black
+---------|-----------------------
+00000001 |Blue
+---------|-----------------------
+00000010 |Green
+---------|-----------------------
+00000011 |Cyan
+---------|-----------------------
+00000100 |Red
+---------|-----------------------
+00000101 |Magenta
+---------|-----------------------
+00000110 |Brown
+---------|-----------------------
+00000111 |White
+---------|-----------------------
+00001000 |Gray
+---------|-----------------------
+00001001 |Light Blue
+---------|-----------------------
+00001010 |Light Green
+---------|-----------------------
+00001011 |Light Cyan
+---------|-----------------------
+00001100 |Light Red
+---------|-----------------------
+00001101 |Light Magenta
+---------|-----------------------
+00001110 |Yellow
+---------|-----------------------
+00001111 |White (High Intensity)
+         |
+=================================
+
+   Each color in the palette can be programmed to one of 256K different
+   colors.
+
+   The features of this mode are:
+
+   A maximum of 200 rows with 320 pels
+
+   Double scanned to display as 400 rows
+
+   Memory-mapped graphics
+
+   256 of 256K colors for each PEL
+
+   One byte per PEL
+
+   64,000 bytes of video memory.
+
+A.3 Registers
+
+   There are six groups of registers in the video subsystem. All video
+   registers are readable except the system data latches and the attribute
+   address flip-flop. The following table lists the register groups, their
+   l/O addresses with the type of access (read or write), and page
+   reference numbers.
+
+   The question mark in the address can be a hex B or D depending on the
+   setting of the I/O address bit in the Miscellaneous Output register,
+   described in [1]"General Registers" on page 203.
+
+   Software Implementation Note: All registers in the video subsystem are
+   read/write. The value of reserved bits in these registers must be
+   preserved. Read the register first and change only the bits required.
+
+Table 360. VGA Subsystem Register Overview:
+=============================================
+Registers                      |R/W |Port
+                               |    |Address
+===============================|====|========
+General Registers              |    |
+-------------------------------|----|--------
+Sequencer Registers            |    |
+   Address Register            |R/W |0x03C4
+   Data Registers              |R/W |0x03C5
+-------------------------------|----|--------
+CRT Controller Registers       |    |
+   Address Register            |R/W |0x03?4
+   Data Registers              |R/W |0x03?5
+-------------------------------|----|--------
+Graphics Controller Registers  |    |
+   Address Register            |R/W |0x03CE
+   Data Registers              |R/W |0x03CF
+-------------------------------|----|--------
+Attribute Controller Registers |    |
+   Address Register            |R/W |0x03C0
+   Data Registers              |W   |0x03C0
+                               |R   |0x03C1
+-------------------------------|----|--------
+Video DAC Palette Registers    |    |
+   Write Address               |R/W |0x03C8
+   Read Address                |W   |0x03C7
+   Data                        |R/W |0x03C9
+   PEL Mask                    |R/W |0x03C6
+                               |    |
+=============================================
+
+  A.3.1 General Registers
+
+Table 361. General Registers:
+==================================================
+Register                        |Read    |Write
+                                |Address |Address
+================================|========|========
+Miscellaneous Output Register   |0x03CC  |0x03C2
+--------------------------------|--------|--------
+Input Status Register 0         |0x03C2  |   -
+--------------------------------|--------|--------
+Input Status Register 1         |0x03?A  |   -
+--------------------------------|--------|--------
+Feature Control Register        |0x03CA  |0x03?A
+--------------------------------|--------|--------
+Video Subsystem Enable Register |0x03C3  |0x03C3
+==================================================
+
+    A.3.1.1 Miscellaneous Output Register
+
+   Read Address: 0x03CC
+
+   Write Address: 0x03C2
+
+================================
+7   |6   |5 |4 |3 |2 |1    |0
+----|----|--|--|--|--|-----|----
+VSP |HSP |- |- |CS   |ERAM |IOS
+    |    |  |  |     |     |
+================================
+
+Miscellaneous Output Register
+=====================================
+-    |: |Set to 0, undefined on Read
+-----|--|----------------------------
+VSP  |: |Vertical Sync Polarity
+-----|--|----------------------------
+HSP  |: |Horizontal Sync Polarity
+-----|--|----------------------------
+PB   |: |Page Bit for Odd/Even
+-----|--|----------------------------
+CS   |: |Clock Select
+-----|--|----------------------------
+ERAM |: |Enable RAM
+-----|--|----------------------------
+IOS  |: |I/O Address Select
+     |  |
+=====================================
+
+The register fields are defined as follows:
+================================================================================
+=============================
+VSP  |Determines the polarity of the vertical sync pulse and can be used (with H
+SP) to control the vertical
+     |size of the display by utilizing the autosynchronization feature of VGA di
+splays.
+     |   = 0 selects a positive vertical retrace sync pulse.
+     |
+
+=====|==========================================================================
+=============================
+HSP  |Determines the polarity of the horizontal sync pulse.
+
+     |   = 0 selects a positive horizontal retrace sync pulse.
+
+     |Bits 7 (VSP) and 6 (HSP) select the vertical size as follows:
+
+     |   Bits
+
+     |    7 6   Vertical Size
+
+     |    0 0 - Reserved
+
+     |    0 1 - 400 lines
+
+     |    1 0 - 350 lines
+
+     |    1 1 - 480 lines
+
+     |
+
+-----|--------------------------------------------------------------------------
+-----------------------------
+PB   |Selects the upper/lower 64K page of memory when the system is in an eve/od
+d mode (modes
+     |0,1,2,3,7).
+
+     |   = 0 selects the low page
+     |   = 1 selects the high page
+     |
+
+-----|--------------------------------------------------------------------------
+-----------------------------
+CS   |These two bits select the clock source as below: The external clock is dri
+ven through the auxiliary
+     |video extension. The input clock should be kept between 14.3 MHz and 28.4
+MHz.
+     |   Bits
+
+     |    3 2   Function
+
+     |    0 0 - Selects 25 MHz clock for 640/320 Horizontal pels
+
+     |    0 1 - Selects 28 MHz clock for 720/360 Horizontal pels
+
+     |    1 0 - Reserved
+
+     |    1 1 - Reserved
+
+     |
+
+-----|--------------------------------------------------------------------------
+-----------------------------
+ERAM |Controls system access to the display buffer.
+
+     |   = 0 disables address decode for the display buffer from the system
+
+     |   = 1 enables address decode for the display buffer from the system
+
+     |
+
+-----|--------------------------------------------------------------------------
+-----------------------------
+IOS  |This bit selects the CRT controller addresses. When set to 0, this bit set
+s the CRT controller ad-
+     |dresses to 0x03Bx and the address for the Input Status Register 1 to 0x03B
+A for compatibility with
+     |the monochrome adapter.
+
+     |When set to 1, this bit sets CRT controller addresses to 0x03Dx and the In
+put Status Register 1 ad-
+     |dress to 0x03DA for compatibility with the color/graphics adapter.
+
+     |The Write addresses to the Feature Control register are affected in the sa
+me manner.
+     |
+
+================================================================================
+=============================
+
+    A.3.1.2 Input Status Register 0
+
+   Read-only Address: 0x03C2
+
+=========================
+7  |6 |5 |4  |3 |2 |1 |0
+---|--|--|---|--|--|--|--
+CI |- |- |SS |- |- |- |-
+   |  |  |   |  |  |  |
+=========================
+
+Input Status Register 0
+===================================
+-  |: |Set to 0, undefined on Read
+===|==|============================
+CI |: |CRT Interrupt
+---|--|----------------------------
+SS |: |Switch Sense
+   |  |
+===================================
+
+The register fields are defined as follows:
+================================================================================
+===========================
+CI |When set to 1, this bit indicates a vertical retrace interrupt is pending
+
+   |
+
+===|============================================================================
+===========================
+SS |Returns the status of the four sense switches as selected by the CS field of
+ the Miscellaneous Output
+   |Register.
+
+================================================================================
+===========================
+
+    A.3.1.3 Input Status Register 1
+
+   Read-only Address: 0x03?A
+
+=========================
+7 |6 |5 |4 |3  |2 |1 |0
+--|--|--|--|---|--|--|---
+- |- |- |- |VR |- |- |DE
+  |  |  |  |   |  |  |
+=========================
+
+Input Status Register
+===================================
+-  |: |Set to 0, undefined on Read
+===|==|============================
+VR |: |Vertical Retrace
+---|--|----------------------------
+DE |: |Display Enable
+   |  |
+===================================
+
+The register fields are defined as follows:
+================================================================================
+================================
+VR |When set to 1, this bit indicates that the display is in a vertical retrace
+interval.This bit can be pro-
+   |grammed, through the Vertical Retrace End register, to generate an interrupt
+ at the start of the verti-
+   |cal retrace.
+
+   |
+
+===|============================================================================
+================================
+DE |When set to 1, this bit indicates a horizontal or vertical retrace interval.
+ This bit is the real-time sta-
+   |tus of the inverted 'display enable' signal. Programs have used this status
+bit to restrict screen up-
+   |dates to the inactive display intervals in order to reduce screen flicker. T
+he video subsystem is
+   |designed to eliminate this software requirement; screen updates may be made
+at any time without
+   |screen degradation.
+
+   |
+
+================================================================================
+================================
+
+    A.3.1.4 Feature Control Register
+
+   Read Address 0x03CA
+
+   Write Address: 0x03?A
+
+   All bits are reserved.
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+Feature Control
+=======================
+
+    A.3.1.5 Video Subsystem Enable Register
+
+   This register (0x03C3) is reserved.
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+Video Subsystem Enable
+
+=======================
+
+  A.3.2 Sequencer Registers
+
+   The Address register is at address 0x03C4 and the data registers are at
+   address 0x03C5. All registers within the sequencer are read/write.
+
+Table 362. Sequencer Registers
+=============================
+Register             |Index
+                     |(hex)
+=====================|=======
+Sequencer Address    |-
+---------------------|-------
+Reset                |00
+---------------------|-------
+Clocking Mode        |01
+---------------------|-------
+Map Mask             |02
+---------------------|-------
+Character Map Select |03
+---------------------|-------
+Memory Mode          |04
+=============================
+
+    A.3.2.1 Sequencer Address Register
+
+   The Address register is at address 0x03C4. This register is loaded with
+   an index value that points to the desired sequencer data register.
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+- |- |- |- |- |SA
+  |  |  |  |  |
+=======================
+
+Sequencer Address Register
+===================================
+-  |: |Set to 0, undefined on Read
+===|==|============================
+SA |: |Sequencer Address
+   |  |
+===================================
+
+The register field is defined as follows:
+================================================================================
+=========
+SA | These bits contain the index value that points to the data register to be a
+ccessed.
+================================================================================
+=========
+
+    A.3.2.2 Reset Register
+
+   Address 0x03C4; Data 0x03C5; Index 0x00.
+
+==========================
+7 |6 |5 |4 |3 |2 |1  |0
+--|--|--|--|--|--|---|----
+- |- |- |- |- |- |SR |ASR
+  |  |  |  |  |  |   |
+==========================
+
+Reset Register
+====================================
+-   |: |Set to 0, undefined on Read
+====|==|============================
+SR  |: |Synchronous Reset
+----|--|----------------------------
+ASR |: |Asynchronous Reset
+    |  |
+====================================
+
+The register fields are defined as follows:
+================================================================================
+=============================
+SR  |When set to 0, this bit commands the sequencer to synchronously clear and h
+alt. Bits 1 and 0 must
+    |be 1 to allow the sequencer to operate. To prevent the loss of data, bit 1
+must be set to 0 during the
+    |active display interval before changing the clock selection. The clock is c
+hanged through the Clock-
+    |ing Mode register or the Miscellaneous Output register.
+
+    |
+
+====|===========================================================================
+=============================
+ASR |When set to 0, this bit commands the sequencer to asynchronously clear and
+halt. Resetting the se-
+    |quencer with this bit can cause loss of video data.
+
+    |
+
+================================================================================
+=============================
+
+    A.3.2.3 Clocking Mode Register
+
+   Address 0x03C4; Data 0x03C5; Index 0x01.
+
+==============================
+7 |6 |5  |4   |3  |2  |1 |0
+--|--|---|----|---|---|--|----
+- |- |SO |SH4 |DC |SL |1 |D89
+  |  |   |    |   |   |  |
+==============================
+
+Clocking Mode Register
+====================================
+-   |: |Set to 0, undefined on Read
+----|--|----------------------------
+1   |: |Set to 1, undefined on Read
+====|==|============================
+SO  |: |Screen Off
+----|--|----------------------------
+SH4 |: |Shift 4
+----|--|----------------------------
+DC  |: |Dot Clock
+----|--|----------------------------
+SL  |: |Shift Load
+----|--|----------------------------
+D89 |: |8/9 Dot Clocks
+    |  |
+====================================
+
+The register fields are defined as follows:
+================================================================================
+===============================
+SO  |When set to 1, this bit turns off the display and assigns maximum memory ba
+ndwidth to the system.
+    |Although the display is blanked, the synchronization pulses are maintained.
+ This bit can be used for
+    |rapid full-screen updates.
+
+    |
+
+====|===========================================================================
+===============================
+SH4 |When the Shift 4 field and the Shift Load Field are set to 0, the video ser
+ializers are loaded every
+    |character clock. When the Shift 4 field is set to 1, the video serializers
+are loaded every forth charac-
+    |ter clock, which is useful when 32 bits are fetched per cycle and chained t
+ogether in the shift regis-
+    |ters.
+
+    |
+
+----|---------------------------------------------------------------------------
+-------------------------------
+DC  |When set to 0, this bit selects the normal dot clocks derived from the sequ
+encer master clock input.
+    |When this bit is set to 1, the master clock will be divided by 2 to generat
+e the dot clock. All other
+    |timings are affected because they are derived from the dot clock. The dot c
+lock divided by 2 is used
+    |for 320 and 360 horizontal PEL modes.
+
+    |
+
+----|---------------------------------------------------------------------------
+-------------------------------
+SL  |When this bit and bit 4 are set to 0, the video serializers are loaded ever
+y character clock. When this
+    |bit is set to 1, the video serializers are loaded every other character clo
+ck, which is useful when 16
+    |bits are fetched per cycle and chained together in the shift registers. The
+ Type 2 video behaves as if
+    |this bit is set to 0; therefore, programs should set it to 0.
+
+    |
+
+----|---------------------------------------------------------------------------
+-------------------------------
+D89 |When set to 0, this bit directs the sequencer to generate character clocks
+9 dots wide; when set to 1,
+    |it directs the sequencer to generate character clocks 8 dots wide. The 9-do
+t mode is for alphanumeric
+    |modes 0+, 1+, 2+, 3+, 7, and 7 + only; the 9th dot equals the 8th dot for A
+SCII codes 0xC0 through
+    |0xDF. All other modes must use 8 dots per character clock. See the line gra
+phics character bit in the
+    |[2]"Attribute Mode Control Register" on page 228
+
+    |
+
+================================================================================
+===============================
+
+    A.3.2.4 Map Mask Register
+
+   Address 0x03C4; Data 0x03C5; Index 0x02.
+
+===============================
+7 |6 |5 |4 |3   |2   |1   |0
+--|--|--|--|----|----|----|----
+- |- |- |- |M3E |M2E |M1E |M0E
+  |  |  |  |    |    |    |
+===============================
+
+Map Mask Register, Index 0x02
+====================================
+-   |: |Set to 0, undefined on Read
+====|==|============================
+M3E |: |Map 3 Enable
+----|--|----------------------------
+M2E |: |Map 2 Enable
+----|--|----------------------------
+M1E |: |Map 1 Enable
+----|--|----------------------------
+M0E |: |Map 0 Enable
+----|--|----------------------------
+D89 |: |8/9 Dot Clocks
+    |  |
+====================================
+
+The register fields are defined as follows:
+================================================================================
+=============================
+M*E |When set to 1, these bits enable system access to the corresponding map. If
+ all maps are enabled, the
+    |system can write its 8-bit value to all four maps in a single memory cycle.
+ This substantially reduces
+    |the system overhead during display updates in graphics modes.
+
+    |Data scrolling operations can be enhanced by enabling all maps and writing
+the display buffer ad-
+    |dress with the data stored in the system data latches. This is a Read-Modif
+y-Write operation.
+    |When odd/even modes are selected, maps 0 and 1 and maps 2 and 3 should have
+ the same map mask
+    |value.
+    |When chain 4 mode is selected, all maps should be enabled.
+
+    |
+================================================================================
+=============================
+
+    A.3.2.5 Character Map Select Register
+
+   Address 0x03C4; Data 0x03C5; Index 0x03.
+
+   In alphanumeric modes, bit 3 of the attribute byte normally defines the
+   foreground intensity. This bit can be redefined as a switch between
+   character sets allowing 512 displayable characters. To enable this
+   feature:
+
+   1. Set the extended memory bit in the Memory Mode register (0x04) to 1.
+
+   2. Select different values for character map A and character map B.
+
+   This function is supported by BIOS and is a function call within the
+   character generator routines.
+
+===========================
+7 |6 |5   |4   |3 |2 |1 |0
+--|--|----|----|--|--|--|--
+- |- |MAH |MBH |MAL  |MBL
+  |  |    |    |     |
+===========================
+
+Character Map Select Register, Index 0x03
+=====================================
+-   |: |Set to 0, undefined on Read
+====|==|=============================
+MAH |: |Character Map A Select (MSB)
+----|--|-----------------------------
+MBH |: |Character Map B Select (MSB)
+----|--|-----------------------------
+MAL |: |Character Map A Select (LSB)
+----|--|-----------------------------
+MBL |: |Character Map B Select (LSB)
+    |  |
+=====================================
+
+The register fields are defined as follows:
+================================================================================
+==============================
+MAH |This bit is the most-significant bit for selecting the location of characte
+r map A.
+    |
+
+----|---------------------------------------------------------------------------
+------------------------------
+MBH |This bit is the most-significant bit for selecting the location of characte
+r map B.
+    |
+
+----|---------------------------------------------------------------------------
+------------------------------
+MAL |These bits and bit 5 select the location of character map A. Map A is the a
+rea of map 2 containing
+    |the character font table used to generate characters when attribute bit 3 i
+s set to 1. The selection is
+    |shown in [3]Table 363 on page 209.
+    |
+
+----|---------------------------------------------------------------------------
+------------------------------
+MBL |These bits and bit 4 select the location of character map B. Map B is the a
+rea of map 2 containing the
+    |character font table used to generate characters when attribute bit 3 is se
+t to 0. The selection is
+    |shown in [4]Table 364 on page 209.
+
+    |
+
+================================================================================
+==============================
+
+
+Table 363. Character Map Select A
+===========================================
+Bits |Map      |Table Location
+532  |Selected |
+=====|=========|===========================
+000  |0        |1st 8KB of display memory
+     |         |plane 2
+-----|---------|---------------------------
+001  |1        |3rd 8KB
+-----|---------|---------------------------
+010  |2        |5th 8KB
+-----|---------|---------------------------
+011  |3        |7th 8KB
+-----|---------|---------------------------
+100  |4        |2nd 8KB
+-----|---------|---------------------------
+101  |5        |4th 8KB
+-----|---------|---------------------------
+110  |6        |6th 8KB
+-----|---------|---------------------------
+111  |7        |8th 8KB
+     |         |
+===========================================
+
+
+Table 364. Character Map Select B
+===========================================
+Bits |Map      |Table Location
+410  |Selected |
+=====|=========|===========================
+000  |0        |1st 8KB of display memory
+     |         |plane 2
+-----|---------|---------------------------
+001  |1        |3rd 8KB
+-----|---------|---------------------------
+010  |2        |5th 8KB
+-----|---------|---------------------------
+011  |3        |7th 8KB
+-----|---------|---------------------------
+100  |4        |2nd 8KB
+-----|---------|---------------------------
+101  |5        |4th 8KB
+-----|---------|---------------------------
+110  |6        |6th 8KB
+-----|---------|---------------------------
+111  |7        |8th 8KB
+     |         |
+===========================================
+
+    A.3.2.6 Memory Mode Register
+
+   Address 0x03C4; Data 0x03C5; Index 0x04.
+
+===========================
+7 |6 |5 |4 |3   |2  |1  |0
+--|--|--|--|----|---|---|--
+- |- |- |- |CH4 |OE |EM |-
+  |  |  |  |    |   |   |
+===========================
+
+Memory Mode Register, Index 0x04
+====================================
+-   |: |Set to 0, undefined on Read
+====|==|============================
+CH4 |: |Chain 4
+----|--|----------------------------
+OE  |: |Odd/Even
+----|--|----------------------------
+EM  |: |Extended Memory
+    |  |
+====================================
+
+The register fields are defined as follows:
+================================================================================
+============================
+CH4 |This bit controls the map selected during system read operations. When set
+to 0, this bit enables sys-
+    |tem addresses to sequentially access data within a bit map by using the Map
+ Mask register. When set
+    |to 1, this bit causes the two low-order bits to select the map accessed as
+shown below.
+    |
+    |Address Bits
+
+    |   A0 A1            Map Selected
+
+    |     0   0              0
+
+    |     0   1              1
+
+    |     1   0              2
+
+    |     1   1              3
+
+    |
+
+----|---------------------------------------------------------------------------
+----------------------------
+OE  |When this bit is set to 0, even system addresses access maps 0 and 2, while
+ odd system addresses ac-
+    |cess maps 1 and 3. When this bit is set to 1, system addresses sequentially
+ access data within a bit
+    |map, and the maps are accessed according to the value in the Map Mask regis
+ter (index 0x02).
+    |
+
+----|---------------------------------------------------------------------------
+----------------------------
+EM  |When set to 1, this bit enables the video memory from 64KB to 256KB. This b
+it must be set to 1 to
+    |enable the character map selection described for the previous register.
+
+    |
+
+    |
+
+================================================================================
+============================
+
+  A.3.3 CRT Controller Registers
+
+   A data register is accessed by writing its index to the Address
+   register at address 0x03D4 or 0x03B4, and then writing the data to the
+   access port at address 0x03D5 or 0x03B5. The l/O address used depends
+   on the setting of the l/O address select bit (bit 0) in the
+   Miscellaneous Output register, which is described in [5]"General
+   Registers" on page 203. The following figure shows the variable part of
+   the address as a question mark.
+
+   Software Implementation Note: When modifying a register, the setting of
+   reserved bits must be preserved. Read the register first and change
+   only the bits required.
+
+Table 365. CRT Controller Registers
+===============================================
+Register Name                  |Address |Index
+===============================|========|======
+Address                        |0x03?4  |-
+-------------------------------|--------|------
+Horizontal Total               |0x03?5  |0x0
+-------------------------------|--------|------
+Horizontal Display-Enable End  |0x03?5  |0x01
+-------------------------------|--------|------
+Start Horizontal Blanking      |0x03?5  |0x02
+-------------------------------|--------|------
+End Horizontal Blanking        |0x03?5  |0x03
+-------------------------------|--------|------
+Start Horizontal Retrace Pulse |0x03?5  |0x04
+-------------------------------|--------|------
+End Horizontal Retrace         |0x03?5  |0x05
+-------------------------------|--------|------
+Vertical Total                 |0x03?5  |0x06
+-------------------------------|--------|------
+Overflow                       |0x03?5  |0x07
+-------------------------------|--------|------
+Preset Row Scan                |0x03?5  |0x08
+-------------------------------|--------|------
+Maximum Scan Line              |0x03?5  |0x09
+-------------------------------|--------|------
+Cursor Start                   |0x03?5  |0x0A
+-------------------------------|--------|------
+Cursor End                     |0x03?5  |0x0B
+-------------------------------|--------|------
+Start Address High             |0x03?5  |0x0C
+-------------------------------|--------|------
+Start Address Low              |0x03?5  |0x0D
+-------------------------------|--------|------
+Cursor Location High           |0x03?5  |0x0E
+-------------------------------|--------|------
+Cursor Location Low            |0x03?5  |0x0F
+-------------------------------|--------|------
+Vertical Retrace Start         |0x03?5  |0x10
+-------------------------------|--------|------
+Vertical Retrace End           |0x03?5  |0x11
+-------------------------------|--------|------
+Vertical Display-Enable End    |0x03?5  |0x12
+-------------------------------|--------|------
+Offset                         |0x03?5  |0x13
+-------------------------------|--------|------
+Underline Location             |0x03?5  |0x14
+-------------------------------|--------|------
+Start Vertical Blanking        |0x03?5  |0x15
+-------------------------------|--------|------
+End Vertical Blanking          |0x03?5  |0x16
+-------------------------------|--------|------
+CRT Mode Control               |0x03?5  |0x17
+-------------------------------|--------|------
+Line Compare                   |0x03?5  |0x18
+===============================================
+Index values not listed are reserved.
+===============================================
+
+    A.3.3.1 Address Register
+
+   This register is at address 0x03?4, and is loaded with an index value
+   that points to the data registers within the CRT controller.
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+- |- |- |Index
+  |  |  |
+=======================
+
+Address Register
+==============================================================================
+-     |  |Set to 0, undefined on Read
+------|--|--------------------------------------------------------------------
+Index |: |These bits are the index that points to the data register accessed
+      |  |through address 0x03D5 or 0x03B5.
+==============================================================================
+
+    A.3.3.2 Horizontal Total Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x00
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+Horizontal Total
+=======================
+
+   This register the total number of characters in the horizontal scan
+   interval including the retrace time. The value directly controls the
+   period of the 'horizontal retrace' signal. A horizontal character
+   counter in the CRT controller counts the character clock inputs;
+   comparators are used to compare the register value with the character's
+   horizontal width to provide horizontal timings. All horizontal and
+   vertical timings are based on this register.
+
+   The value contained in this register is the total number of characters
+   minus 5.
+
+    A.3.3.3 Horizontal Display-Enable End Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x01
+
+==============================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|---------
+Horizontal Display Enable End
+==============================
+
+   The value in this register defines the length of the 'horizontal
+   display-enable' signal, and determines the number of character
+   positions per horizontal line. The value contained in this register is
+   the total number of displayed characters minus 1.
+
+    A.3.3.4 Start Horizontal Blanking Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x02
+
+==========================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|-----
+Start Horizontal Blanking
+==========================
+
+   The value in this register is the horizontal character count where the
+   'horizontal blanking' signal goes active.
+
+    A.3.3.5 End Horizontal Blanking Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x03
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+1 |DES   |EB
+  |     |
+=======================
+
+End Horizontal Blanking Register, Index 0x03
+====================================
+1   |: |Set to 1, undefined on Read
+====|==|============================
+DES |: |Display Enable Skew Control
+----|--|----------------------------
+EB  |: |End Blanking
+    |  |
+====================================
+
+The register fields are defined as follows:
+================================================================================
+===============================
+DES |These two bits determine the amount of skew of the 'display enable' signal.
+ This skew control is
+    |needed to provide sufficient time for the CRT controller to read a characte
+r and attribute code from
+    |the video buffer, to gain access to the character generator, and go through
+ the Horizontal PEL Pan-
+    |ning register in the attribute controller. Each access requires the 'displa
+y enable' signal to be skewed
+    |one character clock so that the video output is synchronized with the horiz
+ontal and vertical retrace
+    |signals. The skew values are shown below.
+
+    |
+
+    |DES Field
+
+    |    6  5          Amount of Skew
+
+    |    0  0          No character clock skew
+
+    |    0  1          One character clock skew
+
+    |    1  0          Two character clock skew
+
+    |    1  1          Three character clock skew
+
+    |
+
+    |Note: Character skew is not adjustable on the Type 2 video and the bits are
+ ignored; however, pro-
+    |grams should set these bits for the appropriate skew to maintain compatibil
+ity.
+    |
+
+----|---------------------------------------------------------------------------
+-------------------------------
+EB  |These bits are the five low-order bits of a 6-bit value that is compared wi
+th the value in the Start
+    |Horizontal Blanking register to determine when the 'horizontal blanking' si
+gnal will go inactive. The
+    |most-significant bit is bit 7 in the End Horizontal Retrace register (index
+ 0x05).
+    |To program these bits for a signal width of W, the following algorithm is u
+sed: the width W, in char-
+    |acter clock units, is added to the value from the Start Horizontal Blanking
+ register. The six low-order
+    |bits of the result are the 6-bit value programmed.
+    |
+
+================================================================================
+===============================
+
+    A.3.3.6 Start Horizontal Retrace Pulse Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x04
+
+===============================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|----------
+Start Horizontal Retrace Pulse
+===============================
+
+   These bits are used to center the screen horizontally by specifying the
+   character position where the 'horizontal retrace' signal goes active.
+
+    A.3.3.7 End Horizontal Retrace Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x05
+
+=========================
+7   |6 |5 |4 |3 |2 |1 |0
+----|--|--|--|--|--|--|--
+EB5 |HRD  |EHR
+    |     |
+=========================
+
+End Horizontal Retrace Register, Index 0x05
+=======================================
+EB5 |: |End Horizontal Blanking, Bit 5
+====|==|===============================
+HRD |: |Horizontal Retrace Delay
+----|--|-------------------------------
+EHR |: |End Horizontal Retrace
+    |  |
+=======================================
+
+The register fields are defined as follows:
+================================================================================
+=================================
+EB5 |This bit is the most significant bit (bit 5) of the end horizontal blanking
+ value in the End Horizontal
+    |Blanking register (index 0x03).
+
+    |
+
+----|---------------------------------------------------------------------------
+---------------------------------
+HRD |These bits control the skew of the 'horizontal retrace' signal. The value o
+f these bits is the amount of
+    |skew provided (from 0 to 3 character clock units). For certain modes, the '
+horizontal retrace' signal
+    |takes up the entire blanking interval. Some internal timings are generated
+by the falling edge of the
+    |'horizontal retrace' signal. To ensure that the signals are latched properl
+y, the 'retrace' signal is
+    |started before the end of the 'display enable' signal and then skewed sever
+al character clock times to
+    |provide the Proper screen centering.
+
+    |
+
+----|---------------------------------------------------------------------------
+---------------------------------
+EHR |These bits are compared with the Start Horizontal Retrace register to give
+a horizontal character
+    |count where the 'horizontal retrace' signal goes inactive.
+
+    |To program these bits with a signal width of W, the following algorithm is
+used: the width W, in
+    |character clock units, is added to the value in the Start Retrace register.
+ The five low-order bits of the
+    |result are the 5-bit value programmed.
+
+    |
+
+================================================================================
+=================================
+
+    A.3.3.8 Vertical Total Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x06
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+Vertical Total
+=======================
+
+   These are the eight low-order bits of a 10-bit vertical total. The
+   value for the vertical total is the number of horizontal raster scans
+   on the display, including vertical retrace, minus 2. This value
+   determines the period of the 'vertical retrace' signal.
+
+   Bits 8 and 9 are in the Overflow register (index 0x07).
+
+    A.3.3.9 Overflow Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x07
+
+============================================
+7    |6    |5   |4   |3    |2    |1    |0
+-----|-----|----|----|-----|-----|-----|----
+VRS9 |VDE9 |VT9 |LC8 |VBS8 |VRS8 |VDE8 |VT8
+     |     |    |    |     |     |     |
+============================================
+
+Overflow Register, Index 0x07
+============================================
+VRS9 |: |Vertical Retrace Start, Bit 9
+-----|--|-----------------------------------
+VDE9 |: |Vertical Display Enable End, Bit 9
+-----|--|-----------------------------------
+VT9  |: |Vertical Total, Bit 9
+-----|--|-----------------------------------
+LC8  |: |Line Compare, Bit 8
+-----|--|-----------------------------------
+VBS8 |: |Vertical Blanking Start, Bit 8
+-----|--|-----------------------------------
+VRS8 |: |Vertical Retrace Start, Bit 8
+-----|--|-----------------------------------
+VDE8 |: |Vertical Display Enable End, Bit 8
+-----|--|-----------------------------------
+VT8  |: |Vertical Total, Bit 8
+     |  |
+============================================
+
+The register fields are defined as follows:
+======================================================================
+VRS9 |Bit 9 of the Vertical Retrace Start register (index 0x10).
+=====|================================================================
+VDE9 |Bit 9 of the Vertical Display Enable End register (index 0x12).
+-----|----------------------------------------------------------------
+VT9  |Bit 9 of the Vertical Total register (index 0x06).
+-----|----------------------------------------------------------------
+LC8  |Bit 8 of the Line Compare register (index 0x18).
+-----|----------------------------------------------------------------
+VBS8 |Bit 8 of the Start Vertical Blanking register (index 0x15).
+-----|----------------------------------------------------------------
+VRS8 |Bit 8 of the Vertical Retrace Start register (index 0x10).
+-----|----------------------------------------------------------------
+VDE8 |Bit 8 of the Vertical Display Enable End register (index 0x12).
+-----|----------------------------------------------------------------
+VT8  |Bit 8 of the Vertical Total register (index 0x06).
+======================================================================
+
+    A.3.3.10 Preset Row Scan Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x08
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+- |BP   |SRS
+  |     |
+=======================
+
+Preset Row Scan Register, Index 0x08
+====================================
+-   |: |Set to 0, Undefined on Read
+----|--|----------------------------
+BP  |: |Byte Panning
+----|--|----------------------------
+SRS |: |Starting Row Scan Count
+    |  |
+====================================
+
+The register fields are defined as follows:
+================================================================================
+=========================
+BP  |These two bits control byte panning in multiple shift modes. These bits are
+ used in pel-panning op-
+    |erations. and should normally be set to 0.
+
+    |
+
+====|===========================================================================
+=========================
+SRS |These bits specify the row scan count for the row starting after a vertical
+ retrace. The row scan
+    |counter is incremented every horizontal retrace time until the maximum row
+scan occurs. When the
+    |maximum row scan is reached, the row scan counter is cleared (not preset).
+
+================================================================================
+=========================
+
+   Note: The CRT controller latches the start address at the start of the
+   vertical retrace. These register values should be loaded during the
+   active display time.
+
+    A.3.3.11 Maximum Scan Line Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x09
+
+==============================
+7   |6   |5    |4 |3 |2 |1 |0
+----|----|-----|--|--|--|--|--
+DSC |LC9 |VBS9 |MSL
+    |    |     |
+==============================
+
+Maximum Scan Line Register, Index 0x09
+========================================
+DSC  |: |200 to 400 Line Conversion
+-----|--|-------------------------------
+LC9  |: |Line Compare, Bit 9
+-----|--|-------------------------------
+VBS9 |: |Start Vertical Blanking, Bit 9
+-----|--|-------------------------------
+MSL  |: |Maximum Scan Line
+     |  |
+========================================
+
+The register fields are defined as follows:
+================================================================================
+=============================
+DSC  |When this bit is set to 1, 200-scan-line video data is converted to 400-sc
+an-line output. To do this,
+     |the clock in the row scan counter is divided by 2, which allows the 200-li
+ne modes to be displayed
+     |as 400 lines on the display (this is called double scanning; each line is
+displayed twice). When this
+     |bit is set to 0, the clock to the row scan counter is equal to the horizon
+tal scan rate.
+     |
+
+=====|==========================================================================
+=============================
+LC9  |Bit 9 of the Line Compare register (index 0x18).
+
+     |
+
+-----|--------------------------------------------------------------------------
+-----------------------------
+VBS9 |Bit 9 of the Start Vertical Blanking register (index 0x15).
+
+     |
+
+-----|--------------------------------------------------------------------------
+-----------------------------
+MSL  |These bits specify the number of scan lines per character row. The value o
+f these bits is the maxi-
+     |mum row scan number minus 1.
+
+================================================================================
+=============================
+
+    A.3.3.12 Cursor Start Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x0A
+
+========================
+7 |6 |5  |4 |3 |2 |1 |0
+--|--|---|--|--|--|--|--
+- |- |CO |RSCB
+  |  |   |
+========================
+
+Cursor Start Register, Index 0x0A
+=====================================
+-    |: |Set to 0, Undefined on Read
+-----|--|----------------------------
+CO   |: |Cursor Off
+-----|--|----------------------------
+RSCB |: |Row Scan Cursor Begins
+     |  |
+=====================================
+
+The register fields are defined as follows:
+================================================================================
+=================================
+CO   |When set to 1, this bit disables the cursor.
+
+     |
+
+=====|==========================================================================
+=================================
+RSCB |These bits specify the row within the character box where the cursor begin
+s. The value of these bits
+     |is the first line of the cursor minus 1. When this value is greater than t
+hat in the Cursor End register,
+     |no cursor is displayed.
+================================================================================
+=================================
+
+    A.3.3.13 Cursor End Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x0B
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+- |CSK  |RSCE
+  |     |
+=======================
+
+Cursor End Register, Index 0x0B
+=====================================
+-    |: |Set to 0, Undefined on Read
+-----|--|----------------------------
+CSK  |: |Cursor Skew Control
+-----|--|----------------------------
+RSCE |: |Row Scan Cursor Ends
+     |  |
+=====================================
+
+The register fields are defined as follows:
+================================================================================
+=============================
+CSK  |These bits control the skew of the cursor. The skew value delays the curso
+r by the selected number
+     |of character clocks from 0 to 3. For example, a skew of 1 moves the cursor
+ right one position on the
+     |screen.
+
+     |
+
+=====|==========================================================================
+=============================
+RSCE |These bits specify the row within the character box where the cursor ends.
+ If this value is less that
+     |the cursor start value, no cursor is displayed.
+
+================================================================================
+=============================
+
+    A.3.3.14 Start Address High Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x0C
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+Start Address High
+=======================
+
+   These are the eight high-order bits of a 16-bit value that specifies
+   the starting address for the regenerative buffer. The start address
+   points to the first address after the vertical retrace on each screen
+   refresh.
+
+   Software Implementation Note: The CRT controller latches the start
+   address at the start of the vertical retrace. These register values
+   should be loaded during the active display time.
+
+    A.3.3.15 Start Address Low Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x0D
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+Start Address Low
+=======================
+
+   These are the eight low-order bits of the starting address for the
+   regenerative buffer.
+
+    A.3.3.16 Cursor Location High Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x0E
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+Cursor Location High
+=======================
+
+   These are the eight high-order bits of the 16-bit cursor
+
+    A.3.3.17 Cursor Location Low Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x0F
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+Cursor Location Low
+=======================
+
+   These are the eight low-order bits of the cursor location.
+
+    A.3.3.18 Vertical Retrace Start Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x10
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+Vertical Retrace Start
+=======================
+
+   These are the eight low-order bits of the 9-bit start position for the
+   'vertical retrace' pulse; it is programmed in horizontal scan lines.
+   Bit 8 is in the Overflow register (index 0x07).
+
+    A.3.3.19 Vertical Retrace End Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x11
+
+==============================
+7  |6   |5   |4   |3 |2 |1 |0
+---|----|----|----|--|--|--|--
+PR |S5R |EVI |CVI |VRE
+   |    |    |    |
+==============================
+
+Vertical Retrace End Register, Index 0x11
+==================================
+PR  |: |Protect Registers 0-7
+----|--|--------------------------
+S5R |: |Select 5 Refresh Cycles
+----|--|--------------------------
+EVI |: |Enable Vertical Interrupt
+----|--|--------------------------
+CVI |: |Clear Vertical Interrupt
+----|--|--------------------------
+VRE |: |Vertical Retrace End
+    |  |
+==================================
+
+The register fields are defined as follows:
+================================================================================
+=====================================
+PR  |When set to 1, this bit disables write access to the CRT controller registe
+rs at index 00 through 07.
+    |The line compare bit in the Overflow register (index 0x07) is not protected
+.
+    |
+
+====|===========================================================================
+=====================================
+S5R |When set to 1, this bit generates five memory refresh cycles per horizontal
+ line. When set to 0, this
+    |bit selects three refresh cycles. Selecting five refresh cycles allows use
+of the VGA chip with 15.75
+    |kHz displays. This bit should be set to 0 for supported operations.
+
+    |
+
+----|---------------------------------------------------------------------------
+-------------------------------------
+EVI |When set to 0, this bit enables a vertical retrace interrupt. The vertical
+retrace interrupt is IRQ2. This
+    |interrupt level can be shared; therefore, to determine whether the video ge
+nerated the interrupt,
+    |check the CRT interrupt bit in Input Status Register 0.
+
+    |
+
+----|---------------------------------------------------------------------------
+-------------------------------------
+CVI |When set to 0, this bit clears a vertical retrace interrupt. At the end of
+the active vertical display
+    |time, a flip-flop is set to indicate an interrupt. An interrupt handler res
+ets this flip-flop by first setting
+    |this bit to 0, then resetting it to 1.
+
+    |
+
+----|---------------------------------------------------------------------------
+-------------------------------------
+VRE |The Vertical Retrace Start register is compared with these four bits to det
+ermine where the 'vertical
+    |retrace' signal goes inactive. It is programmed in units of horizontal scan
+ lines. To program these bits
+    |with a signal width of W, the following algorithm is used: the width W, in
+horizontal scan units, is
+    |added to the value in the Start Vertical Retrace register. The four low-ord
+er bits of the result are the
+    |4-bit value programmed.
+
+================================================================================
+=====================================
+
+    A.3.3.20 Vertical Display Enable End Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x12
+
+============================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|-------
+Vertical Display Enable End
+============================
+
+   These are the eight low-order bits of a 10-bit value that defines the
+   vertical-display-enable end position. The two high-order bits are
+   contained in the Overflow register (index 0x07). The 10-bit value is
+   equal to the total number of scan lines minus 1.
+
+    A.3.3.21 Offset Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x013
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+Offset
+=======================
+
+   These bits specify the logical line width of the screen. The starting
+   memory address for the next character row is larger than the current
+   character row by 2 or 4 times the value of these bits. Depending on the
+   method of clocking the CRT controller, this address is either a word or
+   doubleword address.
+
+    A.3.3.22 Underline Location Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x14
+
+==========================
+7 |6  |5   |4 |3 |2 |1 |0
+--|---|----|--|--|--|--|--
+- |DW |CB4 |SUL
+  |   |    |
+==========================
+
+Underline Location Register, Index 0x14
+====================================
+-   |: |Set to 0, Undefined on Read
+----|--|----------------------------
+DW  |: |Doubleword Mode
+----|--|----------------------------
+CB4 |: |Count by 4
+----|--|----------------------------
+SUL |: |Start Underline
+    |  |
+====================================
+
+The register fields are defined as follows:
+================================================================================
+===========================
+DW  |When this bit is set to 1, memory addresses are doubleword addresses. See t
+he description of the
+    |word/byte mode bit (bit 6) in the [6]"CRT Mode Control Register" on page 22
+0.
+    |
+
+====|===========================================================================
+===========================
+CB4 |When this bit is set to 1, the memory-address counter is clocked with the c
+haracter clock divided by
+    |4, which is used when doubleword addresses are used.
+
+    |
+
+----|---------------------------------------------------------------------------
+---------------------------
+SUL |These bits specify the horizontal scan line of a character row on which an
+underline occurs. The
+    |value programmed is the scan line desired minus 1.
+
+================================================================================
+===========================
+
+    A.3.3.23 Start Vertical Blanking Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x15
+
+========================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|---
+Start Vertical Blanking
+========================
+
+   These are the eight low-order bits of a 10-bit value that specifies the
+   starting location for the 'vertical blanking' signal. Bit 8 is in the
+   Overflow register (index 0x07) and bit 9 is in the Maximum Scan Line
+   register (index 0x09). The 10-bit value is the horizontal scan line
+   count where the 'vertical blanking' signal becomes active minus 1.
+
+    A.3.3.24 End Vertical Blanking Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x16
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+End Vertical Blanking
+=======================
+
+   This register specifies the horizontal scan count where the 'vertical
+   blanking' signal becomes inactive. The register is Programmed in units
+   of the horizontal scan line.
+
+   To program these bits with a 'vertical blanking' signal of width W, the
+   following algorithm is used: the width W, in horizontal scan line
+   units, is added to the value in the Start Vertical Blanking register
+   minus 1. The eight low-order bits of the result are the 8-bit value
+   programmed.
+
+    A.3.3.25 CRT Mode Control Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x17
+
+=====================================
+7   |6  |5   |4 |3   |2   |1   |0
+----|---|----|--|----|----|----|-----
+RST |WB |ADW |- |CB2 |HRS |SRC |CMS0
+    |   |    |  |    |    |    |
+=====================================
+
+CRT Mode Control Register, Index 0x17
+=====================================
+-    |: |Set to 0, Undefined on Read
+-----|--|----------------------------
+RST  |: |Hardware Reset
+-----|--|----------------------------
+WB   |: |Word/Byte Mode
+-----|--|----------------------------
+ADW  |: |Address Wrap
+-----|--|----------------------------
+CB2  |: |Count by Two
+-----|--|----------------------------
+HRS  |: |Horizontal Retrace Select
+-----|--|----------------------------
+SRC  |: |Select Row Scan Counter
+-----|--|----------------------------
+CMS0 |: |Compatibility Mode Support
+     |  |
+=====================================
+
+The register fields are defined as follows:
+================================================================================
+==================================
+RST  |When set to 0, this bit disables the horizontal and vertical retrace signa
+ls and forces them to an inac-
+     |tive level. When set to 1, this bit enables the horizontal and vertical re
+trace signals. This bit does not
+     |reset any other registers or signal outputs.
+
+     |
+
+-----|--------------------------------------------------------------------------
+----------------------------------
+WB   |When this bit is set to 0, the word mode is selected. The word mode shifts
+ the memory-address
+     |counter bits to the left by one bit; the most-significant bit of the count
+er appears on the least-signifi-
+     |cant bit of the memory address outputs.
+
+     |The doubleword bit in the Underline Location register (0x14) also controls
+ the addressing. When the
+     |doubleword bit is 0, the word/byte bit selects the mode. When the doublewo
+rd bit is set to 1, the ad-
+     |dressing is shifted by two bits.
+
+     |When set to 1, bit 6 selects the byte address mode.
+
+     |
+
+-----|--------------------------------------------------------------------------
+----------------------------------
+ADW  |This bit selects the memory-address bit, bit MA 13 or MA 15, that appears
+on the output pin MA 0,
+     |in the word address mode. If the VGA is not in the word address mode, bit
+0 from the address
+     |counter appears on the output pin, MA 0.
+     |When set to 1, this bit selects MA 15. In odd/even mode, this bit should b
+e set to 1 because 256KB
+     |of video memory is installed on the system board. (Bit MA 13 is selected i
+n applications where only
+     |64KB is present. This function maintains compatibility with the IBM Color/
+Graphics Monitor
+     |Adapter.)
+
+     |
+
+-----|--------------------------------------------------------------------------
+----------------------------------
+CB2  |When this bit is set to 0, the address counter uses the character clock. W
+hen this bit is set to 1, the
+     |address counter uses the character clock input divided by 2. This bit is u
+sed to create either a byte or
+     |word refresh address for the display buffer.
+
+     |
+
+-----|--------------------------------------------------------------------------
+----------------------------------
+HRS  |This bit selects the clock that controls the vertical timing counter. The
+clocking is either the horizon-
+     |tal retrace clock or horizontal retrace clock divided by 2. When this bit
+is set to 1. the horizontal re-
+     |trace clock is divided by 2.
+
+     |Dividing the clock effectively doubles the vertical resolution of the CRT
+controller. The vertical
+     |counter has a maximum resolution of 1024 scan lines because the vertical t
+otal value is 10-bits wide.
+     |If the vertical counter is clocked with the horizontal retrace divided by
+2, the vertical resolution is
+     |doubled to 2048 scan lines.
+     |
+-----|--------------------------------------------------------------------------
+----------------------------------
+SRC  |This bit selects the source of bit 14 of the output multiplexer. When this
+ bit is set to 0, bit 1 of the
+     |row scan counter is the source. When this bit is set to 1, the bit 14 of t
+he address counter is the
+     |source.
+
+     |
+
+-----|--------------------------------------------------------------------------
+----------------------------------
+CMS0 |This bit selects the source of bit 13 of the output multiplexer. When this
+ bit is set to 0, bit 0 of the
+     |row scan counter is the source, and when this bit is set to 1, bit 13 of t
+he address counter is the
+     |source.
+
+     |The CRT controller used on the IBM Color/Graphics Adapter was capable of u
+sing 128 horizontal
+     |scan-line addresses. For the VGA to obtain 640-by-200 graphics resolution,
+ the CRT controller is
+     |programmed for 100 horizontal scan lines with two scan-line addresses per
+character row. Row scan
+     |address bit 0 becomes the most-significant address bit to the display buff
+er. Successive scan lines of
+     |the display image are displaced in 8KB of memory. This bit allows compatib
+ility with the graphics
+     |modes of earlier adapters.
+
+================================================================================
+==================================
+
+    A.3.3.26 Line Compare Register
+
+   Address 0x03?4; Data 0x03?5; Index 0x18
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+Line Compare
+
+=======================
+
+   This register contains the eight low-order bits of the 10-bit compare
+   target. When the vertical counter reaches the target value, the
+   internal start address of the line counter is cleared. This creates a
+   split screen where the lower screen is immune to scrolling. Bit 8 is in
+   the Overflow register (index 0x07), and bit 9 is in the Maximum Scan
+   Line register (index 0x09).
+
+  A.3.4 Graphics Controller Registers
+
+   The Address register for the graphics controller is at address 0x03CE.
+   The data registers are at address 0x03CF. All registers are read/write.
+
+Table 366. Graphics Controller Registers
+=================================
+Register Name    |Address |Index
+=================|========|======
+Address          |0x03CE  |-
+-----------------|--------|------
+Set/Reset        |0x03CF  |0x0
+-----------------|--------|------
+Enable Set/Reset |0x03CF  |0x01
+-----------------|--------|------
+Color Compare    |0x03CF  |0x02
+-----------------|--------|------
+Data Rotate      |0x03CF  |0x03
+-----------------|--------|------
+Read Map Select  |0x03CF  |0x04
+-----------------|--------|------
+Graphics Mode    |0x03CF  |0x05
+-----------------|--------|------
+Miscellaneous    |0x03CF  |0x06
+-----------------|--------|------
+Color Don't Care |0x03CF  |0x07
+-----------------|--------|------
+Bit Mask         |0x03CF  |0x08
+=================================
+
+    A.3.4.1 Address Register
+
+   The Address register is at address 0x03CE
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+- |- |- |- |Index
+=======================
+
+   This register is loaded with the index value that points to the desired
+   data register within the graphics controller.
+
+    A.3.4.2 Set/Reset Register
+
+   Address 0x03CE; Data 0x03CF; Index 0x00
+
+===============================
+7 |6 |5 |4 |3   |2   |1   |0
+--|--|--|--|----|----|----|----
+- |- |- |- |SR3 |SR2 |SR1 |SR0
+  |  |  |  |    |    |    |
+===============================
+
+Set/Reset Register, Index 0x00
+====================================
+-   |: |Set to 0, Undefined on Read
+----|--|----------------------------
+SR3 |: |Set/Reset Map 3
+----|--|----------------------------
+SR2 |: |Set/Reset Map 2
+----|--|----------------------------
+SR1 |: |Set/Reset Map 1
+----|--|----------------------------
+SR0 |: |Set/Reset Map 0
+    |  |
+====================================
+
+The register fields are defined as follows:
+================================================================================
+===============================
+SR* |When write mode 0 is selected, the system writes the value of each set/rese
+t bit to its respective
+    |memory map. For each write operation, the set/reset bit, if enabled, is wri
+tten to all eight bits within
+    |that map. Set/reset operation can be enabled on a map-by-map basis through
+the Enable Set/Reset
+    |register.
+
+================================================================================
+===============================
+
+    A.3.4.3 Enable Set/Reset Register
+
+   Address 0x03CE; Data 0x03CF; Index 0x01
+
+===================================
+7 |6 |5 |4 |3    |2    |1    |0
+--|--|--|--|-----|-----|-----|-----
+- |- |- |- |ESR3 |ESR2 |ESR1 |ESR0
+  |  |  |  |     |     |     |
+===================================
+
+Enable Set/Reset Register, Index 0x01
+=====================================
+-    |: |Set to 0, Undefined on Read
+-----|--|----------------------------
+ESR3 |: |Enable Set/Reset Map 3
+-----|--|----------------------------
+ESR2 |: |Enable Set/Reset Map 2
+-----|--|----------------------------
+ESR1 |: |Enable Set/Reset Map 1
+-----|--|----------------------------
+ESR0 |: |Enable Set/Reset Map 0
+     |  |
+=====================================
+
+The register fields are defined as follows:
+================================================================================
+============================
+ESR* |These bits enable the set/reset function used when write mode 0 is selecte
+d in the Graphics Mode
+     |register (index 0x05). When the bit is set to 1, the respective memory map
+ receives the value speci-
+     |fied in the Set/Reset register. When Set/Reset is not enabled for a map, t
+hat map receives the value
+     |sent by the system.
+
+================================================================================
+============================
+
+    A.3.4.4 Color Compare Register
+
+   Address 0x03CE; Data 0x03CF; Index 0x02
+
+===============================
+7 |6 |5 |4 |3   |2   |1   |0
+--|--|--|--|----|----|----|----
+- |- |- |- |CC3 |CC2 |CC1 |CC0
+  |  |  |  |    |    |    |
+===============================
+
+Color Compare Register, Index 0x02
+====================================
+-   |: |Set to 0, Undefined on Read
+----|--|----------------------------
+CC3 |: |Color Compare Map 3
+----|--|----------------------------
+CC2 |: |Color Compare Map 2
+----|--|----------------------------
+CC1 |: |Color Compare Map 1
+----|--|----------------------------
+CC0 |: |Color Compare Map 0
+    |  |
+====================================
+
+The register fields are defined as follows:
+================================================================================
+=============================
+CC* |These bits are the 4-bit color value to be compared when the read mode bit
+in the Graphics Mode
+    |register is set to 1. When the system does a memory read, the data returned
+ from the memory cycle
+    |will be a 1 in each bit position where the four maps equal the Color Compar
+e register. If the read
+    |mode bit is 0, the data is returned without comparison.
+
+    |All bits of the corresponding map's byte are compared with the color compar
+e bit. Each of the eight
+    |bit positions in the selected byte are compared across the four maps, and a
+ 1 is returned in each posi-
+    |tion where the bits of all four maps equal their respective color compare v
+alues.
+================================================================================
+=============================
+
+    A.3.4.5 Data Rotate Register
+
+   Address 0x03CE; Data 0x03CF; Index 0x03
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+- |- |- |FS   |RC
+  |  |  |     |
+=======================
+
+Data Rotate Register, Index 0x03
+===================================
+-  |: |Set to 0, Undefined on Read
+---|--|----------------------------
+FS |: |Function Select
+---|--|----------------------------
+RC |: |Rotate Count
+   |  |
+===================================
+
+The register fields are defined as follows:
+================================================================================
+==================================
+FS |Data written to the video buffer can be operated on logically by data alread
+y in the system latches.
+   |The Function Select field determines whether and how this is done.
+
+   |Data can be any of the choices selected by the write mode bits except system
+ latches, which cannot
+   |be modified. If rotated data is selected also, the rotate is performed     b
+efore the logical operation. The
+   |logical operations selected are shown in the following table.
+
+   |
+
+   |FS Field
+
+   |    4  3          Function
+
+   |    0  0          Data Unmodified
+
+   |    0  1          Data ANDed with Latched Data
+
+   |    1  0          Data ORed with Latched Data
+   |    1  1          Data XORed with Latched Data
+
+   |
+
+---|----------------------------------------------------------------------------
+----------------------------------
+RC |In write mode 0, these bits select the number of positions the system data i
+s rotated to the right dur-
+   |ing a system Memory Write operation. To write data that is not rotated in mo
+de 0, all bits are set to 0.
+   |
+
+================================================================================
+==================================
+
+    A.3.4.6 Read Map Select Register
+
+   Address 0x03CE; Data 0x03CF; Index 0x04
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+- |- |- |- |- |- |MS
+  |  |  |  |  |  |
+=======================
+
+Read Map Select Register, Index 0x04
+===================================
+-  |: |Set to 0, Undefined on Read
+---|--|----------------------------
+MS |: |Map Select
+   |  |
+===================================
+
+The register field is defined as follows:
+================================================================================
+===========================
+MS |These bits select the memory map for system read operations. This register h
+as no effect on the color
+   |compare read mode. In odd/even modes, the value can be a binary 00 or 01 to
+select the chained
+   |maps 0, 1 and the value can be a binary 10 or 11 to select the chained maps
+2, 3.
+================================================================================
+===========================
+
+    A.3.4.7 Graphics Mode Register
+
+   Address 0x03CE; Data 0x03CF; Index 0x05
+
+=============================
+7 |6    |5  |4  |3  |2 |1 |0
+--|-----|---|---|---|--|--|--
+- |C256 |SR |OE |RM |- |WM
+  |     |   |   |   |  |
+=============================
+
+Graphics Mode Register, Index 0x05
+=====================================
+-    |: |Set to 0, Undefined on Read
+-----|--|----------------------------
+C256 |: |256 - Color Mode
+-----|--|----------------------------
+SR   |: |Shift Register Mode
+-----|--|----------------------------
+OE   |: |Odd/Even
+-----|--|----------------------------
+RM   |: |Read Mode
+-----|--|----------------------------
+WM   |: |Write Mode
+     |  |
+=====================================
+
+The register fields are defined as follows:
+================================================================================
+===================================
+C256 |When set to 0, this bit allows bit 5 to control the loading of the shift r
+egisters. When set to 1, this bit
+     |causes the shift registers to be loaded in a manner that supports the 256-
+color mode.
+     |
+
+-----|--------------------------------------------------------------------------
+-----------------------------------
+SR   |When set to 1, this bit directs the shift registers in the graphics contro
+ller to format the serial data
+     |stream with even-numbered bits from both maps on even-numbered maps, and o
+dd-numbered bits
+     |from both maps on the odd-numbered maps. This bit is used for modes 4 and
+5.
+     |
+
+-----|--------------------------------------------------------------------------
+-----------------------------------
+OE   |When set to 1, this bit selects the odd/even addressing mode used by the I
+BM Color/Graphics Mon-
+     |itor Adapter. Normally, the value here follows the value of Memory Mode re
+gister bit 2 in the se-
+     |quencer.
+
+     |
+
+-----|--------------------------------------------------------------------------
+-----------------------------------
+RM   |When this bit is set to 1, the system reads the results of the comparison
+of the four memory maps and
+     |the Color Compare register.
+
+     |When this bit is set to 0, the system reads data from the memory map selec
+ted by the Read Map Se-
+     |lect register, or by the two low-order bits of the memory address (this se
+lection depends on the
+     |chain-4 bit in the Memory Mode register of the sequencer).
+
+     |
+
+-----|--------------------------------------------------------------------------
+-----------------------------------
+WM   |The write mode selected and its operation are defined below. The logic ope
+ration specified by the
+     |function select bits is performed on system data for modes 0, 2, and 3.
+
+================================================================================
+===================================
+
+================================================================================
+WM Field |Mode Description
+=========|======================================================================
+00       |Each memory map is written with the system data rotated by the
+         |count in   the Data Rotate register. If the set/reset function is en-
+         |abled for a specific map, that map receives the 8-bit value con-
+         |tained in the Set/Reset register.
+---------|----------------------------------------------------------------------
+01       |Each memory map is written with the contents of the system
+         |latches. These latches are loaded by a system Read operation.
+---------|----------------------------------------------------------------------
+10       |Memory map n (0 through 3) is filled with eight bits of the value
+         |of data bit n.
+---------|----------------------------------------------------------------------
+11       |Each memory map is written with the 8-bit value contained in the
+         |Set/Reset register for that map (the Enable Set/Reset register has
+         |no effect). Rotated system data is ANDed with the Bit Mask reg-
+         |ister to form an 8-bit value that performs the same function as the
+         |Bit Mask register in write modes 0 and 2 (see also [7]"Bit Mask
+
+         |[8]Register" on page 226).
+
+================================================================================
+
+    A.3.4.8 Miscellaneous Register
+
+   Address 0x03CE; Data 0x03CF; Index 0x06
+
+=========================
+7 |6 |5 |4 |3 |2 |1  |0
+--|--|--|--|--|--|---|---
+- |- |- |- |MM   |OE |GM
+  |  |  |  |     |   |
+=========================
+
+Miscellaneous Register, Index 0x06
+===================================
+-  |: |Set to 0, Undefined on Read
+---|--|----------------------------
+MM |: |Memory Map
+---|--|----------------------------
+OE |: |Odd/Even
+---|--|----------------------------
+GM |: |Graphics Mode
+   |  |
+===================================
+
+The register fields are defined as follows:
+================================================================================
+===========================
+MM |These bits control the mapping of the regenerative buffer into the system ad
+dress space. The bit
+   |functions are defined below.
+
+   |
+
+   |MM Field
+
+   |    3  2          Addressing Assignment
+
+   |    0  0          A0000 for 128KB
+
+   |    0  1          A0000 for 64KB
+
+   |    1  0          B0000 for 32 KB
+
+   |    1  1          B8000 for 32 KB
+
+   |
+
+---|----------------------------------------------------------------------------
+---------------------------
+OE |When set to 1, this bit directs the system address bit, A0, to be replaced b
+y a higher-order bit. The
+   |odd map is then selected when A0 is 1, and the even map when A0 is 0.
+
+   |
+---|----------------------------------------------------------------------------
+---------------------------
+GM |This bit controls alphanumeric mode addressing. When set to 1, this bit sele
+cts graphics modes,
+   |which also disables the character generator latches.
+
+================================================================================
+===========================
+
+    A.3.4.9 Color Don't Care Register
+
+   Address 0x03CE; Data 0x03CF; Index 0x07
+
+===========================
+7 |6 |5 |4 |3  |2  |1  |0
+--|--|--|--|---|---|---|---
+- |- |- |- |M3 |M2 |M1 |M0
+  |  |  |  |   |   |   |
+===========================
+
+Color Don't Care Register, Index 0x07
+===================================
+-  |: |Set to 0, Undefined on Read
+---|--|----------------------------
+M3 |: |Compare Map 3
+---|--|----------------------------
+M2 |: |Compare Map 2
+---|--|----------------------------
+M1 |: |Compare Map 1
+---|--|----------------------------
+M0 |: |Compare Map 0
+   |  |
+===================================
+
+The register fields are defined as follows:
+================================================================================
+=========================
+M* |These bits select whether a map is going to participate in the color compare
+ cycle. When the bit is
+   |set to 1, the bits in that map are compared.
+
+================================================================================
+=========================
+
+    A.3.4.10 Bit Mask Register
+
+   Address 0x03CE; Data 0x03CF; Index 0x08
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+Bit Mask
+
+=======================
+
+   When the bit is set to 1, the corresponding bit position in each map
+   can be changed. When the bit set to 0, the bit position in the map is
+   masked to prevent change, provided that the location being written was
+   the last location read by the system microprocessor.
+
+   The bit mask applies to write modes 0 and 2. To preserve bits using the
+   bit mask, data must be latched internally by reading the location. When
+   data is written to preserve the bits, the most current data in the
+   latches is written in those positions. The bit mask applies to all maps
+   simultaneously.
+
+  A.3.5 Attribute Controller Registers
+
+   Each register for the attribute controller has two addresses. Address
+   0x03C0 is the write address and 0x03C1 is the read address. The
+   individual data registers are selected by writing their index to the
+   Address register (0x03C0).
+
+Table 367. Attribute Controller Registers:
+===================================================
+Register Name          |Write   |Read    |Index
+                       |Address |Address |
+=======================|========|========|=========
+Address                |0x03C0  |0x03C0  |-
+-----------------------|--------|--------|---------
+Internal Palette       |0x03C0  |0x03C1  |0x0-0x0F
+-----------------------|--------|--------|---------
+Attribute Mode Control |0x03C0  |0x03C1  |0x10
+-----------------------|--------|--------|---------
+Overscan Color         |0x03C0  |0x03C1  |0x11
+-----------------------|--------|--------|---------
+Color Plane Enable     |0x03C0  |0x03C1  |0x12
+-----------------------|--------|--------|---------
+Horizontal PEL Panning |0x03C0  |0x03C1  |0x13
+-----------------------|--------|--------|---------
+Color Select           |0x03C0  |0x03C1  |0x14
+===================================================
+
+    A.3.5.1 Address Register
+
+   This read/write register is at address 0x03C0.
+
+   The attribute controller registers do not have an input bit to control
+   selection of the address and data registers. An internal address
+   flip-flop controls this selection. Reading Input Status Register 1
+   clears the flip-flop and selects the Address register.
+
+   After the Address register has been loaded with the index, the next
+   Write operation to 03C0 loads the data register. The flip-flop toggles
+   for each Write operation to address 0x03C0. It does not toggle for Read
+   operations to 03C0 or 03C1.
+
+==========================
+7 |6 |5    |4 |3 |2 |1 |0
+--|--|-----|--|--|--|--|--
+- |- |IPAS |Index
+  |  |     |
+==========================
+
+Address Register
+=========================================
+-    |: |Set to 0, Undefined on Read
+-----|--|--------------------------------
+IPAS |: |Internal Palette Address Source
+     |  |
+=========================================
+
+The register fields are defined as follows:
+================================================================================
+======================================
+IPAS  |This bit is set to 0 to load color values to the registers in the interna
+l palette. It is set to 1 for normal
+      |operation of the attribute controller.
+
+      |Note: Do not access the internal palette while this bit is set to 1. Whil
+e this bit is 1, the Type 1 video
+      |subsystem disables accesses to the palette; however, the Type 2 does not,
+ and the actual color value
+      |addressed cannot be ensured.
+
+      |
+
+------|-------------------------------------------------------------------------
+--------------------------------------
+Index |These bits contain the index to the data registers in the attribute contr
+oller.
+================================================================================
+======================================
+
+    A.3.5.2 Internal Palette Registers 0 through F
+
+   Write 0x03C0; Read 0x03C1; Index 0x00-0x0F
+
+=============================
+7 |6 |5  |4  |3  |2  |1  |0
+--|--|---|---|---|---|---|---
+- |- |P5 |P4 |P3 |P2 |P1 |P0
+  |  |   |   |   |   |   |
+=============================
+
+Internal Palette Registers
+=========================================
+-        |: |Set to 0, Undefined on Read
+---------|--|----------------------------
+P5 to P0 |: |Palette Data
+         |  |
+=========================================
+
+The register fields are defined as follows:
+================================================================================
+==============================
+P5-P0 |These 6-bit registers allow a dynamic mapping between the text attribute
+or graphic color input
+      |value and the display color on the CRT screen. When set to 1, this bit se
+lects the appropriate color.
+      |The Internal Palette registers should be modified only during the vertica
+l retrace interval to avoid
+      |problems with the displayed image. These internal palette values are sent
+ off-chip to the video DAC,
+      |where they serve as addresses into the DAC registers.
+
+      |   Bit          Color
+
+      |    0            Blue
+      |    1            Green
+      |    2            Red
+
+      |    3            Secondary Blue
+
+      |    4            Secondary Green
+
+      |    5            Secondary Red
+
+================================================================================
+==============================
+
+   Software Implementation Note: These registers can be accessed only when
+   bit 5 in the Address register is set to 0. When the bit is 1, writes
+   are "don't care" and reads return undefined data.
+
+    A.3.5.3 Attribute Mode Control Register
+
+   Write 0x03C0; Read 0x03C1; Index 0x10.
+
+==============================
+7  |6  |5  |4 |3  |2   |1  |0
+---|---|---|--|---|----|---|--
+PS |PW |PP |- |EB |ELG |ME |G
+   |   |   |  |   |    |   |
+==============================
+
+Attribute Mode Control Register
+=================================================
+-   |: |Set to 0, Undefined on Read
+----|--|-----------------------------------------
+PS  |: |P5, P4 Select
+----|--|-----------------------------------------
+PW  |: |PEL Width
+----|--|-----------------------------------------
+PP  |: |PEL Panning Compatibility
+----|--|-----------------------------------------
+EB  |: |Enable Blink/Select Background Intensity
+----|--|-----------------------------------------
+ELG |: |Enable Line Graphics Character Code
+----|--|-----------------------------------------
+ME  |: |Mono Emulation
+----|--|-----------------------------------------
+G   |: |Graphics/Alphanumeric Mode
+    |  |
+=================================================
+
+The register fields are defined as follows:
+================================================================================
+====================================
+PS  |This bit selects the source for the P5 and P4 video bits that act as inputs
+ to the video DAC. When
+    |this bit is set to 0, P5 and P4 are the outputs of the Internal Palette reg
+isters. When this bit is set to 1,
+    |P5 and P4 are bits 1 and 0 of the Color Select register.
+    |
+----|---------------------------------------------------------------------------
+------------------------------------
+PW  |When this bit is set to 1, the video data is sampled so that eight bits are
+ available to select a color in
+    |the 256-color mode (0x13). This bit is set to 0 in all other modes.
+
+    |
+
+----|---------------------------------------------------------------------------
+------------------------------------
+PP  |When this bit is set to 1, a successful line-compare in the CRT controller
+forces the output of the
+    |PEL Panning register to 0 until a vertical synchronization occurs, at which
+ time the output returns to
+    |its programmed value. This bit allows a selected portion of a screen to be
+panned.
+    |When this bit is set to 0, line compare has no effect on the output of the
+PEL Panning register.
+    |
+
+----|---------------------------------------------------------------------------
+------------------------------------
+EB  |When this bit is set to 0, the most-significant bit of the attribute select
+s the background intensity (al-
+    |lows 16 colors for background). When set to 1, this bit enables blinking.
+
+    |
+
+----|---------------------------------------------------------------------------
+------------------------------------
+ELG |When this bit is set to 0, the ninth dot will be the same as the background
+. When set to 1, this bit en-
+    |ables the special line-graphics character codes for the monochrome emulatio
+n mode. This emulation
+    |mode forces the ninth dot of a line graphic character to be identical to th
+e eighth dot of the character.
+    |The line-graphics character codes for the monochrome emulation mode are 0xC
+0 through 0xDF.
+    |For character fonts that do not utilize these line-graphics character codes
+, bit 2 should be set to 0 to
+    |prevent unwanted video information from displaying on the CRT screen.
+
+    |BIOS will set this bit, the correct dot clock, and other registers when the
+ 9-dot alphanumeric mode is
+    |selected.
+
+    |
+
+----|---------------------------------------------------------------------------
+------------------------------------
+ME  |When this bit is set to 1, monochrome emulation mode is selected. When this
+ bit is set to 0, color
+    |emulation mode is selected.
+
+    |
+
+----|---------------------------------------------------------------------------
+------------------------------------
+G   |When set to 1, this bit selects the graphics mode of operation.
+
+================================================================================
+====================================
+
+    A.3.5.4 Overscan Color Register
+
+   Write 0x03C0; Read 0x03C1; Index 0x11.
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+Overscan Color
+=======================
+
+   These bits select the border color used in the 80-column alphanumeric
+   modes and in the graphics modes other than modes 4, 5, and D. (Selects
+   a color from one of the DAC registers.)
+
+    A.3.5.5 Color Plane Enable Register
+
+   Write 0x03C0; Read 0x03C1; Index 0x12.
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+  |  |  |  |ECP
+  |  |  |  |
+=======================
+
+Color Plane Enable Register
+====================================
+-   |: |Set to 0, Undefined on Read
+----|--|----------------------------
+ECP |: |Enable Color Plane
+    |  |
+====================================
+
+The register field is defined as follows:
+===============================================================================
+ECP |Setting a bit to 1, enables the corresponding display-memory color plane.
+===============================================================================
+
+    A.3.5.6 Horizontal PEL Panning Register
+
+   Write 0x03C0; Read 0x03C1; Index 0x13.
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+  |  |  |  |HPP
+  |  |  |  |
+=======================
+
+Attribute Mode Control Register
+====================================
+-   |: |Set to 0, Undefined on Read
+----|--|----------------------------
+HPP |: |Horizontal PEL Panning
+    |  |
+====================================
+
+The register field is defined as follows:
+================================================================================
+================================
+HPP |These bits select the number of pels that the video data is shifted to the
+left. PEL panning is available
+    |in both alphanumeric and graphics modes. The following table shows the numb
+er of bits shifted for
+    |each mode.
+
+    |
+
+================================================================================
+================================
+
+Table 368. Image Shifting
+=====================================================
+Register Value |Number of Pels Shifted to the Left
+               |-------------------------------------
+               |Mode Hex |A/N    |All Other
+               |13       |Modes* |Modes
+===============|=========|=======|===================
+0              |0        |1      |0
+---------------|---------|-------|-------------------
+1              |-        |2      |1
+---------------|---------|-------|-------------------
+2              |1        |3      |2
+---------------|---------|-------|-------------------
+3              |-        |4      |3
+---------------|---------|-------|-------------------
+4              |2        |5      |4
+---------------|---------|-------|-------------------
+5              |-        |6      |5
+---------------|---------|-------|-------------------
+6              |3        |7      |6
+---------------|---------|-------|-------------------
+7              |-        |8      |7
+---------------|---------|-------|-------------------
+8              |-        |0      |-
+=====================================================
+* Only mode 7 and the A/N modes with 400 scan lines.
+=====================================================
+
+    A.3.5.7 Color Select Register
+
+   Write 0x03C0; Read 0x03C1; Index 0x14.
+
+===============================
+7 |6 |5 |4 |3   |2   |1   |0
+--|--|--|--|----|----|----|----
+- |- |- |- |SC7 |SC6 |SC5 |SC4
+  |  |  |  |    |    |    |
+===============================
+
+Color Select Register
+====================================
+-   |: |Set to 0, Undefined on Read
+----|--|----------------------------
+SC7 |: |S_color 7
+----|--|----------------------------
+SC6 |: |S_color 6
+----|--|----------------------------
+SC5 |: |S_color 5
+----|--|----------------------------
+SC4 |: |S_color 4
+    |  |
+====================================
+
+The register fields are defined as follows:
+================================================================================
+==================================
+SC7, SC6 |In modes other than mode 13 hex, these are the two most-significant bi
+ts of the 8-bit digital color
+         |value to the video DAC. In mode 13 hex, the 8-bit attribute is the dig
+ital color value to the video
+         |DAC. These bits are used to rapidly switch between sets of colors in t
+he video DAC.
+         |
+
+---------|----------------------------------------------------------------------
+----------------------------------
+SC5, SC4 |These bits can be used in place of the P4 and P5 bits from the Interna
+l Palette registers to form the
+         |8-bit digital color value to the video DAC. Selecting these bits is do
+ne in the Attribute Mode Control
+         |register (index 0x10). These bits are used to rapidly switch between c
+olors sets within the video
+         |DAC.
+         |
+
+================================================================================
+==================================
+
+  A.3.6 Video Digital to Analog Converter
+
+   The video digital-to-analog converter (DAC) integrates the function of
+   a color palette and three internal DACs for driving an analog display.
+   The DAC has 256 registers containing 18 bits each to allow the display
+   of up to 256 colors from a possible 256K colors.
+
+Table 369. DAC Registers
+===============================================
+Register Name                |Read/  |Address
+                             |Write  |
+=============================|=======|=========
+Palette Address (Write Mode) |R/W    |0x03C8
+-----------------------------|-------|---------
+Palette Address (Read Mode)  |W      |0x03C7
+-----------------------------|-------|---------
+DAC State                    |R      |0x03C7
+-----------------------------|-------|---------
+Palette Data                 |R/W    |0x03C9
+-----------------------------|-------|---------
+Pel Mask                     |R      |0x03C6
+===============================================
+
+    A.3.6.1 Palette Address Write Mode Register
+
+   Read/Write Address 0x03C8
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+Palette Address
+=======================
+
+   This register contains the 8-bit address used to access the 256 color
+   registers during a write operation. Color data from the Palette Data
+   Register is loaded into the palette registers in three separate output
+   cycles per write operation. At the end of the third output to the
+   Palette Data Register, the Palette Address Register will automatically
+   increment.
+
+    A.3.6.2 Palette Address Read Mode Register
+
+   Write Address 0x03C7
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+Palette Address
+=======================
+
+   This register contains the 8-bit address used to access the 256 color
+   registers during a read operation. Color data from the palette
+   registers is loaded into the Palette Data Register in three separate
+   output cycles per write operation. At the end of the third output to
+   the Palette Data Register, the Palette Address Register will
+   automatically increment.
+
+    A.3.6.3 DAC State Register
+
+   Read Address 0x03C7
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+- |- |- |- |- |- |STA
+=======================
+
+   This is a read-only register that returns the last active operation in
+   bits 1 and 0. If the last operation was a read operation, both bits are
+   set to 1. If the last operation was a write, both bits are set to 0.
+
+    A.3.6.4 Palette Data Register
+
+   Read/Write Address 0x03C9
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+Palette Data
+=======================
+
+   The Palette Data Register is really 18 bits wide to correspond to the
+   three 6-bit RGB representations in the palette registers. Since the
+   system interface is 8 bits, three read/write operations are needed to
+   access this register for each palette register.
+
+    A.3.6.5 Pel Mask Register
+
+   Read Address 0x03C6
+
+=======================
+7 |6 |5 |4 |3 |2 |1 |0
+--|--|--|--|--|--|--|--
+Pel Mask
+=======================
+
+   This read only register is initialized by the mode set software and
+   should not be further modified.
+
+    A.3.6.6 Device Operation
+
+   The palette address (P7 - P0) and the blanking input are sampled on the
+   rising edge of the PEL clock. After three more PEL clock cycles, the
+   video reflects the state of these inputs.
+
+   During normal operation the palette address is used as a pointer to one
+   of the 256 data registers in the palette. The value in each data
+   register is converted to an analog signal for each of the three outputs
+   (red, green, blue). The blanking input is used to force the video
+   output to 0 volts. The blanking operation is independent of the palette
+   operation.
+
+   Each data register is 18 bits wide: 6 bits each for red, green, and
+   blue. The data registers are accessible through the system interface.
+
+    A.3.6.7 Video DAC to System Interface
+
+   The Palette Address register holds an 8-bit value that is used to
+   address a location within the video DAC. The Palette Address register
+   responds to two addresses; the address depends on the type of palette
+   access, Read or Write. Once the address is loaded, successive accesses
+   to the data register automatically increment the address register.
+
+   For palette Write operations, the address for the Palette Address
+   register is 0x03C8. A write cycle consists of writing three successive
+   bytes to the Data register at address 0x03C9. The six least-significant
+   bits of each byte are concatenated to form the 18-bit palette data. The
+   order is red value first, then green, then blue.
+
+   For palette Read operations, the address for the Palette Address
+   register is 0x03C7 (in the read mode, the Palette Address register is
+   write only). A read cycle consists of reading three successive bytes
+   from the Data register at address 0x03C9. The six least-significant
+   bits of each byte contain the corresponding color value. The order is
+   red value first, then green, then blue.
+
+   If the Palette Address register is written to during a Read or Write
+   cycle, a new cycle is initialized and the unfinished cycle is
+   terminated. The effects of writing to the Data register during a Read
+   cycle or reading from the Data register during a Write cycle are
+   undefined and can change the palette contents.
+
+   The DAC State register is a read-only register at address 0x03C7. Bits
+   1 and 0 return the last active operation to the DAC. If the last
+   operation was a Read operation, both bits are set to 1. If the last
+   operation was a Write, both bits are set to 0.
+
+   Reading the Read Palette Address register at 0x03C8 or the DAC State
+   register at 0x03C7 does not interfere with read or write cycles.
+
+    A.3.6.8 Programming Considerations
+
+   As explained in [9]"Video DAC to System Interface" on page 232, the
+   effects of writing to the Data register during a read cycle or reading
+   from the Data register during a write cycle are undefined and can
+   change the palette contents. Therefore, the following sequence must be
+   followed to ensure the integrity of the color palette during accesses
+   to it:
+
+    1. 1. Disable interrupts.
+    2. 2. Write the address to PEL Address register.
+    3. 3. Write or read three bytes of data.
+    4. 4. Go to Step 2, repeat for the desired number of locations.
+    5. 5. Enable interrupts.
+
+   All accesses to the DAC registers are byte-wide l/O operations.
+
+   To prevent "snow" on the screen, an application reading data from or
+   writing data to the DAC registers should ensure that the blank input to
+   the DAC is asserted. This can be accomplished either by restricting
+   data transfers to retrace intervals (use Input Status register 1 to
+   determine when retrace is occurring) or by using the Screen Off bit
+   located in the Clocking Mode register in the sequencer.
+
+   Do not write to the PEL Mask register (0x03C6). Palette information can
+   be changed as a result. This register is correctly initialized to 0xFF
+   during a mode set.
+
+A.4 VGA Programming Considerations
+
+   The following are some programming considerations for the VGA:
+
+    1. The following rules must be followed to guarantee the critical
+       timings necessary to ensure the proper operation of the CRT
+       controller:
+
+    1. The value in the Horizontal Total register must be at least 0x19.
+    2. The minimum positive pulse width of the 'horizontal
+       synchronization' signal must be four character clock units.
+    3. The End Horizontal Retrace register must be programmed such that
+       the 'horizontal synchronization' signal goes to 0 at least one
+       character clock time before the 'horizontal display enable' signal
+       goes active.
+    4. The End Vertical Blanking register must be set to a minimum of one
+       horizontal scan line greater than the line-compare value.
+
+     When PEL panning compatibility is enabled in the Attribute Mode
+   Control register, a successful line compare in the CRT controller
+   forces the output of the Horizontal PEL Panning register to 0's until a
+   vertical synchronization occurs. When the vertical synchronization
+   occurs, the output returns to the programmed value. This allows the
+   portion of the screen indicated by the Line Compare register to be
+   operated on by the Horizontal PEL Panning register.
+
+     A write to the Character Map Select register becomes valid on the
+   next whole character line. This will prevent deformed character images
+   when changing character generators in the middle of a character scan
+   line.
+
+     For mode 13 hex, the attribute controller is configured so that the
+   8-bit attribute in video memory becomes the 8-bit address (P0-P7) into
+   the video DAC. The user should not modify the contents of the Internal
+   Palette registers
+
+     The following is the sequence for accessing the attribute data
+   registers:
+     * 1. Disable interrupts.
+     * 2. Reset the flip-flop for the Attribute Address register.
+     * 3. Write the index.
+     * 4. Access the data register.
+     * 5. Enable interrupts.
+
+     The Color Select register in the attribute controller section allows
+   the programmer to rapidly switch color sets in the video DAC. Bit 7 of
+   the Attribute Mode Control register controls the number of bits in the
+   Color Select register used to address the color information in the
+   video DAC (either two or four bits are used). By changing the value in
+   the Color Select register, an application can switch color sets in
+   graphics and alphanumeric modes (mode 13 hex does not use this
+   feature).
+   For multiple color sets, the user must load the color values.
+
+    1. An application that saves the video state must store the four bytes
+       of information contained in the system microprocessor latches in
+       the graphics controller subsection. These latches are loaded with
+       32 bits from video memory (8 bits per map) each time the system
+       reads from video memory. The application needs to:
+
+    1. Use write mode 1 to write the values in the latches to a location
+       in video memory that is not part of the display buffer, such as the
+       last location in the address range.
+    2. Save the values of the latches by reading them back from video
+       memory.
+
+   If memory addressing is in the chain-4 or odd/even mode, reconfigure
+   the memory as four sequential maps prior to performing the sequence
+   above.
+
+    1. The Horizontal PEL Panning register allows programs to control the
+       starting position of the display area on the screen. The display
+       area can be shifted to the left up to eight PEL positions. In
+       single-byte shift modes, to pan to the PEL position above 8, the
+       CRT controller start address is incremented and the PEL Panning
+       register is reset to 0.
+       In multiple shift modes, the byte-panning bits (in the Reset Row
+       Scan register) are used as extensions to the Horizontal PEL Panning
+       register. This allows panning across the width of the video output.
+       For example, in the 32-bit shift mode, the byte pan and pel-panning
+       bits provide panning up to 31 bits. To pan from position 31 to 32,
+       the CRT controller start address is incremented and the panning
+       bits, both PEL and byte, are reset to 0.
+       Further panning can be accomplished by changing the start-address
+       value in the CRT controller registers, Start Address High and Start
+       Address Low. The sequence is:
+
+    1. Use the Horizontal PEL Panning register to shift the maximum number
+       of bits to the left.
+    2. Increment the start address.
+    3. Set the Horizontal PEL Panning register so that no bits are
+       shifted.
+       The screen will now be shifted one PEL to the left of the position
+       it was in at the end of Step 1. Step 1 through Step 3 are repeated
+       as often as necessary.
+
+     When using a split-screen application that scrolls a second screen on
+   top of the first screen and operating in a mode with 200 scan lines,
+   the Line Compare register (CRT Controller register 0x19) must contain
+   an even value. This is a requirement of the double scanning logic in
+   the CRT controller.
+
+     If the value in the Cursor Start register (CRT Controller register
+   0x0A) is greater than that in the Cursor End register (CRT Controller
+   register 0x0B), the cursor is not displayed.
+
+     In 8-dot character modes, the underline attribute produces a solid
+   line across adjacent characters. In 9-dot character modes, the
+   underline across adjacent characters is dashed. In 9-dot modes with the
+   line-graphics characters (C0 - DF character codes), the underline is
+   solid.
+
+  A.4.1 Programming the Registers
+
+   Each of the video components has an address register and a number of
+   data registers. The data registers have addresses common to all
+   registers for that component. The individual registers are selected by
+   a pointer (index) in its Address register. To write to a data register,
+   the Address register is loaded with the index of the desired data
+   register, then the data register is loaded by writing to the common l/O
+   address.
+
+   The general registers do not share a common address; they each have
+   their own I/O address.
+
+   See [10]"Video DAC to System Interface" on page 232 for details on
+   programming the video DAC.
+
+   For compatibility with the IBM Enhanced Graphics Adapter (EGA), the
+   internal video subsystem palette is programmed the same as the EGA.
+   Using BIOS to program the palette will produce a color compatible to
+   that produced by the EGA. mode 13 hex (256 colors) is programmed so
+   that the first 16 locations in the DAC produce compatible colors.
+
+   When BIOS is used to load the color palette for a color mode and a
+   monochrome display is attached, the color palette is changed. The
+   colors are summed to produce shades of gray that allow color
+   applications to produce a readable screen.
+
+   Modifying the following bits must be done while the sequencer is held
+   in a synchronous reset through its Reset register:
+
+     * Bits 3 and 0 of the Clocking Mode register.
+     * Bits 3 and 2 of the Miscellaneous Output register.
+
+  A.4.2 RAM Loadable Character Generator
+
+   The character generator is RAM loadable and can support characters up
+   to 32 scan lines high. Three character fonts are stored in BIOS, and
+   one is automatically loaded when an alphanumeric mode is selected. The
+   Character Map Select register can be programmed to redefine the
+   function of bit 3 of the attribute byte to be a character-font switch.
+   This allows the user to select between any two character sets residing
+   in map 2, and effectively gives the user access to 512 characters
+   instead of 256. Character fonts can be loaded off-line, and up to eight
+   fonts can be loaded at any one time. The character generator is in map
+   2 and must be protected using the map mask function.
+
+  A.4.3 Creating a Split Screen
+
+   The VGA hardware supports a split screen. The top portion of the screen
+   is designated as screen A, and the bottom portion is designated as
+   screen B.
+
+   The following figure shows the screen mapping for a system containing a
+   32KB alphanumeric storage buffer, such as the VGA. Information
+   displayed on screen A is defined by the Start Address. High and Low
+   registers of the CRT controller. Information displayed on screen B
+   always begins at video address 0x0000.
+
+===========================
+0000H |
+------|--------------------
+      |Screen B
+      |Buffer Storage Area
+------|--------------------
+0FFFH |
+------|--------------------
+1000H |
+------|--------------------
+      |Screen A
+      |Buffer Storage Area
+------|--------------------
+7FFFH |
+      |
+===========================
+
+   The Line Compare register of the CRT controller performs the split
+   screen function. The CRT controller has an internal horizontal scan
+   line counter and logic that compares the counter value to the value in
+   the Line Compare register and clears the memory address generator when
+   a comparison occurs. The linear address generator then sequentially
+   addresses the display buffer starting at location 0. Each subsequent
+   row address is determined by the 16-bit addition of the start-of-line
+   latch and the Offset register.
+
+   Screen B can be smoothly scrolled onto the display by updating the Line
+   Compare register in synchronization with the 'vertical retrace' signal.
+   Screen B information is not affected by scrolling operations that use
+   the Start Address registers to scroll through the screen A information.
+
+   When pel-panning compatibility is enabled (Attribute Mode Control
+   register), a successful line comparison forces the output of the
+   Horizontal PEL Panning register to 0's until vertical synchronization
+   occurs. This feature allows the information on screen B to remain
+   unaffected by pel-panning operations on screen A.
+
+References
+
+   1. http://www.o3one.org/hwdocs/vga/vga_app.mak.html#REF25895
+   2. http://www.o3one.org/hwdocs/vga/vga_app.mak.html#REF10439
+   3. http://www.o3one.org/hwdocs/vga/vga_app.mak.html#REF41630
+   4. http://www.o3one.org/hwdocs/vga/vga_app.mak.html#REF14422
+   5. http://www.o3one.org/hwdocs/vga/vga_app.mak.html#REF25895
+   6. http://www.o3one.org/hwdocs/vga/vga_app.mak.html#REF25128
+   7. http://www.o3one.org/hwdocs/vga/vga_app.mak.html#REF35027
+   8. http://www.o3one.org/hwdocs/vga/vga_app.mak.html#REF35027
+   9. http://www.o3one.org/hwdocs/vga/vga_app.mak.html#REF12737
+  10. http://www.o3one.org/hwdocs/vga/vga_app.mak.html#REF12737

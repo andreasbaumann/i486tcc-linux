@@ -1207,6 +1207,8 @@ links
     - https://www.x.org/archive//individual/font
   - X apps and stuff
     - https://www.x.org/archive/individual/app/
+- VGA16
+  - http://www.o3one.org/hwdocs/vga/vga_app.html
 - terminal multiplexing
   - tmux: newer
   - screen: looks a little bit aged, might habe more features but also more code
