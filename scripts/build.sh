@@ -551,7 +551,7 @@ if [ "x${CONFIG_TINYXSERVER}" = "xy" ]; then
 		tar xf "${BASE}/downloads/tinyxserver-${TINYXSERVER_VERSION}.tar.gz"
 		cd "tinyxserver-${TINYXSERVER_VERSION}" || exit 1
 		patch -Np1 < "${BASE}/patches/tinyxserver-tcc.patch"	
-		patch -Np1 < "${BASE}/patches/tinyxserver-fbdev.patch"
+		patch -Np1 < "${BASE}/patches/tinyxserver-fbdev-device.patch"
 		patch -Np1 < "${BASE}/patches/tinyxserver-xvesa-vm86.patch"
 		make -j$CPUS BASE="${BASE}" core Xfbdev Xvesa xinit
 		make -j$CPUS BASE="${BASE}" DESTDIR="${BASE}/build/stage1" PREDIR=/ -j$CPUS install
@@ -1008,9 +1008,10 @@ fi
 if [ ! -f "${BASE}/floppy.img" ]; then
 	touch EOF
 	cp "${BASE}/build/stage1/boot/bzImage" .
-	# old way of setting video mode on boot into real mode (0x317)
-	#tools/rdev -v bzImage 792
-	tools/rdev -v bzImage 3
+	# 0x100 + mode 0x12 (640x480x16) = 274
+	tools/rdev -v bzImage 274
+	# ASK_VGA = -3, do a 16-bit invert
+#	tools/rdev -v bzImage 65533
 	tar cvf data.tar -b1 bzImage ramdisk.img EOF
 	cat "${BASE}/build/stage1/boot/boot.img" data.tar > "${BASE}/floppy.img"
 	split -d -b 1474560 floppy.img floppy
