@@ -66,8 +66,7 @@ patches
   * 'sys/sysmacros.h' is missing for 'minor' and 'major'
   * nbd-client gets killed before calling killall5, we cannot mark it
     to be started by 'init' presumably (as systemd does), we can also not
-    umount it otherwise we don't have killall5. There is the option of
-    having a shutdown ramdisk (as others do)..
+    umount it otherwise we don't have killall5. 
     ubase-killall5-omit-pid.patch
 - smdev
   * 'sys/sysmacros.h' is missing for 'minor' and 'major'
@@ -561,21 +560,20 @@ EOF
   - tons of tools which are not really binary seed 
     (they are just used to produce binaries)
 - can we use ccache and distcc with tcc?
-- maybe we need a shutdown ramdisk (generated on the fly or using
-  pivot_root and not switch_root and reuse the init ramdisk - but
-  loosing the memory while running and pivot_root is a deprecated
-  syscall. And we have a new ramarchive initrd and not a traditional
-  ramdisk. The shutdown ramdisk is not so much a ramdisk but a tmpfs
-  you are not unmounting with the rest of the file systems. And you
-  populate it with killall5 and unmount, etc.
+- There is the option of having a shutdown ramdisk (as others do)..
+  generated on the fly or using pivot_root and not switch_root and
+  reuse the init ramdisk - but loosing the memory while running and
+  pivot_root is a deprecated syscall. And we have a new ramarchive
+  initrd and not a traditional ramdisk. The shutdown ramdisk is not so
+  much a ramdisk but a tmpfs you are not unmounting with the rest of the
+  file systems. And you populate it with killall5 and unmount, etc.
+  => for now too complicated
 - qemu: Slirp: Failed to send packet, ret: -1
   => seems to be a qemu network thingy..
 - vis sometimes looses first line of text or shows strange artefacts
   when exiting it
 - If building on x86_64, you need lib32 glibc and gcc-libs for tcc
   to link a standalone version between stage0 and stage1
-- does the ramdisk get correctly unmounted? I see a /mnt busy message
-  when doing the switch_root
 - man pages are not compressed on the root partition, mandoc can deal
   with compressed pages (as it requires zlib)
 - low memory support
