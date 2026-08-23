@@ -1,0 +1,22 @@
+#!/usr/bin/expect -f
+# ssh_cmd.exp <remote-command> <timeout-seconds>
+#
+# Runs <remote-command> on the qemu guest started by scripts/run_qemu.sh
+# (or scripts/test_shutdown.sh) via SSH on localhost:2222, using the fixed
+# dev/test root password ('xx') baked in by scripts/create_root.sh.
+set cmd [lindex $argv 0]
+set tmo [lindex $argv 1]
+set timeout $tmo
+
+spawn ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o PreferredAuthentications=password -o PubkeyAuthentication=no -p 2222 root@127.0.0.1 $cmd
+
+expect {
+	"password:" { send "xx\r" }
+	timeout { puts "SSH_TIMEOUT_PRE_PASSWORD"; exit 2 }
+	eof { puts "SSH_EOF_PRE_PASSWORD"; exit 3 }
+}
+
+expect {
+	eof { }
+	timeout { puts "SSH_TIMEOUT_POST_PASSWORD"; exit 4 }
+}

@@ -1,0 +1,42 @@
+#!/usr/bin/expect -f
+# monitor_type.exp <monitor-socket-path> <text-to-type>
+#
+# Types <text-to-type> into whatever has keyboard focus on the guest by
+# sending QEMU monitor `sendkey` commands one keystroke at a time, then
+# presses Return. Uses a single persistent socat connection to the monitor
+# and paces each keystroke by waiting for the "(qemu)" prompt to echo back
+# before sending the next one. A one-shot `socat` call per keystroke (a new
+# connection each time) was tried first and is unreliable -- individual
+# letters get dropped under host load even though the connection succeeds,
+# while this persistent/paced approach reproduces reliably.
+set sock [lindex $argv 0]
+set text [lindex $argv 1]
+set timeout 10
+
+spawn socat - UNIX-CONNECT:$sock
+expect {
+	"(qemu)" {}
+	timeout { puts "MONITOR_TIMEOUT_CONNECT"; exit 2 }
+}
+
+foreach c [split $text ""] {
+	if {$c eq " "} {
+		set key "spc"
+	} else {
+		set key $c
+	}
+	send "sendkey $key\n"
+	expect {
+		"(qemu)" {}
+		timeout { puts "MONITOR_TIMEOUT_KEY_$key"; exit 3 }
+	}
+}
+
+send "sendkey ret\n"
+expect {
+	"(qemu)" {}
+	timeout { puts "MONITOR_TIMEOUT_RET"; exit 4 }
+}
+
+close
+puts "MONITOR_TYPE_DONE"
