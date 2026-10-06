@@ -8,7 +8,7 @@ regex = '<strong>(\d+\.\d+\.\d+)</strong>'
             
 [TINYCC]
 source = "git"
-git = "https://repo.or.cz/tinycc.git"
+git = "https://github.com/TinyCC/tinycc.git"
 use_commit = true
 from_pattern = "(.{5,5}).*"
 to_pattern = '\1'

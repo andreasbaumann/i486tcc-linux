@@ -26,7 +26,7 @@ echo "Downloading software to '$BASE'/downloads"
 cd "${BASE}/downloads/" || exit 1
 
 if [ ! -f "${BASE}/downloads/tinycc-${TINYCC_VERSION}.tar.gz" ]; then
-	git clone https://repo.or.cz/tinycc.git "tinycc-${TINYCC_VERSION}"
+	git clone https://github.com/TinyCC/tinycc.git "tinycc-${TINYCC_VERSION}"
 	git -C "tinycc-${TINYCC_VERSION}" checkout "${TINYCC_VERSION}"
 	tar zcf "${BASE}/downloads/tinycc-${TINYCC_VERSION}.tar.gz" "tinycc-${TINYCC_VERSION}"
 	rm -rf "tinycc-${TINYCC_VERSION}"
