@@ -1,0 +1,44 @@
+#!/bin/sh
+#
+# Local-only shim for nvchecker (checkversions.sh), not a system git
+# replacement. git.suckless.org and git.2f30.org answer every TLS 1.3
+# ClientHello with a "decode error" alert (broken TLS 1.3 on their end,
+# confirmed with openssl s_client/curl; TLS 1.2 works fine). git's own
+# http.sslVersion/GIT_SSL_VERSION only sets a floor, not a ceiling, so it
+# can't force TLS 1.2-only - only curl's combined --tlsv1.2 --tls-max 1.2
+# does. This wrapper intercepts just "git ls-remote" against those two
+# hosts and resolves it via their dumb-http protocol over TLS-1.2-capped
+# curl; everything else is passed through to the real git untouched.
+#
+# checkversions.sh symlinks this script as "git" in a throwaway tempdir
+# and prepends that to PATH, since nvchecker always invokes the literal
+# command name "git".
+
+REAL_GIT="/usr/bin/git"
+
+if [ "$1" = "ls-remote" ] && [ $# -ge 2 ]; then
+	URL="$2"
+	REF="$3"
+	case "$URL" in
+	https://git.suckless.org/*|https://git.2f30.org/*)
+		if [ -z "$REF" ] || [ "$REF" = "HEAD" ]; then
+			RESOLVED=`curl -sf --tlsv1.2 --tls-max 1.2 "${URL}/HEAD" | sed -n 's/^ref: //p'`
+			OUTREF="HEAD"
+		else
+			RESOLVED="$REF"
+			OUTREF="$REF"
+		fi
+		if [ -n "$RESOLVED" ]; then
+			SHA=`curl -sf --tlsv1.2 --tls-max 1.2 "${URL}/info/refs" | awk -v r="$RESOLVED" '$2 == r { print $1 }'`
+			if [ -n "$SHA" ]; then
+				printf '%s\t%s\n' "$SHA" "$OUTREF"
+				exit 0
+			fi
+		fi
+		echo "git-tls12-wrapper: failed to resolve ${REF:-HEAD} for ${URL}" >&2
+		exit 1
+		;;
+	esac
+fi
+
+exec "$REAL_GIT" "$@"

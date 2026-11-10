@@ -1,7 +1,12 @@
 #!/bin/oksh
 
+GITWRAP_DIR=""
+
 abort( )
 {
+	if [ -n "${GITWRAP_DIR}" ]; then
+		rm -rf "${GITWRAP_DIR}"
+	fi
 	echo >&2 '
 ***************
 *** ABORTED ***
@@ -18,6 +23,16 @@ trap 'abort' 0
 SCRIPT=`readlink -f "$0"`
 BASE=`dirname ${SCRIPT}`/..
 
+# git.suckless.org and git.2f30.org currently fail every TLS 1.3 handshake;
+# this shim resolves nvchecker's git-ls-remote checks against those two
+# hosts over TLS 1.2 instead, passing all other git calls straight through
+# (see scripts/nvchecker-git-wrapper). nvchecker always invokes the literal
+# command name "git", so expose the shim under that name via a throwaway
+# tempdir prepended to PATH.
+GITWRAP_DIR=`mktemp -d`
+ln -s "${BASE}/scripts/nvchecker-git-wrapper" "${GITWRAP_DIR}/git"
+PATH="${GITWRAP_DIR}:${PATH}"
+
 for line in `cat "${BASE}/configs/versions"`; do
 	PACKAGE=`echo $line | cut -f 1 -d = | sed -s 's/_VERSION$//'`
 	HAS_VERSION=`echo $line | cut -f 2 -d = | tr -d '"'`
@@ -32,6 +47,8 @@ for line in `cat "${BASE}/configs/versions"`; do
 	fi
 	echo "${STATE} ${PACKAGE} ${HAS_VERSION} ${CHECK_VERSION}"
 done
+
+rm -rf "${GITWRAP_DIR}"
 
 trap - 0
 
