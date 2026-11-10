@@ -1,44 +1,94 @@
 #!/bin/sh
 #
-# Local-only shim for nvchecker (checkversions.sh), not a system git
+# Local-only shim for checkversions.sh/download.sh, not a system git
 # replacement. git.suckless.org and git.2f30.org answer every TLS 1.3
 # ClientHello with a "decode error" alert (broken TLS 1.3 on their end,
 # confirmed with openssl s_client/curl; TLS 1.2 works fine). git's own
 # http.sslVersion/GIT_SSL_VERSION only sets a floor, not a ceiling, so it
-# can't force TLS 1.2-only - only curl's combined --tlsv1.2 --tls-max 1.2
-# does. This wrapper intercepts just "git ls-remote" against those two
-# hosts and resolves it via their dumb-http protocol over TLS-1.2-capped
-# curl; everything else is passed through to the real git untouched.
+# can't force TLS 1.2-only - only curl's --tlsv1.2 --tls-max 1.2 (or an
+# equivalent capped TLS connection) does.
 #
-# checkversions.sh symlinks this script as "git" in a throwaway tempdir
-# and prepends that to PATH, since nvchecker always invokes the literal
-# command name "git".
+# "git ls-remote" against those two hosts is resolved directly via their
+# dumb-http protocol over TLS-1.2-capped curl. "git clone" needs the
+# full smart-HTTP protocol, which isn't worth reimplementing here, so
+# instead a throwaway local socat relay does a certificate-verified,
+# TLS-1.2-capped connection to the real host, and the real git is pointed
+# at "http://127.0.0.1:<port>/..." (no TLS of its own) with the real
+# Host header added back via -c http.extraHeader, so the origin server
+# still vhost-routes correctly. Everything else passes through to the
+# real git untouched.
+#
+# checkversions.sh/download.sh symlink this script as "git" in a
+# throwaway tempdir and prepend that to PATH, since nvchecker/the
+# scripts always invoke the literal command name "git".
 
 REAL_GIT="/usr/bin/git"
 
-if [ "$1" = "ls-remote" ] && [ $# -ge 2 ]; then
-	URL="$2"
-	REF="$3"
-	case "$URL" in
-	https://git.suckless.org/*|https://git.2f30.org/*)
-		if [ -z "$REF" ] || [ "$REF" = "HEAD" ]; then
-			RESOLVED=`curl -sf --tlsv1.2 --tls-max 1.2 "${URL}/HEAD" | sed -n 's/^ref: //p'`
-			OUTREF="HEAD"
-		else
-			RESOLVED="$REF"
-			OUTREF="$REF"
-		fi
-		if [ -n "$RESOLVED" ]; then
-			SHA=`curl -sf --tlsv1.2 --tls-max 1.2 "${URL}/info/refs" | awk -v r="$RESOLVED" '$2 == r { print $1 }'`
-			if [ -n "$SHA" ]; then
-				printf '%s\t%s\n' "$SHA" "$OUTREF"
-				exit 0
+case "$1" in
+ls-remote)
+	if [ $# -ge 2 ]; then
+		URL="$2"
+		REF="$3"
+		case "$URL" in
+		https://git.suckless.org/*|https://git.2f30.org/*)
+			if [ -z "$REF" ] || [ "$REF" = "HEAD" ]; then
+				RESOLVED=`curl -sf --tlsv1.2 --tls-max 1.2 "${URL}/HEAD" | sed -n 's/^ref: //p'`
+				OUTREF="HEAD"
+			else
+				RESOLVED="$REF"
+				OUTREF="$REF"
 			fi
-		fi
-		echo "git-tls12-wrapper: failed to resolve ${REF:-HEAD} for ${URL}" >&2
-		exit 1
-		;;
-	esac
-fi
+			if [ -n "$RESOLVED" ]; then
+				SHA=`curl -sf --tlsv1.2 --tls-max 1.2 "${URL}/info/refs" | awk -v r="$RESOLVED" '$2 == r { print $1 }'`
+				if [ -n "$SHA" ]; then
+					printf '%s\t%s\n' "$SHA" "$OUTREF"
+					exit 0
+				fi
+			fi
+			echo "git-tls12-wrapper: failed to resolve ${REF:-HEAD} for ${URL}" >&2
+			exit 1
+			;;
+		esac
+	fi
+	;;
+clone)
+	if [ $# -ge 3 ]; then
+		URL="$2"
+		DEST="$3"
+		case "$URL" in
+		https://git.suckless.org/*|https://git.2f30.org/*)
+			HOST=`expr "$URL" : 'https://\([^/]*\)/.*'`
+			URLPATH=`expr "$URL" : 'https://[^/]*\(/.*\)'`
+			LOG=`mktemp`
+			socat -d -d TCP-LISTEN:0,bind=127.0.0.1,reuseaddr,fork \
+				OPENSSL-CONNECT:"${HOST}":443,min-proto-version=TLS1.2,max-proto-version=TLS1.2 \
+				2>"$LOG" &
+			RELAY_PID=$!
+			PORT=""
+			i=0
+			while [ $i -lt 20 ]; do
+				PORT=`sed -n 's/.*listening on AF=[0-9]* 127\.0\.0\.1:\([0-9]*\)/\1/p' "$LOG"`
+				[ -n "$PORT" ] && break
+				sleep 1
+				i=$((i+1))
+			done
+			if [ -z "$PORT" ]; then
+				echo "git-tls12-wrapper: relay failed to start for ${HOST}" >&2
+				kill "$RELAY_PID" 2>/dev/null
+				rm -f "$LOG"
+				exit 1
+			fi
+			"$REAL_GIT" -c "http.extraHeader=Host: ${HOST}" clone \
+				"http://127.0.0.1:${PORT}${URLPATH}" "$DEST"
+			STATUS=$?
+			kill "$RELAY_PID" 2>/dev/null
+			wait "$RELAY_PID" 2>/dev/null
+			rm -f "$LOG"
+			exit $STATUS
+			;;
+		esac
+	fi
+	;;
+esac
 
 exec "$REAL_GIT" "$@"
