@@ -808,6 +808,8 @@ to abase).
 Some todos to sort out
 ----------------------
 
+- mandoc
+  - call makewhatis to make apropos have some index files
 - zlib
   - use libz or zlib-ng
 - st/rxvt
