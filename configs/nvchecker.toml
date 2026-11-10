@@ -116,9 +116,10 @@ github = "tmux/tmux"
 use_latest_release = true
 
 [ZLIB]
-source = "regex"
-url = "https://www.zlib.net/"
-regex = 'version (\d+\.\d+\.\d+)'
+source = "github"
+github = "madler/zlib"
+use_latest_release = true
+prefix = "v"
 
 [MANDOC]
 source = "regex"
