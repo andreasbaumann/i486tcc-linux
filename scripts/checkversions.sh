@@ -37,7 +37,10 @@ for line in `cat "${BASE}/configs/versions"`; do
 	PACKAGE=`echo $line | cut -f 1 -d = | sed -s 's/_VERSION$//'`
 	HAS_VERSION=`echo $line | cut -f 2 -d = | tr -d '"'`
 	NVOUT=`nvchecker -c "${BASE}/configs/nvchecker.toml" -e "${PACKAGE}" --logger json`
-	CHECK_VERSION=`echo "${NVOUT}" | jq -r 'select(.event=="updated") | .version' 2>/dev/null`
+	# print with printf, not echo: oksh's echo expands backslash escapes,
+	# which mangles the \\. sequences in the JSON log line of a "cmd" source
+	# (e.g. MANDOC's curl|grep) into invalid JSON escapes and makes jq bail out
+	CHECK_VERSION=`printf "%s\n" "${NVOUT}" | jq -r 'select(.event=="updated") | .version' 2>/dev/null`
 	JQ_STATUS=$?
 	STATE="UPD"
 	if test ${JQ_STATUS} -ne 0 -o "x${CHECK_VERSION}" = "x"; then
