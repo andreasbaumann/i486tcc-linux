@@ -397,6 +397,11 @@ cd ../linux
 bugs
 ----
 
+- might be missing some X fonts
+  - sqlite3 table output broken
+  - hexdump manpage: weird character after NAME hexdump
+- meh: This program does not yet support display depths <24.
+- sh: /usr/libexec/sftp-server: not found
 - endbr32, illegal instruction in 86Box in kernel?
 - fbset -xres 320 -yres 200 -depth 8
   ioctl FBIOPUT_VSCREENINFO: Out of memory
