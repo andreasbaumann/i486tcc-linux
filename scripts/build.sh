@@ -965,7 +965,9 @@ if [ ! -f "${BASE}/build/stage1/boot/boot.img" ]; then
 	tar xf "${BASE}/downloads/uflbbl-${UFLBBL_VERSION}.tar.gz"
 	cd "uflbbl-${UFLBBL_VERSION}" || exit 1
 	patch -Np1 < "${BASE}/patches/uflbbl-boot-options.patch"
-	patch -Np1 < "${BASE}/patches/uflbbl-debug.patch"
+	# slow, use only if boot loader has a problem TODO: should be a boot loader flag
+	#patch -Np1 < "${BASE}/patches/uflbbl-debug.patch"
+	fi
 	cd src
 	nasm -o boot.img boot.asm
 	cp boot.img "${BASE}/build/stage1/boot/boot.img"
