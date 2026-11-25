@@ -92,6 +92,10 @@ patches
   * disabled IPv6
   * fixed some missing IPv6 conditionals
   * added conditional for FamilyServerInterpreted ("si:")
+- xdpyinfo
+  * removed the xcb dependency (tinyxlib has no xcb), -queryExtensions
+    uses XQueryExtension again
+  * disabled xf86vidmode (tinyxlib has the headers, but no libXxf86vm)
 - image viewer
   - meh
     * disabled external libraries for gif, png, jpeg, imagemagick

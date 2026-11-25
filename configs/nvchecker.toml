@@ -214,6 +214,11 @@ source = "regex"
 url = "https://www.x.org/archive/individual/app/"
 regex = 'xauth-(\d+\.\d+.\d+).tar.gz'
 
+[XDPYINFO]
+source = "regex"
+url = "https://www.x.org/archive/individual/app/"
+regex = 'xdpyinfo-(\d+\.\d+.\d+).tar.gz'
+
 [MEH]
 source = "git"
 git = "https://github.com/andreasbaumann/meh.git"

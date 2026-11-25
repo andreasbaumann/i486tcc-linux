@@ -193,6 +193,11 @@ if [ ! -f "${BASE}/downloads/xauth-${XAUTH_VERSION}.tar.gz" ]; then
 		"https://www.x.org/archive/individual/app/xauth-${XAUTH_VERSION}.tar.gz"
 fi
 
+if [ ! -f "${BASE}/downloads/xdpyinfo-${XDPYINFO_VERSION}.tar.gz" ]; then
+	wget -O "${BASE}/downloads/xdpyinfo-${XDPYINFO_VERSION}.tar.gz" \
+		"https://www.x.org/archive/individual/app/xdpyinfo-${XDPYINFO_VERSION}.tar.gz"
+fi
+
 if [ ! -f "${BASE}/downloads/meh-${MEH_VERSION}.tar.gz" ]; then
 	git clone https://github.com/andreasbaumann/meh.git "meh-${MEH_VERSION}"
 	git -C "meh-${MEH_VERSION}" checkout "${MEH_VERSION}"

@@ -357,6 +357,16 @@ config XAUTH
     
     https://gitlab.freedesktop.org/xorg/app/xauth
     
+config XDPYINFO
+  bool "xdpyinfo"
+  default y
+  depends on TINYXLIB
+  help
+    Display information utility for X, shows the capabilities of
+    the X server and its screens and extensions.
+    
+    https://gitlab.freedesktop.org/xorg/app/xdpyinfo
+    
 config SLOCK
   bool "slock"
   default y

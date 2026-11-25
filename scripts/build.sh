@@ -644,6 +644,30 @@ if [ "x${CONFIG_XAUTH}" = "xy" ]; then
 	fi
 fi
 
+if [ "x${CONFIG_XDPYINFO}" = "xy" ]; then
+	if [ ! -f "${BASE}/build/stage1/bin/xdpyinfo" ]; then
+		rm -rf "xdpyinfo-${XDPYINFO_VERSION}"
+		tar xf "${BASE}/downloads/xdpyinfo-${XDPYINFO_VERSION}.tar.gz"
+		cd "xdpyinfo-${XDPYINFO_VERSION}" || exit 1
+		patch -Np1 < "${BASE}/patches/xdpyinfo-no-xcb.patch"
+		CC="${BASE}/build/stage1/bin/i386-tcc" \
+		./configure --prefix="${BASE}/build/stage1" \
+			--x-includes="${BASE}/build/stage1/include" \
+			--x-libraries="${BASE}/build/stage1/lib" \
+			--host="i386-linux-musl"
+		# tinyxlib has the xf86vmode headers, but no libXxf86vm
+		sed -i 's|.*HAVE_X11_EXTENSIONS_XF86VMODE_H.*|/* #undef HAVE_X11_EXTENSIONS_XF86VMODE_H */|' config.h
+		# the X extension libraries detected by the host pkg-config are not
+		# the ones we have in tinyxlib, so link against ours only
+		make -j$CPUS LDFLAGS="-static" \
+			xdpyinfo_LDADD="-lXtst -lXi -lXinerama -lXrender -lXext -lX11"
+		make -j$CPUS install
+		cd .. || exit 1
+	else
+		echo "stage1 xdpyinfo exists"
+	fi
+fi
+
 if [ "x${CONFIG_XHOST}" = "xy" ]; then
 	if [ ! -f "${BASE}/build/stage1/bin/xhost" ]; then
 		rm -rf "xhost-${XHOST_VERSION}"
@@ -967,7 +991,6 @@ if [ ! -f "${BASE}/build/stage1/boot/boot.img" ]; then
 	patch -Np1 < "${BASE}/patches/uflbbl-boot-options.patch"
 	# slow, use only if boot loader has a problem TODO: should be a boot loader flag
 	#patch -Np1 < "${BASE}/patches/uflbbl-debug.patch"
-	fi
 	cd src
 	nasm -o boot.img boot.asm
 	cp boot.img "${BASE}/build/stage1/boot/boot.img"
