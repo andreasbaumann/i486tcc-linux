@@ -401,6 +401,19 @@ cd ../linux
 bugs
 ----
 
+- joe/jstar
+  - starts up slowly, but usable once started, could just be the nbd and size
+    of the binary
+- vi
+  - really slow, barely usable
+  - errors in taskbar
+- kilo
+  - clear screen on exit
+- abase
+  - pkill
+  - ntpdate or simething simple
+  - packagers
+  - simple top
 - might be missing some X fonts
   - sqlite3 table output broken
   - hexdump manpage: weird character after NAME hexdump
