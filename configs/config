@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # i486tcclinux version: KCONFIG_VERSION
-# Sun Jan  4 20:27:37 2026
+# Thu Nov 26 19:22:33 2026
 #
 
 #
@@ -59,6 +59,7 @@ CONFIG_KILO=y
 CONFIG_MANDOC=y
 CONFIG_SQLITE=y
 CONFIG_SC=y
+CONFIG_WORDGRINDER=y
 CONFIG_MUTT=y
 CONFIG_TMUX=y
 CONFIG_FBSET=y

@@ -107,7 +107,25 @@ patches
 - lua
   * removed dependency on readline
 - wordgrinder
-  * TODO: work in progress
+  * dpy.c guards all curses calls with a 'started' flag: wordgrinder calls
+    into the display before dpy_start()/initscr() (lua ResizeScreen, and
+    wg.write in --lua script mode). ncurses' getmaxyx/wmove are macros
+    returning ERR for a NULL window, netbsd-curses implements them as real
+    functions dereferencing the window, so every binary segfaulted in
+    getmaxy() immediately. Not an lpeg or static linking problem.
+  * LUA_INTERPRETER is the stage1 lua (the build runs lua on the host to
+    generate build.ninja and the embedded script table)
+  * lpeg is LPEG_PACKAGE=builtin, i.e. compiled into the binary and
+    registered from main.c, and all lua scripts are embedded via
+    multibin2c, so no notion-style module preloading is needed: there is
+    no dlopen/require of a shared module anywhere
+  * XFT_PACKAGE=none, so only the curses frontend is built, no
+    xwordgrinder (the xwordgrinder man page still gets installed)
+  * PREFIX/DESTDIR have to be passed to the make invocation that
+    *generates* .obj/build.ninja, they are baked into the ninja file.
+    Passing them only to 'make install' installs into ${HOME}.
+  * 66/66 of the upstream self-tests pass during the build
+  * see the bug list for the remaining memory corruption on the target
 - rxvt
   * use the 'fixed' font per default and only that one
   * config.h patching for PTYS_ARE_PTMX
@@ -700,8 +718,39 @@ notion: Caught signal 2. Dying.
 Segmentation fault 
 => xrandr is a dummy module (but the shared library should be loaded by lua?)
 => xmessage: do we really want to install that Xorg app?
-- wordgrinder: segfaults in luapeg on first script, probably a static linking
-  issue or a tcc issue?
+- wordgrinder: memory corruption on the target only (tests/test_wordgrinder.sh).
+  Roughly one run in five dies, independently of what it is asked to do:
+  ~4/30 for 'wordgrinder --convert file.txt file.wg', ~1/30 even for
+  'wordgrinder --lua' running 'print("ok")'. It surfaces in three ways,
+  all of them symptoms of a corrupted heap:
+    - SIGSEGV in musl's mallocng get_meta() from free() (fault address 8,
+      0x80000008, ... = meta->mem with meta == garbage)
+    - SIGSEGV in lua's GC (sweeplist, luaS_resize, luaH_getstr)
+    - a syntax error while *compiling* one of the embedded lua scripts
+      ("[string "src/lua/lunamark/entities.lua"]:828: '=' expected"), i.e.
+      lua's lexer buffer gets trashed. The embedded scripts themselves are
+      fine: they live in a read-only section and all 50 script_table sizes
+      are byte-exact against the .lua files.
+  Ruled out so far:
+    - not RAM pressure: same rate with -m 24M and -m 64M
+    - not the CPU model: same rate with -cpu 486 and -cpu pentium2
+    - not tcc's optimiser: -Os 4/30, -O0 (debug build) 1/30
+    - not lua or musl: the same GC- and compile-heavy script run via the
+      stage1 lua interpreter is clean (0 segfaults), via wordgrinder it is
+      not. Both link the same liblua.a and musl
+    - not the zip/deflate code: the .wg writer is pure lua (SaveToStream),
+      no wg.compress/writezip involved, and text/HTML/ODT conversions
+      (which do use minizip) are fine
+    - not lpeg registration as such: a variant built without
+      luaopen_lpeg() still corrupts (the lua modules then fail outright,
+      since lunamark needs lpeg at load time)
+    - does not reproduce on the build host at all: 300/300 identical runs
+      of the same static binary are clean, and valgrind reports no invalid
+      read/write/free (only musl allocator noise)
+  Next steps would be a canary/guard-page malloc shim linked into
+  wordgrinder to catch the corrupting write at the point it happens, since
+  neither the target (no gdb, no CONFIG_COREDUMP) nor the host (does not
+  reproduce) can be debugged directly.
 - rxvt: 2.7.10 doesn't link statically and has a rxvt-2.7.10 additionally to
   rxvt.
   TODO: we use rxvt-2.6.4, why exactly?
@@ -864,7 +913,8 @@ Some todos to sort out
     - fix VGA framebuffer vga16fb
     - add GD5424 and ISA support to cirrusfb
 - wordgrinder
-  - static lua bindings as for notion, so we can use it on i486linux
+  - find the memory corruption described in the bug list (lpeg is already
+    statically linked and preregistered, unlike notion's modules)
 - real Unisys machine
 - fix NE2000/NE1000 bug on real chip
 - kconfig

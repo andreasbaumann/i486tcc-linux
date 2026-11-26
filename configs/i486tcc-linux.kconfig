@@ -243,13 +243,14 @@ config SC
     
     https://github.com/n-t-roff/sc
 
-#config WORDGRINDER
-#  bool "wordgrinder"
-#  default n
-#  help
-#     Terminal-based text editing suite.
-#
-#     https://cowlark.com/wordgrinder/
+config WORDGRINDER
+  bool "wordgrinder"
+  default y
+  depends on NETBSD_NCURSES && LUA && ZLIB
+  help
+     Terminal-based text editing suite.
+
+     https://cowlark.com/wordgrinder/
 
 config MUTT
   bool "mutt"

@@ -888,26 +888,30 @@ if [ "x${CONFIG_PYTHON}" = "xy" ]; then
 	fi
 fi
 
-#~ if [ "x${CONFIG_WORDGRINDER}" = "xy" ]; then
-#~ if [ ! -f "${BASE}/build/stage1/bin/wg" ]; then
-	#~ rm -rf "wordgrinder-${WORDGRINDER_VERSION}"
-	#~ tar xf "${BASE}/downloads/wordgrinder-${WORDGRINDER_VERSION}.tar.gz"
-	#~ cd "wordgrinder-${WORDGRINDER_VERSION}" || exit 1
-	#~ patch -Np1 < "${BASE}/patches/wordgrinder-tcc.patch"
-	#~ sed -i "s|@@BASE@@|${BASE}|g" Makefile src/c/emu/lpeg/makefile
-	#~ make -j$CPUS \
-		#~ LUA_PACKAGE="--cflags={-I${BASE}/build/stage1/include} --libs={${BASE}/build/stage1/lib/liblua.a}" \
-		#~ CURSES_PACKAGE="--cflags={-I${BASE}/build/stage1/include} --libs={${BASE}/build/stage1/lib/libncurses.a ${BASE}/build/stage1/lib/libtermcap.a}" \
-		#~ XFT_PACKAGE="none" \
-		#~ NINJA="${BASE}/build/stage1/bin/samu" \
-		#~ CC="${BASE}/build/stage1/bin/i386-tcc" \
-		#~ LDFLAGS="-static"
-	#~ make -j$CPUS install PREFIX= DESTDIR="${BASE}/build/stage1"
-	#~ cd .. || exit 1
-#~ else
-	#~ echo "stage1 lua exists"
-#~ fi
-#~ fi
+if [ "x${CONFIG_WORDGRINDER}" = "xy" ]; then
+	if [ ! -f "${BASE}/build/stage1/bin/wordgrinder" ]; then
+		rm -rf "wordgrinder-${WORDGRINDER_VERSION}"
+		tar xf "${BASE}/downloads/wordgrinder-${WORDGRINDER_VERSION}.tar.gz"
+		cd "wordgrinder-${WORDGRINDER_VERSION}" || exit 1
+		patch -Np1 < "${BASE}/patches/wordgrinder-tcc.patch"
+		sed -i "s|@@BASE@@|${BASE}|g" Makefile src/c/emu/lpeg/makefile
+		# PREFIX/DESTDIR have to be passed to the make generating build.ninja
+		# already, they are baked into the generated ninja file (otherwise
+		# 'make install' installs into ${HOME}).
+		# Only the curses frontend is built, XFT_PACKAGE=none disables the
+		# X11 one.
+		make -j$CPUS install PREFIX= DESTDIR="${BASE}/build/stage1" \
+			LUA_PACKAGE="--cflags={-I${BASE}/build/stage1/include} --libs={${BASE}/build/stage1/lib/liblua.a}" \
+			CURSES_PACKAGE="--cflags={-I${BASE}/build/stage1/include} --libs={${BASE}/build/stage1/lib/libncurses.a ${BASE}/build/stage1/lib/libtermcap.a}" \
+			XFT_PACKAGE="none" \
+			NINJA="${BASE}/build/stage1/bin/samu" \
+			CC="${BASE}/build/stage1/bin/i386-tcc" \
+			LDFLAGS="-static"
+		cd .. || exit 1
+	else
+		echo "stage1 wordgrinder exists"
+	fi
+fi
 
 # TODO FROM HERE
 
